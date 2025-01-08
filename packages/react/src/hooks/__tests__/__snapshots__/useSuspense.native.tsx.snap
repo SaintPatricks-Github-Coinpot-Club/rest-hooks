@@ -1,0 +1,118 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`useSuspense() errors should throw error when response is {} when expecting entity 1`] = `
+[Error: Error processing GET http://test.com/article-cooler/400
+
+Full Schema: {
+  "key": "CoolerArticle",
+  "schema": {
+    "author": {
+      "key": "User",
+      "schema": {}
+    }
+  }
+}
+
+Error:
+Attempted to initialize CoolerArticle with an array, but named members were expected
+
+This is likely due to a malformed response.
+Try inspecting the network response or fetch() return value.
+Or use debugging tools: https://dataclient.io/docs/getting-started/debugging
+Learn more about schemas: https://dataclient.io/docs/api/schema
+If this is a mistake, you can disable this check by setting static automaticValidation = 'silent'
+
+First three members: []]
+`;
+
+exports[`useSuspense() errors should throw error when response is array when expecting entity 1`] = `
+[Error: Error processing GET http://test.com/article-cooler/400
+
+Full Schema: {
+  "key": "CoolerArticle",
+  "schema": {
+    "author": {
+      "key": "User",
+      "schema": {}
+    }
+  }
+}
+
+Error:
+Attempted to initialize CoolerArticle with an array, but named members were expected
+
+This is likely due to a malformed response.
+Try inspecting the network response or fetch() return value.
+Or use debugging tools: https://dataclient.io/docs/getting-started/debugging
+Learn more about schemas: https://dataclient.io/docs/api/schema
+If this is a mistake, you can disable this check by setting static automaticValidation = 'silent'
+
+First three members: []]
+`;
+
+exports[`useSuspense() errors should throw error when response is number when expecting entity 1`] = `
+[Error: Error processing GET http://test.com/article-cooler/400
+
+Full Schema: {
+  "key": "CoolerArticle",
+  "schema": {
+    "author": {
+      "key": "User",
+      "schema": {}
+    }
+  }
+}
+
+Error:
+Attempted to initialize CoolerArticle with an array, but named members were expected
+
+This is likely due to a malformed response.
+Try inspecting the network response or fetch() return value.
+Or use debugging tools: https://dataclient.io/docs/getting-started/debugging
+Learn more about schemas: https://dataclient.io/docs/api/schema
+If this is a mistake, you can disable this check by setting static automaticValidation = 'silent'
+
+First three members: []]
+`;
+
+exports[`useSuspense() errors should throw error when response is string when expecting entity 1`] = `
+[Error: Error processing GET http://test.com/article-cooler/400
+
+Full Schema: {
+  "key": "CoolerArticle",
+  "schema": {
+    "author": {
+      "key": "User",
+      "schema": {}
+    }
+  }
+}
+
+Error:
+Attempted to initialize CoolerArticle with an array, but named members were expected
+
+This is likely due to a malformed response.
+Try inspecting the network response or fetch() return value.
+Or use debugging tools: https://dataclient.io/docs/getting-started/debugging
+Learn more about schemas: https://dataclient.io/docs/api/schema
+If this is a mistake, you can disable this check by setting static automaticValidation = 'silent'
+
+First three members: []]
+`;
+
+exports[`useSuspense() should dispatch an action that fetches 1`] = `
+{
+  "args": [
+    {
+      "id": 5,
+    },
+  ],
+  "endpoint": [Function],
+  "key": "GET http://test.com/article-cooler/5",
+  "meta": {
+    "reject": [Function],
+    "resolve": [Function],
+  },
+  "type": "rdc/fetch",
+}
+`;

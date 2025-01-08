@@ -1,10 +1,11 @@
-import React from 'react';
-import { useCache, useSuspense } from 'rest-hooks';
-import { Card, List, Layout, Space, Timeline, Typography, Divider } from 'antd';
 import { Link } from '@anansi/router';
-import { UserResource, User } from 'resources/User';
-import RepositoryResource, { Repository } from 'resources/Repository';
 import { ForkOutlined, StarOutlined } from '@ant-design/icons';
+import { useCache, useSuspense } from '@data-client/react';
+import { List, Space, Typography } from 'antd';
+import React, { type JSX } from 'react';
+
+import RepositoryResource, { Repository } from '@/resources/Repository';
+import { UserResource, User } from '@/resources/User';
 
 const { Title } = Typography;
 

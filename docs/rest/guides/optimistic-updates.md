@@ -1,200 +1,198 @@
 ---
-title: Optimistic Updates
+title: 100x faster React with Optimistic Updates
+sidebar_label: Optimistic Updates
 ---
 
 <head>
-  <title>Optimistic Updates - High performance mutations</title>
+  <meta name="docsearch:pagerank" content="40"/>
 </head>
 
 import HooksPlayground from '@site/src/components/HooksPlayground';
+import {RestEndpoint} from '@data-client/rest';
+import { todoFixtures } from '@site/src/fixtures/todos';
+import OptimisticTransform from '../shared/\_optimisticTransform.mdx';
+
+# Optimistic Updates
 
 Optimistic updates enable highly responsive and fast interfaces by avoiding network wait times.
-An update is optimistic by assuming the network is successful. In the case of any errors, Rest
-Hooks will then roll back any changes in a way that deals with all possible race conditions.
+An update is optimistic by assuming the network is successful.
 
-## Partial updates
+Doing this amplifies and creates new race conditions; thankfully Reactive Data Client automatically
+handles these for you.
 
-One common use case is for quick toggles. Here we demonstrate a publish button for an
-article. Note that we need to include the primary key (`id` in this case) in the response
-body to ensure the normalized cache gets updated correctly.
+## Resources
 
-```typescript title="api/Article.ts"
-import { Entity, createResource } from '@rest-hooks/rest';
+[resource()](../api/resource.md) can be configured by setting [optimistic: true](../api/resource.md#optimistic).
 
-export class Article extends Entity {
-  readonly id: string | undefined = undefined;
-  readonly title: string = '';
-  readonly content: string = '';
-  readonly published: boolean = false;
+<HooksPlayground defaultOpen="n" row fixtures={todoFixtures}>
 
-  pk() {
-    return this.id;
-  }
+```ts title="TodoResource" {16}
+import { Entity, resource } from '@data-client/rest';
+
+export class Todo extends Entity {
+  id = 0;
+  userId = 0;
+  title = '';
+  completed = false;
+
+  static key = 'Todo';
 }
-
-const BaseArticleResource = createResource({
-  path: '/articles/:id',
-  schema: Article,
+export const TodoResource = resource({
+  urlPrefix: 'https://jsonplaceholder.typicode.com',
+  path: '/todos/:id',
+  searchParams: {} as { userId?: string | number } | undefined,
+  schema: Todo,
+  optimistic: true,
 });
-export const ArticleResource = {
-  ...BaseArticleResource,
-  partialUpdate: BaseArticleResource.partialUpdate.extend({
-    // highlight-start
-    getOptimisticResponse(snap, params, body) {
-      return {
-        // we absolutely need the primary key here,
-        // but won't be sent in a partial update
-        id: params.id,
-        ...body,
-      };
-    },
-    // highlight-end
-  }),
-};
 ```
 
-```typescript title="PublishButton.tsx"
-import { useController } from 'rest-hooks';
-import { ArticleResource } from 'api/Article';
+```tsx title="TodoItem" collapsed
+import { useController } from '@data-client/react';
+import { TodoResource, type Todo } from './TodoResource';
 
-export default function PublishButton({ id }: { id: string }) {
-  const controller = useController();
-
+export default function TodoItem({ todo }: { todo: Todo }) {
+  const ctrl = useController();
+  const handleChange = e =>
+    ctrl.fetch(
+      TodoResource.partialUpdate,
+      { id: todo.id },
+      { completed: e.currentTarget.checked },
+    );
+  const handleDelete = () =>
+    ctrl.fetch(TodoResource.delete, {
+      id: todo.id,
+    });
   return (
-    <button
-      onClick={() =>
-        controller.fetch(
-          ArticleResource.partialUpdate,
-          { id },
-          { published: true },
-        )
-      }
-    >
-      Publish
-    </button>
+    <div className="listItem nogap">
+      <label>
+        <input
+          type="checkbox"
+          checked={todo.completed}
+          onChange={handleChange}
+        />
+        {todo.completed ? <strike>{todo.title}</strike> : todo.title}
+      </label>
+      <CancelButton onClick={handleDelete} />
+    </div>
   );
 }
 ```
 
-## Optimistic create with instant updates
+```tsx title="CreateTodo" collapsed
+import { v4 as uuid } from 'uuid';
+import { useController } from '@data-client/react';
+import { TodoResource } from './TodoResource';
 
-Optimistic updates can also be combined with [immediate updates](/docs/guides/immediate-updates), enabling updates to
-other endpoints instantly. This is most commonly seen when creating new items
-while viewing a list of them.
-
-Here we demonstrate what could be used in a list of articles with a modal
-to create a new article. On submission of the form it would instantly
-add to the list of articles the newly created article - without waiting on a network response.
-
-```typescript title="api/Article.ts"
-import { Entity, createResource } from '@rest-hooks/rest';
-import uuid from 'uuid/v4';
-
-export class Article extends Entity {
-  readonly id: string | undefined = undefined;
-  readonly title: string = '';
-  readonly content: string = '';
-  readonly published: boolean = false;
-
-  pk() {
-    return this.id;
-  }
-}
-
-const BaseArticleResource = createResource({
-  path: '/articles/:id',
-  schema: Article,
-});
-export const ArticleResource = {
-  ...BaseArticleResource,
-  create: BaseArticleResource.create.extend({
-    getRequestInit(body) {
-      if (body) {
-        return this.constructor.prototype.getRequestInit.call(this, {
-          // highlight-next-line
-          id: uuid(),
-          ...body,
-        });
-      }
-      return this.constructor.prototype.getRequestInit.call(this, body);
-    },
-    getOptimisticResponse(snap, params, body) {
-      return body;
-    },
-    update(newResourcePk: string) {
-      return {
-        [list.key({})]: (resourcePks: string[] = []) => [
-          ...resourcePks,
-          newResourcePk,
-        ],
-      };
-    },
-  }),
-};
-```
-
-Since the actual `id` of the article is created on the server, we will need to fill
-in a temporary fake `id` here, so the `primary key` can be generated. This is needed
-to properly normalize the article to be looked up in the cache.
-
-Once the network responds, it will have a different `id`, which will replace the existing
-data. This is often seamless, but care should be taken if the fake `id` is used in any
-renders - like to issue subsequent requests. We recommend disabling `edit` type features
-that rely on the `primary key` until the network fetch completes.
-
-```typescript title="CreateArticle.tsx"
-import { useController } from 'rest-hooks';
-import { ArticleResource } from 'api/Article';
-
-export default function CreateArticle() {
-  const { fetch } = useController();
-  const submitHandler = useCallback(
-    data => fetch(ArticleResource.create, data),
-    [create],
+export default function CreateTodo({ userId }: { userId: number }) {
+  const ctrl = useController();
+  const handleKeyDown = async e => {
+    if (e.key === 'Enter') {
+      ctrl.fetch(TodoResource.getList.push, {
+        userId,
+        title: e.currentTarget.value,
+      });
+      e.currentTarget.value = '';
+    }
+  };
+  return (
+    <div className="listItem nogap">
+      <label>
+        <input type="checkbox" name="new" checked={false} disabled />
+        <TextInput size="small" onKeyDown={handleKeyDown} />
+      </label>
+      <CancelButton />
+    </div>
   );
-
-  return <Form onSubmit={submitHandler}>{/* rest of form */}</Form>;
 }
 ```
 
-## Optimistic Deletes
+```tsx title="TodoList" collapsed
+import { useSuspense } from '@data-client/react';
+import { TodoResource } from './TodoResource';
+import TodoItem from './TodoItem';
+import CreateTodo from './CreateTodo';
 
-Since deletes [automatically update the cache correctly](/docs/guides/immediate-updates#delete) upon fetch success,
-making your delete endpoint do this optimistically is as easy as adding the [getOptimisticResponse](api/RestEndpoint.md#getoptimisticresponse)
-function to your options.
+function TodoList() {
+  const userId = 1;
+  const todos = useSuspense(TodoResource.getList, { userId });
+  return (
+    <div>
+      {todos.map(todo => (
+        <TodoItem key={todo.pk()} todo={todo} />
+      ))}
+      <CreateTodo userId={userId} />
+    </div>
+  );
+}
+render(<TodoList />);
+```
 
-We return an empty string because that's the response we expect from the server. Although by
-default, the server response is ignored.
+</HooksPlayground>
 
-```typescript title="api/Article.ts"
-import { Entity, createResource } from '@rest-hooks/rest';
+This makes all mutations optimistic using some sensible default implementations that handle most cases.
 
-export class Article extends Entity {
-  readonly id: string | undefined = undefined;
-  readonly title: string = '';
-  readonly content: string = '';
-  readonly published: boolean = false;
+### update/getList.push/getList.unshift
 
-  pk() {
-    return this.id;
-  }
+```ts
+function optimisticUpdate(
+  snap: SnapshotInterface,
+  params: any,
+  body: any,
+) {
+  return {
+    ...params,
+    ...ensureBodyPojo(body),
+  };
 }
 
-const BaseArticleResource = createResource({
-  path: '/articles/:id',
-  schema: Article,
-});
-export const ArticleResource = {
-  ...BaseArticleResource,
-  delete: BaseArticleResource.delete.extend({
-    // highlight-start
-    getOptimisticResponse(snap, params, body) {
-      return params;
-    },
-    // highlight-end
-  }),
-};
+function ensureBodyPojo(body: any) {
+  return body instanceof FormData
+    ? Object.fromEntries((body as any).entries())
+    : body;
+}
 ```
+
+For creates (push/unshift) this typically results in no `id` in the response to compute a pk.
+<abbr title="Reactive Data Client">Data Client</abbr> will create a random `pk` to make this work.
+
+Until the object is actually created, doing mutations on that object generally does not work.
+Therefore, it may be prudent in these cases to disable further mutations until the actual
+`POST` is completed. One way to determine this is to simply look for the existance of
+a real `id` in the entity.
+
+### partialUpdate
+
+```ts
+function optimisticPartial(schema: Queryable) {
+  return function (snap: SnapshotInterface, params: any, body: any) {
+    const data = snap.get(schema, params);
+    if (!data) throw snap.abort;
+    return {
+      ...params,
+      ...data,
+      // even tho we don't always have two arguments, the extra one will simply be undefined which spreads fine
+      ...ensurePojo(body),
+    };
+  };
+}
+```
+
+Partial updates do not send the entire body, so we can use the entity from
+the store to compute the expected response. [Snapshots](/docs/api/Snapshot)
+give us safe access to the existing store value that is robust against any
+race conditions.
+
+### delete
+
+```ts
+function optimisticDelete(snap: SnapshotInterface, params: any) {
+  return params;
+}
+```
+
+In case you do not want all endpoints to be optimistic, or if you have unusual API designs,
+you can set [getOptimisticResponse()](../api/RestEndpoint.md#getoptimisticresponse) using
+[Resource.extend()](../api/resource.md#extend)
 
 ## Optimistic Transforms
 
@@ -202,137 +200,165 @@ Sometimes user actions should result in data transformations that are dependent 
 The simplest examples of this are toggling a boolean, or incrementing a counter; but the same principal applies to
 more complicated transforms. To make it more obvious we're using a simple counter here.
 
-<HooksPlayground>
+<OptimisticTransform />
 
-```ts
-class CountEntity extends Entity {
-  readonly count = 0;
+Reactive Data Client automatically handles all race conditions due to network timings. Reactive Data Client both tracks
+fetch timings, pairs responses with their respective optimistic update and rollsback in case of resolution or
+rejection/failure.
 
-  pk() {
-    return `SINGLETON`;
-  }
-}
-const getCount = new RestEndpoint({
-  path: '/api/count',
-  schema: CountEntity,
-  name: 'get',
-}
-);
-const increment = new RestEndpoint(
-  {
-    path: '/api/count/increment',
-    method: 'POST',
-    name: 'increment',
-    schema: CountEntity,
-    getRequestInit() {
-      return this.constructor.prototype.getRequestInit.call(this, { updatedAt: Date.now() });
-    }
-    getOptimisticResponse(snap) {
-      const { data } = snap.getResponse(getCount);
-      if (!data) throw new AbortOptimistic();
-      return {
-        count: data.count + 1,
-      };
-    },
-  },
-);
+You can see how this is problematic for other libraries even without optimistic updates;
+but optimistic updates make it even worse.
 
-function CounterPage() {
-  const { fetch } = useController();
-  const { count } = useSuspense(getCount);
-  const [clickHandler, loading, error] = useLoading(() => fetch(increment));
-  return (
-    <div>
-      <p>
-        Click the button multiple times quickly to trigger the race condition
-      </p>
-      <div>
-        {count} <button onClick={clickHandler}>+</button>
-        {loading ? ' ...loading' : ''}
-      </div>
-    </div>
-  );
-}
-render(<CounterPage />);
+### Example race condition
+
+Here's an example of the race condition. Here we request an increment twice; but the first response comes back to
+client after the second response.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Client
+    participant Server
+    Client->>+Server: Increment from 0
+    Client->>+Server: Increment from 1
+    Server->>-Client: Response: 2
+    Server->>-Client: Response: 1
 ```
 
-</HooksPlayground>
+With other libraries and no optimistic updates this would result in showing 0, then, 2, then 1.
 
-Try removing `getOptimisticResponse` from the increment [RestEndpoint](api/RestEndpoint.md). Even without optimistic updates, this race condition can be a real problem. While it is less likely with fast endpoints;
-slower or less reliable internet connections means a slow response time no matter how fast the server is.
+If the other library does have optimistic updates, it should show 0, 1, 2, 2, then 1.
 
-The problem is that the responses come back in a different order than they are computed. If we can determine the
-correct 'total order', we would be able to solve this problem.
+In both cases we end up showing an incorrect state, and along the way see weird janky state updates.
 
-Without optimistic updates, this can be achieved simply by having the server return a timestamp of when it was last updated.
-The client can then choose to ignore responses that are out of date by their time of resolution.
+### Compensating for Server timing variations {#server-timings}
 
-### Tracking order with updatedAt
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Client
+    participant Server
+    Client->>Server: Request timing
+    Note over Client,Server: Server timing
+    Server->>Client: Response timing
+```
 
-To handle potential out of order resolutions, we can track the last update time in `updatedAt`.
-Overriding our [useIncoming](api/Entity.md#useincoming), we can check which data is newer, and disregard old data
-that resolves out of order.
+There are three timings which can vary in an async mutation.
 
-We use [snap.fetchedAt](/docs/api/Snapshot#fetchedat) in our [getOptimisticResponse](api/RestEndpoint.md#getoptimisticresponse). This respresents the moment the fetch is triggered,
-which is when the optimistic update first applies.
+1. Request timing
+1. Server timing
+1. Response timing
 
-<HooksPlayground>
+Reactive Data Client is able to automatically handling the network timings, aka request and response timing. Typically this
+is sufficient, as servers tend to process requests received first before others. However, in case persist order
+varies from request order in the server this could cause another race condition.
 
-```tsx
-class CountEntity extends Entity {
-  readonly count = 0;
-  readonly updatedAt = 0;
+This can be be solved by maintaining a [total order](https://en.wikipedia.org/wiki/Total_order). Because the
+servers and clients can potentially has different times, we will need to track time from a consistent perspective.
+Since we are performing optimistic updates this means we must use the client's clock. This means we will send the request
+timing to the server in an `updatedAt` header via [getRequestInit()](../api/RestEndpoint.md#getRequestInit). The server should then ensure processing based on that order, and
+then store this `updatedAt` in the entity to return in any request.
+
+Overriding [shouldReorder](api/Entity.md#shouldreorder), we can reorder out-of-order responses based on the
+server timestamp.
+
+We use [snap.fetchedAt](/docs/api/Snapshot#fetchedat) in our [getOptimisticResponse](api/RestEndpoint.md#getoptimisticresponse). This respresents the moment the fetch is triggered, which will be the same time the `updatedAt` header is computed.
+
+<HooksPlayground fixtures={[
+{
+endpoint: new RestEndpoint({path: '/api/count'}),
+args: [],
+response: { count: 0, updatedAt: Date.now() }
+},
+{
+endpoint: new RestEndpoint({
+path: '/api/count/increment',
+method: 'POST',
+body: undefined,
+}),
+fetchResponse(input, init) {
+return ({
+"count": (this.count = this.count + 1),
+"updatedAt": JSON.parse(init.body).updatedAt,
+});
+},
+delay: () => 200 + Math.random() * 4500,
+delayCollapse:true,
+}
+]}
+getInitialInterceptorData={() => ({ count: 0 })}
+row
+>
+
+```ts title="count" {9-11} collapsed
+export class CountEntity extends Entity {
+  count = 0;
+  updatedAt = 0;
 
   pk() {
     return `SINGLETON`;
   }
 
-  static useIncoming(existingMeta, incomingMeta, existing, incoming) {
-    return existing.updatedAt <= incoming.updatedAt;
+  static shouldReorder(existingMeta, incomingMeta, existing, incoming) {
+    return incoming.updatedAt < existing.updatedAt;
   }
 }
-const getCount = new RestEndpoint({
+export const getCount = new RestEndpoint({
   path: '/api/count',
   schema: CountEntity,
   name: 'get',
-}
-);
-const increment = new RestEndpoint(
-  {
-    path: '/api/count/increment',
-    method: 'POST',
-    name: 'increment',
-    schema: CountEntity,
-    getRequestInit() {
-      return this.constructor.prototype.getRequestInit.call(this, { updatedAt: Date.now() });
-    }
-    getOptimisticResponse(snap) {
-      const { data } = snap.getResponse(getCount);
-      if (!data) throw new AbortOptimistic();
-      return {
-        count: data.count + 1,
-        updatedAt: snap.fetchedAt,
-      };
-    },
+});
+```
+
+```ts title="increment" {9-15,21}
+import { getCount, CountEntity } from './count';
+
+export const increment = new RestEndpoint({
+  path: '/api/count/increment',
+  method: 'POST',
+  body: undefined,
+  name: 'increment',
+  schema: CountEntity,
+  getRequestInit() {
+    // this is a substitute for super.getRequestInit()
+    // since we aren't in a class context
+    return RestEndpoint.prototype.getRequestInit.call(this, {
+      updatedAt: Date.now(),
+    });
   },
-);
+  getOptimisticResponse(snap) {
+    const data = snap.get(CountEntity, {});
+    if (!data) throw snap.abort;
+    return {
+      count: data.count + 1,
+      updatedAt: snap.fetchedAt,
+    };
+  },
+});
+```
+
+```tsx title="CounterPage" collapsed
+import { useLoading } from '@data-client/react';
+import { getCount } from './count';
+import { increment } from './increment';
 
 function CounterPage() {
-  const { fetch } = useController();
+  const ctrl = useController();
   const { count } = useSuspense(getCount);
   const [n, setN] = React.useState(count);
   const [clickHandler, loading, error] = useLoading(() => {
     setN(n => n + 1);
-    return fetch(increment);
+    return ctrl.fetch(increment);
   });
   return (
     <div>
       <p>
-        Click the button multiple times quickly to trigger the potential race
-        condition. This time our vector clock protects us.
+        Click the button multiple times quickly to trigger the
+        potential race condition. This time our vector clock protects
+        us.
       </p>
       <div>
-        Network: {count} Should be: {n}
+        Data Client: {count} Should be: {n}
         <br />
         <button onClick={clickHandler}>+</button>
         {loading ? ' ...loading' : ''}
@@ -344,122 +370,3 @@ render(<CounterPage />);
 ```
 
 </HooksPlayground>
-
-<!---
-### Vector Clocks
-
-However, when doing an optimistic update, we now have two distinct nodes computed derived data. Optimistic updates
-represent the client's computation and the server also computes derivations. Much like the [real world](https://en.wikipedia.org/wiki/Theory_of_relativity)
-agreeing on a total order of events is no longer possible. However, using [vector clocks](https://en.wikipedia.org/wiki/Vector_clock)
-allows us to maintain agreement on a *casual* order.
-
-The key things to observe in the code example is the added field `updatedAt`, which is our vector clock, as well
-as how it is used in our new [static merge()](/rest/api/Entity#merge) as well as updates to [getOptimisticResponse](/rest/api/Endpoint#getoptimisticresponse).
-
-<HooksPlayground>
-
-```ts
-class CountEntity extends Entity {
-  readonly id = 0;
-  readonly count = 0;
-  readonly updatedAt = { client: 0, server: 0 };
-
-  pk() {
-    return `${this.id}`;
-  }
-
-  static merge(existing, incoming) {
-    if (
-      existing.updatedAt.client < incoming.updatedAt.client ||
-      existing.updatedAt.server < incoming.updatedAt.server
-    ) {
-      return {
-        ...existing,
-        ...incoming,
-        updatedAt: {
-          client: Math.max(
-            existing.updatedAt.client,
-            incoming.updatedAt.client,
-          ),
-          server: Math.max(
-            existing.updatedAt.server,
-            incoming.updatedAt.server,
-          ),
-        },
-      };
-    }
-    return existing;
-  }
-}
-const simulatedServerStateCount = 0;
-const getCount = new Endpoint(
-  (id: number) =>
-    Promise.resolve({
-      id,
-      count: simulatedServerStateCount,
-      updatedAt: { client: 0, server: Date.now() },
-    }),
-  {
-    name: 'get',
-    schema: CountEntity,
-  },
-);
-const increment = new Endpoint(
-  (id: number) =>
-    new Promise(resolve => {
-      const serverState = {
-        id,
-        count: ++simulatedServerStateCount,
-        updatedAt: { client: Date.now(), server: Date.now() + 200 },
-      };
-      // resolve from 500ms -> 5 seconds. Represents network variance.
-      // making state computed before hand allows demonstrating out of order race conditions
-      setTimeout(() => resolve(serverState), 500 + Math.random() * 4500);
-    }),
-  {
-    name: 'increment',
-    schema: CountEntity,
-    sideEffect: true,
-    getOptimisticResponse(snap, id) {
-      const { data } = snap.getResponse(getCount, id);
-      // server already has this optimistic computation then do nothing
-      if (!data || snap.fetchedAt < data.updatedAt.client) throw new AbortOptimistic();
-      return {
-        id,
-        count: data.count + 1,
-        updatedAt: {
-          client: snap.fetchedAt,
-          server: data.updatedAt.server,
-        },
-      };
-    },
-  },
-);
-
-function CounterPage() {
-  const { fetch } = useController();
-  const { count } = useSuspense(getCount, 1);
-  const [n, setN] = React.useState(count);
-  const [clickHandler, loading, error] = useLoading(() => {
-    fetch(increment, 1);
-    setN(n => n+1);
-  });
-  return (
-    <div>
-      <p>
-        Click the button multiple times quickly to trigger the potential race condition.
-        This time our vector clock protects us.
-      </p>
-      <div>
-        Network: {count} Should be: {n}<br/><button onClick={clickHandler}>+</button>
-        {loading ? ' ...loading' : ''}
-      </div>
-    </div>
-  );
-}
-render(<CounterPage />);
-```
-
-</HooksPlayground>
-
--->

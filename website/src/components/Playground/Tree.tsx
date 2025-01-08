@@ -1,6 +1,6 @@
-import { JSONTree } from 'react-json-tree';
-import React, { useMemo } from 'react';
 import { useColorMode, usePrismTheme } from '@docusaurus/theme-common';
+import React, { useMemo } from 'react';
+import { JSONTree } from 'react-json-tree';
 
 export default function Output({ value }: { value: any }) {
   const isDarkTheme = useColorMode().colorMode === 'dark';
@@ -21,13 +21,13 @@ export default function Output({ value }: { value: any }) {
     () => ({
       tree: {
         overflow: 'auto',
-        flex: '4 1 70%',
+        flex: '4 1 40%',
         margin: 0,
         padding: '0 0.5rem 0 0.8rem',
-        backgroundColor: isDarkTheme
-          ? 'var(--ifm-pre-background)'
-          : 'rgb(41, 45, 62)',
+        backgroundColor:
+          isDarkTheme ? 'var(--ifm-pre-background)' : 'rgb(41, 45, 62)',
         font: 'var(--ifm-code-font-size) / var(--ifm-pre-line-height) var(--ifm-font-family-monospace) !important',
+        color: 'rgb(227, 227, 227)',
       },
       arrowContainer: ({ style }, arrowStyle) => ({
         style: {
@@ -56,9 +56,10 @@ export default function Output({ value }: { value: any }) {
     }),
     [isDarkTheme, valueColorMap],
   );
+  const shouldExpandNodeInitially = useMemo(shouldExpandNode, []);
   return (
     <JSONTree
-      shouldExpandNode={shouldExpandNode}
+      shouldExpandNodeInitially={shouldExpandNodeInitially}
       data={value}
       valueRenderer={valueRenderer}
       theme={theme}
@@ -67,15 +68,23 @@ export default function Output({ value }: { value: any }) {
   );
 }
 
-function shouldExpandNode(keyName, data, level) {
-  if (level === 0) return true;
-  if (level === 1 && ['entities', 'results'].includes(keyName[0])) return true;
-  if (level === 2 && keyName[1] === 'entities') return true;
-  if (level === 2 && keyName[1] === 'results') return true;
-  if (level === 3 && keyName[2] === 'entities') return true;
-  if (level === 3 && keyName[2] === 'results') return true;
-  return false;
-}
+const shouldExpandNode = () => {
+  let entityCount = 0;
+  let schemaCount = 0;
+
+  return (keyName, data, level) => {
+    if (level === 0) return true;
+    if (level === 1 && ['entities', 'results'].includes(keyName[0]))
+      return true;
+    if (level === 2 && keyName[1] === 'entities') return schemaCount++ < 2;
+    if (level === 2 && keyName[1] === 'results') return true;
+    if (level === 3 && keyName[2] === 'entities') {
+      return entityCount++ < 4;
+    }
+    if (level === 3 && keyName[2] === 'results') return true;
+    return false;
+  };
+};
 
 const HASINTL = typeof Intl !== 'undefined';
 

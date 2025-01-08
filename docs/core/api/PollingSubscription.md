@@ -1,10 +1,7 @@
 ---
-title: PollingSubscription implements Subscription
+title: PollingSubscription
 sidebar_label: PollingSubscription
-hide_title: true
 ---
-
-# PollingSubscription implements [Subscription](./SubscriptionManager.md)
 
 Will dispatch a `fetch` action at the minimum interval of all subscriptions to this
 resource.
@@ -13,13 +10,19 @@ resource.
 - Immediately fetches when online status returns.
 - Immediately fetches any new subscriptions.
 
+:::info implements
+
+`PollingSubscription` implements [Subscription](./SubscriptionManager.md#subscription)
+
+:::
+
 ```tsx
 import {
   SubscriptionManager,
   PollingSubscription,
-  CacheProvider,
+  DataProvider,
   NetworkManager,
-} from 'rest-hooks';
+} from '@data-client/react';
 import ReactDOM from 'react-dom';
 
 const managers = [
@@ -28,17 +31,17 @@ const managers = [
 ]
 
 ReactDOM.render(
-  <CacheProvider managers={managers}>
+  <DataProvider managers={managers}>
     <App />
-  </CacheProvider>,
+  </DataProvider>,
   document.body,
 );
 ```
 
 ## Dispatched Actions
 
-- 'rest-hooks/fetch'
+- 'rdc/fetch'
 
 > #### Note:
 >
-> This is already used by `CacheProvider` by default.
+> This is already used by `DataProvider` by default.

@@ -1,25 +1,37 @@
 ---
-title: useCancelling()
+title: useCancelling() - Declarative fetch aborting for React
+sidebar_label: useCancelling()
+description: Builds an Endpoint that cancels fetch everytime parameters change. Aborts inflight request on param change.
 ---
 
-```typescript
-function useCancelling<E extends EndpointInterface & {
-    extend: (o: {
-        signal?: AbortSignal | undefined;
-    }) => any;
-}>(endpoint: E, params: EndpointParam<E> | null): E
-```
+import HooksPlayground from '@site/src/components/HooksPlayground';
+import PkgInstall from '@site/src/components/PkgInstall';
+import UseCancelling from '../shared/\_useCancelling.mdx';
 
-Builds an Endpoint that cancels fetch everytime params change
+# useCancelling()
+
+Builds an Endpoint that cancels fetch everytime parameters change
 
 [Aborts](https://developer.mozilla.org/en-US/docs/Web/API/AbortController) inflight request if the parameters change.
 
-```tsx
-import { useCancelling } from '@rest-hooks/hooks';
-import { useSuspense } from 'rest-hooks';
+## Usage
 
-const CancelingUserList = useCancelling(UserList, { query });
-const users = useSuspense(CancelingUserList, { query });
+<UseCancelling />
+
+:::warning Warning
+
+Be careful when using this with many disjoint components fetching the same
+arguments (Endpoint/params pair) to useSuspense(). This solution aborts fetches per-component,
+which means you might end up canceling a fetch that another component still cares about.
+
+:::
+
+## Types
+
+```typescript
+function useCancelling<
+  E extends EndpointInterface & {
+    extend: (o: { signal?: AbortSignal }) => any;
+  },
+>(endpoint: E, ...args: readonly [...Parameters<E>] | readonly [null]): E {
 ```
-
-Part of [@rest-hooks/hooks](https://www.npmjs.com/package/@rest-hooks/hooks)

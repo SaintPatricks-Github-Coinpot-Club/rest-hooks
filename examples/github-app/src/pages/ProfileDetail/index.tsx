@@ -1,13 +1,9 @@
-import React, { useMemo } from 'react';
-import { useSuspense } from 'rest-hooks';
-import { Card, List, Layout, Space, Timeline, Typography, Divider } from 'antd';
+import { useSuspense } from '@data-client/react';
+import { Intl } from '@js-temporal/polyfill';
+import { Card, List, Layout, Typography } from 'antd';
 import Markdown from 'react-markdown';
-import { Link } from '@anansi/router';
-import { UserResource, User } from 'resources/User';
-import RepositoryResource, { Repository } from 'resources/Repository';
-import { ForkOutlined, StarOutlined } from '@ant-design/icons';
-import { EventResource, typeToIcon, Event } from 'resources/Event';
-import { groupBy } from 'lodash';
+
+import { UserResource } from '@/resources/User';
 
 import UserEvents from './UserEvents';
 import UserRepositories from './UserRepos';

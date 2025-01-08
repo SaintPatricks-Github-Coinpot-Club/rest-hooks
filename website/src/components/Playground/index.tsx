@@ -1,194 +1,166 @@
-import React, { useContext } from 'react';
-import { LiveProvider, LiveEditor, LiveProviderProps } from 'react-live';
-import clsx from 'clsx';
-import Translate from '@docusaurus/Translate';
+import type { Fixture, Interceptor } from '@data-client/test';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
-import useIsBrowser from '@docusaurus/useIsBrowser';
-import { usePrismTheme } from '@docusaurus/theme-common';
-import * as ts from 'typescript';
-import { FixtureEndpoint } from '@rest-hooks/test';
+import clsx from 'clsx';
+import type { Language, PrismTheme } from 'prism-react-renderer';
+import React, { lazy } from 'react';
+import { LiveProvider } from 'react-live';
 
-import CodeTabContext from '../Demo/CodeTabContext';
-import Preview from './Preview';
+import Boundary from './Boundary';
+import { isGoogleBot } from './isGoogleBot';
+import MonacoPreloads from './MonacoPreloads';
+import { PlaygroundTextEdit } from './PlaygroundTextEdit';
+import PreviewWrapper from './PreviewWrapper';
 import styles from './styles.module.css';
-import FixturePreview from './FixturePreview';
+import { useCode } from './useCode';
+import { useReactLiveTheme } from './useReactLiveTheme';
 
-const babelTransform = code => {
-  const transformed = ts.transpileModule(code, {
-    compilerOptions: {
-      module: ts.ModuleKind.ESNext,
-      target: ts.ScriptTarget.ES2017,
-      jsx: ts.JsxEmit.React,
-    },
-  });
-  return transformed.outputText;
+// previously exported by react-live
+type LiveProviderProps = {
+  code?: string;
+  disabled?: boolean;
+  enableTypeScript?: boolean;
+  language?: Language;
+  noInline?: boolean;
+  scope?: Record<string, unknown>;
+  theme?: PrismTheme;
+  hidden?: boolean;
+  transformCode?(code: string): void;
 };
 
-function Header({
-  children,
-  className,
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) {
-  return (
-    <div className={clsx(styles.playgroundHeader, className)}>{children}</div>
-  );
-}
-
-function PreviewWithHeader({ groupId, defaultOpen, row, fixtures }) {
-  return (
-    <div
-      style={{ overflow: 'hidden', display: 'flex', flexDirection: 'column' }}
-    >
-      <Header>
-        <Translate
-          id="theme.Playground.result"
-          description="The result label of the live codeblocks"
-        >
-          Live Preview
-        </Translate>
-      </Header>
-      <div className={styles.playgroundResult}>
-        <Preview
-          groupId={groupId}
-          defaultOpen={defaultOpen}
-          row={row}
-          fixtures={fixtures}
-        />
-      </div>
-    </div>
-  );
-}
-
-function HeaderTabs() {
-  const { selectedValue, setSelectedValue, values } =
-    useContext(CodeTabContext);
-  return (
-    <div className={styles.tabs} role="tablist" aria-orientation="horizontal">
-      {values.map(({ value, label }) => (
-        <div
-          role="tab"
-          tabIndex={selectedValue === value ? 0 : -1}
-          aria-selected={selectedValue === value}
-          key={value}
-          className={clsx(styles.tab, {
-            [styles.selected]: selectedValue === value,
-          })}
-          onFocus={setSelectedValue}
-          onClick={setSelectedValue}
-          value={value}
-        >
-          {label}
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function HeaderWithTabControls({ children }) {
-  return (
-    <Header className={styles.tabControls}>
-      <div>{children}</div>
-      <HeaderTabs />
-    </Header>
-  );
-}
-
-function EditorWithHeader({ title, fixtures }) {
-  const { values } = useContext(CodeTabContext);
-  const hasTabs = values.length > 0;
-  const isBrowser = useIsBrowser();
-  return (
-    <div>
-      {fixtures.length ? (
-        <>
-          <Header>Fixtures</Header>
-          <FixturePreview fixtures={fixtures} />
-        </>
-      ) : null}
-      {hasTabs ? (
-        <HeaderWithTabControls>{title}</HeaderWithTabControls>
-      ) : (
-        <Header>{title}</Header>
-      )}
-      <LiveEditor key={`${isBrowser}`} className={styles.playgroundEditor} />
-    </div>
-  );
-}
-EditorWithHeader.defaultProps = {
-  title: (
-    <Translate
-      id="theme.Playground.liveEditor"
-      description="The live editor label of the live codeblocks"
-    >
-      Live Editor
-    </Translate>
-  ),
-};
-
-export default function Playground({
+export default function Playground<T>({
   children,
   transformCode,
   groupId,
   defaultOpen,
-  row,
-  hidden,
+  row = false,
+  hidden = false,
   fixtures,
+  getInitialInterceptorData,
+  defaultTab,
   ...props
 }: Omit<LiveProviderProps, 'ref'> & {
   groupId: string;
   defaultOpen: 'y' | 'n';
-  row: boolean;
-  children: string;
-  fixtures: FixtureEndpoint[];
+  row?: boolean;
+  children: string | any[];
+  fixtures: (Fixture | Interceptor<T>)[];
+  getInitialInterceptorData?: () => T;
+  defaultTab?: string;
 }) {
   const {
     liveCodeBlock: { playgroundPosition },
   } = useDocusaurusContext().siteConfig.themeConfig as any;
-  const prismTheme = usePrismTheme();
-
-  const scope = { ...props.scope };
+  const realTheme = useReactLiveTheme();
 
   return (
-    <div
-      className={clsx(styles.playgroundContainer, {
-        [styles.row]: row,
-        [styles.hidden]: hidden,
-      })}
-    >
-      <LiveProvider
-        code={children.replace(/\n$/, '')}
-        transformCode={transformCode || (code => babelTransform(`${code};`))}
-        theme={prismTheme}
-        {...props}
+    <>
+      <div
+        className={clsx(styles.playgroundContainer, {
+          [styles.row]: row,
+          [styles.hidden]: hidden,
+        })}
       >
-        {playgroundPosition === 'top' ? (
-          <>
-            <PreviewWithHeader
-              groupId={groupId}
-              defaultOpen={defaultOpen}
-              row={row}
-              fixtures={fixtures}
-            />
-            <EditorWithHeader fixtures={fixtures} />
-          </>
-        ) : (
-          <>
-            <EditorWithHeader fixtures={fixtures} />
-            <PreviewWithHeader
-              groupId={groupId}
-              defaultOpen={defaultOpen}
-              row={row}
-              fixtures={fixtures}
-            />
-          </>
-        )}
-      </LiveProvider>
-    </div>
+        <LiveProvider theme={realTheme} enableTypeScript={true} {...props}>
+          <PlaygroundContent
+            reverse={playgroundPosition === 'top'}
+            row={row}
+            fixtures={fixtures}
+            groupId={groupId}
+            defaultOpen={defaultOpen}
+            getInitialInterceptorData={getInitialInterceptorData}
+            defaultTab={defaultTab}
+          >
+            {children}
+          </PlaygroundContent>
+        </LiveProvider>
+      </div>
+      <MonacoPreloads />
+    </>
   );
 }
-Playground.defaultProps = {
-  row: false,
-  hidden: false,
-};
+
+function PlaygroundContent<T>({
+  reverse,
+  children,
+  row,
+  fixtures,
+  groupId,
+  defaultOpen,
+  defaultTab,
+  getInitialInterceptorData,
+}: ContentProps<T>) {
+  const { handleCodeChange, codes, codeTabs } = useCode(children, defaultTab);
+  /*const code = ready.every(v => v)
+    ? codes.join('\n')
+    : 'render(<div>Loading...</div>);';*/
+  const code = codes.join('\n');
+
+  return (
+    <Reversible reverse={reverse}>
+      <PlaygroundTextEdit
+        fixtures={fixtures}
+        row={row}
+        codeTabs={codeTabs}
+        handleCodeChange={handleCodeChange}
+        codes={codes}
+      />
+      <Boundary fallback={previewLoading}>
+        <PreviewWithScopeLazy
+          code={code}
+          {...{
+            groupId,
+            defaultOpen,
+            row,
+            fixtures,
+            getInitialInterceptorData,
+          }}
+        />
+      </Boundary>
+    </Reversible>
+  );
+}
+interface ContentProps<T = any> {
+  groupId: string;
+  defaultOpen: 'y' | 'n';
+  row: boolean;
+  fixtures: (Fixture | Interceptor<T>)[];
+  children: React.ReactNode;
+  reverse?: boolean;
+  getInitialInterceptorData?: () => T;
+  defaultTab?: string;
+}
+
+const previewLoading = (
+  <PreviewWrapper key="preview">
+    <div className={styles.playgroundPreview}></div>
+    <div className={styles.debugToggle}>
+      Store
+      <span className={clsx(styles.arrow, styles.right, styles.vertical)}>
+        ▶
+      </span>
+    </div>
+  </PreviewWrapper>
+);
+
+const PreviewWithScopeLazy = lazy(() =>
+  isGoogleBot ?
+    Promise.resolve({ default: (props: any): JSX.Element => previewLoading })
+  : import(
+      /* webpackChunkName: 'PreviewWithScope', webpackPrefetch: true */ './PreviewWithScope'
+    ),
+);
+
+function Reversible({
+  children,
+  reverse = false,
+}: {
+  children: React.ReactNode[];
+  reverse?: boolean;
+}): React.ReactElement {
+  const newchild = [...children];
+  newchild.reverse();
+  if (reverse) {
+    return newchild as any;
+  }
+  return children as any;
+}

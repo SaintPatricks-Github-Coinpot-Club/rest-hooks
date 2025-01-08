@@ -2,18 +2,26 @@
 title: Unit testing components
 ---
 
-:::danger
+:::warning
 
-Do *not* use jest.mock on any rest-hooks library. This will likely result in hard-to trace
+Be careful when using [jest.mock](https://jestjs.io/docs/jest-object#jestmockmodulename-factory-options) on modules like Reactive Data Client. Eliminating expected
+exports can lead to hard-to trace
 errors like `TypeError: Class extends value undefined is not a function or null`.
+
+Instead either do a [partial mock](https://jestjs.io/docs/mock-functions#mocking-partials),
+or better [mockResolvedValue](https://jestjs.io/docs/mock-functions#mocking-modules) on your
+endpoints.
 
 :::
 
 If you need to add unit tests to your components to check some behavior you might want
 avoid dealing with network fetch cycle as that is probably orthogonal to what your are
-trying to test. Using [<MockResolver /\>](../api/MockResolver) in our tests allow
+trying to test. Using [&lt;DataProvider /\>](../api/DataProvider.md) with [mockInitialState](../api/mockInitialState.md) and [Fixtures](../api/Fixtures.md) in our tests allow
 us to prime the cache with provided fixtures so the components will immediately render
 with said results.
+
+Testing user interactions that trigger mutations can be aided with the use of [&lt;MockResolver /\>](../api/MockResolver.md)
+and [Interceptors](../api/Fixtures.md#interceptor)
 
 ```typescript title="__tests__/fixtures.ts"
 export default {
@@ -37,13 +45,13 @@ export default {
       ],
     },
     {
-      endpoint: ArticleResource.update(),
+      endpoint: ArticleResource.update,
       args: [{ id: 532 }] as const,
-      response: {
-        id: 532,
-        content: 'updated "never again"',
-        author: 23,
-        contributors: [5],
+      response({ id }, body) {
+        return {
+          id,
+          ...body,
+        };
       },
     },
   ],
@@ -67,9 +75,9 @@ export default {
 ```
 
 ```tsx title="__tests__/ArticleList.tsx"
-import { CacheProvider } from 'rest-hooks';
-import { render } from '@testing-library/react';
-import { MockResolver } from '@rest-hooks/test';
+import { DataProvider, AsyncBoundary } from '@data-client/react';
+import { render, waitFor } from '@testing-library/react';
+import { MockResolver, mockInitialState } from '@data-client/test';
 
 import ArticleList from 'components/ArticleList';
 import results from './fixtures';
@@ -77,30 +85,29 @@ import results from './fixtures';
 describe('<ArticleList />', () => {
   it('renders', () => {
     const tree = (
-      <CacheProvider initialState={mockInitialState(results.full)}>
+      <DataProvider initialState={mockInitialState(results.full)}>
         <ArticleList maxResults={10} />
-      </CacheProvider>
+      </DataProvider>
     );
-    const { queryByText } = render(tree);
-    const content = queryByText(results.full.result[0].content);
+    const { findByText } = render(tree);
+    const content = findByText(results.full.result[0].content);
     expect(content).toBeDefined();
   });
 
   it('suspends then resolves', async () => {
     const tree = (
-      <CacheProvider>
+      <DataProvider>
         <MockResolver fixtures={results.full}>
-          <Suspense fallback="loading">
+          <AsyncBoundary fallback="loading">
             <ArticleList maxResults={10} />
-          </Suspense>
+          </AsyncBoundary>
         </MockResolver>
-      </CacheProvider>
+      </DataProvider>
     );
-    const { queryByText, waitForNextUpdate } = render(tree);
-    expect(queryByText('loading')).toBeDefined();
+    const { findByText } = render(tree);
+    expect(findByText('loading')).toBeDefined();
 
-    await waitForNextUpdate();
-    expect(queryByText(results.full.result[0].content)).toBeDefined();
+    await waitFor(expect(findByText(results.full.result[0].content)).toBeDefined());
   })
 });
 ```

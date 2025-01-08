@@ -1,14 +1,16 @@
 ---
-title: schema.Union
+titlke: schema.Union - Declarative polymorphic data for React
+sidebar_label: schema.Union
 ---
-<head>
-  <title>schema.Union - Representing a Union of possible types | Rest Hooks</title>
-</head>
 
 import LanguageTabs from '@site/src/components/LanguageTabs';
 import HooksPlayground from '@site/src/components/HooksPlayground';
+import { RestEndpoint } from '@data-client/rest';
+import StackBlitz from '@site/src/components/StackBlitz';
 
-Describe a schema which is a union of multiple schemas. This is useful if you need the polymorphic behavior provided by `schema.Array` or `schema.Values` but for non-collection fields.
+# schema.Union
+
+Describe a schema which is a union of multiple schemas. This is useful if you need the polymorphic behavior provided by [schema.Array](./Array.md) or [schema.Values](./Values.md) but for non-collection fields.
 
 - `definition`: **required** An object mapping the definition of the nested entities found within the input array
 - `schemaAttribute`: **required** The attribute on each entity found that defines what schema, per the definition mapping, to use when normalizing.
@@ -21,37 +23,49 @@ Describe a schema which is a union of multiple schemas. This is useful if you ne
 
 - `define(definition)`: When used, the `definition` passed in will be merged with the original definition passed to the `Union` constructor. This method tends to be useful for creating circular references in schema.
 
+:::info Naming
+
+`Union` is named after the [set theory concept](https://en.wikipedia.org/wiki/Union_(set_theory)) just like [TypeScript Unions](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#union-types)
+
+:::
+
 ## Usage
 
-_Note: If your data returns an object that you did not provide a mapping for, the original object will be returned in the result and an entity will not be created._
+:::note
 
-<HooksPlayground groupId="schema" defaultOpen="y">
+If your data returns an object that you did not provide a mapping for, the original object will be returned in the result and an entity will not be created.
 
-```tsx
-const sampleData = () =>
-  Promise.resolve([
+:::
+
+<HooksPlayground groupId="schema" defaultOpen="y" fixtures={[
+{
+endpoint: new RestEndpoint({path: '/feed'}),
+args: [],
+response: [
     { id: 1, type: 'link', url: 'https://ntucker.true.io', title: 'Nate site' },
     { id: 10, type: 'post', content: 'good day!' },
-  ]);
+  ],
+delay: 150,
+},
+]}>
 
+```typescript title="api/Feed"
 abstract class FeedItem extends Entity {
-  readonly id: number = 0;
-  declare readonly type: 'link' | 'post';
-  pk() {
-    return `${this.id}`;
-  }
+  id = 0;
+  declare type: 'link' | 'post';
 }
 class Link extends FeedItem {
-  readonly type = 'link' as const;
-  readonly url: string = '';
-  readonly title: string = '';
+  type = 'link' as const;
+  url = '';
+  title = '';
 }
 class Post extends FeedItem {
-  readonly type = 'post' as const;
-  readonly content: string = '';
+  type = 'post' as const;
+  content = '';
 }
 
-const feed = new Endpoint(sampleData, {
+const feed = new RestEndpoint({
+  path: '/feed',
   schema: [
     new schema.Union(
       {
@@ -62,9 +76,11 @@ const feed = new Endpoint(sampleData, {
     ),
   ],
 });
+```
 
+```tsx title="FeedList" collapsed
 function FeedList() {
-  const feedItems = useSuspense(feed, {});
+  const feedItems = useSuspense(feed);
   return (
     <div>
       {feedItems.map(item =>
@@ -87,3 +103,10 @@ render(<FeedList />);
 ```
 
 </HooksPlayground>
+
+### Github Events
+
+Contribution activity comes from grouping github events by their type. Each type of Event has its
+own distinct schema, which is why we use `schema.Union`
+
+<StackBlitz app="github-app" file="src/pages/ProfileDetail/UserEvents.tsx,src/resources/Event.tsx" view="preview" initialpath="/users/ntucker" height="700" />
