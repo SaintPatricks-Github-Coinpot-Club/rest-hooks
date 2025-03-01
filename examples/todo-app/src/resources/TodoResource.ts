@@ -1,37 +1,26 @@
+import { schema } from '@data-client/rest';
+
 import {
-  createPlaceholderResource,
+  placeholderResource,
   PlaceholderEntity,
 } from './PlaceholderBaseResource';
 
 export class Todo extends PlaceholderEntity {
-  readonly userId: number = 0;
-  readonly title: string = '';
-  readonly completed: boolean = false;
+  userId = 0;
+  title = '';
+  completed = false;
+
+  static key = 'Todo';
 }
 
-const TodoResourceBase = createPlaceholderResource({
-  path: 'https\\://jsonplaceholder.typicode.com/todos/:id',
+export const TodoResource = placeholderResource({
+  path: '/todos/:id',
   schema: Todo,
+  optimistic: true,
+  searchParams: {} as { userId?: string | number } | undefined,
 });
-export const TodoResource = {
-  ...TodoResourceBase,
-  partialUpdate: TodoResourceBase.partialUpdate.extend({
-    getOptimisticResponse(snap, params, body) {
-      return {
-        id: params.id,
-        ...body,
-      };
-    },
-  }),
-  create: TodoResourceBase.create.extend({
-    getOptimisticResponse(snap, body) {
-      return body;
-    },
-    update: (newResourceId: string) => ({
-      [TodoResourceBase.getList.key()]: (resourceIds: string[] = []) => [
-        ...resourceIds,
-        newResourceId,
-      ],
-    }),
-  }),
-};
+
+export const queryRemainingTodos = new schema.Query(
+  TodoResource.getList.schema,
+  (entries) => entries.filter((todo) => !todo.completed).length,
+);

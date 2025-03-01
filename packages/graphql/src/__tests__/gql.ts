@@ -1,5 +1,5 @@
+import { schema } from '@data-client/endpoint';
 import nock from 'nock';
-import { schema } from '@rest-hooks/endpoint';
 
 import GQLEndpoint from '../GQLEndpoint';
 import GQLEntity from '../GQLEntity';
@@ -110,6 +110,15 @@ describe('GQLEndpoint', () => {
     }`,
     { user: User },
   );
+  const userDetailNoSchema = gql.query(
+    (v: { name: string }) => `query UserDetail($name: String!) {
+      user(name: $name) {
+        id
+        name
+        email
+      }
+    }`,
+  );
 
   it('should query', async () => {
     const response = await userDetail({ name: 'Fong' });
@@ -126,6 +135,30 @@ describe('GQLEndpoint', () => {
     `);
     // @ts-expect-error
     expect(response.slkd).toBeUndefined();
+  });
+
+  it('testKey should match keys', () => {
+    expect(userDetail.testKey(userDetail.key({ name: 'bob' }))).toBeTruthy();
+    expect(
+      userDetail.testKey(userDetail.key({ name: 'charles' })),
+    ).toBeTruthy();
+    expect(userDetail.testKey(userDetail.key({ name: 'alice' }))).toBeTruthy();
+    expect(userDetail.testKey(userDetail.key({ name: 'xxx?*' }))).toBeTruthy();
+  });
+
+  it('should query no schema', async () => {
+    const response = await userDetailNoSchema({ name: 'Fong' });
+    expect(response.user).toBeDefined();
+    expect(response.user.name).toBeDefined();
+    expect(response).toMatchInlineSnapshot(`
+      {
+        "user": {
+          "email": "fong@test.com",
+          "id": "1",
+          "name": "Fong",
+        },
+      }
+    `);
   });
 
   it('should deny bad types', () => {
@@ -198,7 +231,6 @@ describe('GQLEndpoint', () => {
     expect(error).toBeDefined();
     expect(error.status).toBe(400);
 
-    // eslint-disable-next-line require-atomic-updates
     console.error = oldError;
   });
 });

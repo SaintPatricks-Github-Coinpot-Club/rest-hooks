@@ -28,8 +28,23 @@ exports[`Controller.getResponse() infers schema with extra members but not set 1
       "next": false,
     },
     "first": null,
-    "second": undefined,
+    "second": "",
     "third": 0,
   },
+}
+`;
+
+exports[`Snapshot.getResponseMeta() denormalizes schema with extra members but not set 1`] = `
+{
+  "data": [
+    Tacos {
+      "id": "1",
+      "type": "foo",
+    },
+    Tacos {
+      "id": "2",
+      "type": "bar",
+    },
+  ],
 }
 `;

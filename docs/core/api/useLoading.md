@@ -1,71 +1,31 @@
 ---
-title: useLoading()
+title: useLoading() - Turn any promise into React State
+sidebar_label: useLoading()
+description: Track loading and error state of any async function.
 ---
 
-```typescript
-export default function useLoading<F extends (...args: any) => Promise<any>>(
-  func: F,
-  deps: readonly any[] = [],
-): [F, boolean];
-```
+import UseLoading from '../shared/\_useLoading.mdx';
+import PkgInstall from '@site/src/components/PkgInstall';
+import StackBlitz from '@site/src/components/StackBlitz';
 
-Helps track loading state of imperative async functions.
+# useLoading()
 
-```tsx
-import { useLoading } from '@rest-hooks/hooks';
+Helps track loading and error state of imperative async functions.
 
-function Button({ onClick, children, ...props }) {
-  const [clickHandler, loading, error] = useLoading(onClick);
-  return (
-    <button onClick={clickHandler} {...props}>
-      {loading ? 'Loading...' : children}
-    </button>
-  );
-}
-```
+:::tip
 
-Part of [@rest-hooks/hooks](https://www.npmjs.com/package/@rest-hooks/hooks)
+[useSuspense()](./useSuspense.md) or [useDLE()](./useDLE.md) are better for GET/read endpoints.
 
-### Todo toggle example
+:::
 
-```tsx
-import { useCallback } from 'react';
-import { useController } from 'rest-hooks';
-import { useLoading } from '@rest-hooks/hooks';
+## Usage
 
-import { TodoResource, Todo } from 'api/Todo';
+<UseLoading />
 
-interface Props {
-  todo: Todo;
-}
+Like [useCallback](https://react.dev/reference/react/useCallback), takes a dependency list to
+ensure referential consistency of the function.
 
-function TodoListItem({ todo }) {
-  const { fetch } = useController();
-
-  const [toggleHandler, loading, error] = useLoading(
-    (e: ChangeEvent<HTMLInputElement>) =>
-      fetch(
-        TodoResource.partialUpdate,
-        { id },
-        { completed: e.currentTarget.checked },
-      ),
-    [fetch],
-  );
-
-  return (
-    <div>
-      <input
-        type="checkbox"
-        checked={todo.completed}
-        onChange={toggleHandler}
-      />
-      {loading ? <Spinner /> : null}
-      {error ? <Error>{error}</Error> : null}
-      {todo.title}
-    </div>
-  );
-}
-```
+## Eslint
 
 :::tip Eslint configuration
 
@@ -84,3 +44,21 @@ of [react-hooks/exhaustive-deps](https://www.npmjs.com/package/eslint-plugin-rea
 ```
 
 :::
+
+## Types
+
+```typescript
+export default function useLoading<
+  F extends (...args: any) => Promise<any>,
+>(func: F, deps: readonly any[] = []): [F, boolean];
+```
+
+## Examples
+
+### Github pagination
+
+<StackBlitz app="github-app" file="src/resources/Issue.tsx,src/pages/IssueList.tsx,src/pages/NextPage.tsx" view="editor" />
+
+### Github comment form submission
+
+<StackBlitz app="github-app" file="src/pages/IssueDetail/CreateComment.tsx,src/pages/IssueDetail/CommentForm.tsx" view="editor" />

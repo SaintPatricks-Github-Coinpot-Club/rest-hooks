@@ -1,0 +1,439 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`DataProvider Endpoint should gracefully abort in useSuspense() 1`] = `[AbortError: Aborted]`;
+
+exports[`DataProvider Query should work as endpoint Schema 1`] = `
+[
+  CoolerArticle {
+    "author": User {
+      "email": "bob@bob.com",
+      "id": 23,
+      "isAdmin": false,
+      "username": "charles",
+    },
+    "content": "whatever",
+    "id": 5,
+    "tags": [
+      "a",
+      "best",
+      "react",
+    ],
+    "title": "hi ho",
+  },
+]
+`;
+
+exports[`DataProvider Query should work as endpoint Schema 2`] = `
+[
+  CoolerArticle {
+    "author": User {
+      "email": "bob@bob.com",
+      "id": 23,
+      "isAdmin": false,
+      "username": "charles",
+    },
+    "content": "whatever",
+    "id": 5,
+    "tags": [
+      "a",
+      "best",
+      "react",
+    ],
+    "title": "hi ho",
+  },
+  CoolerArticle {
+    "author": null,
+    "content": "whatever",
+    "id": 1000,
+    "tags": [
+      "a",
+    ],
+    "title": "bob says",
+  },
+]
+`;
+
+exports[`DataProvider should filter Query based on arguments 1`] = `
+[
+  CoolerArticle {
+    "author": User {
+      "email": "bob@bob.com",
+      "id": 23,
+      "isAdmin": false,
+      "username": "charles",
+    },
+    "content": "whatever",
+    "id": 5,
+    "tags": [
+      "a",
+      "best",
+      "react",
+    ],
+    "title": "hi ho",
+  },
+]
+`;
+
+exports[`DataProvider should filter Query based on arguments 2`] = `
+[
+  CoolerArticle {
+    "author": User {
+      "email": "bob@bob.com",
+      "id": 23,
+      "isAdmin": false,
+      "username": "charles",
+    },
+    "content": "whatever",
+    "id": 5,
+    "tags": [
+      "a",
+      "best",
+      "react",
+    ],
+    "title": "hi ho",
+  },
+  CoolerArticle {
+    "author": null,
+    "content": "whatever",
+    "id": 1000,
+    "tags": [
+      "a",
+    ],
+    "title": "bob says",
+  },
+]
+`;
+
+exports[`DataProvider should filter Query based on arguments 3`] = `
+[
+  CoolerArticle {
+    "author": User {
+      "email": "bob@bob.com",
+      "id": 23,
+      "isAdmin": false,
+      "username": "charles",
+    },
+    "content": "whatever",
+    "id": 3,
+    "tags": [],
+    "title": "the next time",
+  },
+  CoolerArticle {
+    "author": User {
+      "email": "bob@bob.com",
+      "id": 23,
+      "isAdmin": false,
+      "username": "charles",
+    },
+    "content": "whatever",
+    "id": 5,
+    "tags": [
+      "a",
+      "best",
+      "react",
+    ],
+    "title": "hi ho",
+  },
+  CoolerArticle {
+    "author": null,
+    "content": "whatever",
+    "id": 1000,
+    "tags": [
+      "a",
+    ],
+    "title": "bob says",
+  },
+  CoolerArticle {
+    "author": null,
+    "content": "whatever",
+    "id": 2000,
+    "tags": [],
+    "title": "should not exist",
+  },
+]
+`;
+
+exports[`DataProvider should passthrough union with unexpected schema attribute 1`] = `
+[
+  [
+    "Schema attribute "another" is not expected.
+Expected one of: "first", "second"
+
+Value: {
+  "id": "5",
+  "body": "hi",
+  "type": "another"
+}",
+  ],
+  [
+    "Schema attribute undefined is not expected.
+Expected one of: "first", "second"
+
+Value: {
+  "id": "5",
+  "body": "hi"
+}",
+  ],
+  [
+    "TypeError: Unable to infer schema for UnionSchema
+Value: {
+  "id": "5",
+  "body": "hi",
+  "type": "another"
+}.",
+  ],
+  [
+    "TypeError: Unable to infer schema for UnionSchema
+Value: {
+  "id": "5",
+  "body": "hi"
+}.",
+  ],
+]
+`;
+
+exports[`DataProvider useSuspense() should throw errors on malformed response 1`] = `
+[Error: Error processing GET http://test.com/article-cooler/878
+
+Full Schema: {
+  "key": "CoolerArticle",
+  "schema": {
+    "author": {
+      "key": "User",
+      "schema": {}
+    }
+  }
+}
+
+Error:
+Attempted to initialize CoolerArticle with an array, but named members were expected
+
+This is likely due to a malformed response.
+Try inspecting the network response or fetch() return value.
+Or use debugging tools: https://dataclient.io/docs/getting-started/debugging
+Learn more about schemas: https://dataclient.io/docs/api/schema
+If this is a mistake, you can disable this check by setting static automaticValidation = 'silent'
+
+First three members: [
+  1
+]]
+`;
+
+exports[`ExternalDataProvider Endpoint should gracefully abort in useSuspense() 1`] = `[AbortError: Aborted]`;
+
+exports[`ExternalDataProvider Query should work as endpoint Schema 1`] = `
+[
+  CoolerArticle {
+    "author": User {
+      "email": "bob@bob.com",
+      "id": 23,
+      "isAdmin": false,
+      "username": "charles",
+    },
+    "content": "whatever",
+    "id": 5,
+    "tags": [
+      "a",
+      "best",
+      "react",
+    ],
+    "title": "hi ho",
+  },
+]
+`;
+
+exports[`ExternalDataProvider Query should work as endpoint Schema 2`] = `
+[
+  CoolerArticle {
+    "author": User {
+      "email": "bob@bob.com",
+      "id": 23,
+      "isAdmin": false,
+      "username": "charles",
+    },
+    "content": "whatever",
+    "id": 5,
+    "tags": [
+      "a",
+      "best",
+      "react",
+    ],
+    "title": "hi ho",
+  },
+  CoolerArticle {
+    "author": null,
+    "content": "whatever",
+    "id": 1000,
+    "tags": [
+      "a",
+    ],
+    "title": "bob says",
+  },
+]
+`;
+
+exports[`ExternalDataProvider should filter Query based on arguments 1`] = `
+[
+  CoolerArticle {
+    "author": User {
+      "email": "bob@bob.com",
+      "id": 23,
+      "isAdmin": false,
+      "username": "charles",
+    },
+    "content": "whatever",
+    "id": 5,
+    "tags": [
+      "a",
+      "best",
+      "react",
+    ],
+    "title": "hi ho",
+  },
+]
+`;
+
+exports[`ExternalDataProvider should filter Query based on arguments 2`] = `
+[
+  CoolerArticle {
+    "author": User {
+      "email": "bob@bob.com",
+      "id": 23,
+      "isAdmin": false,
+      "username": "charles",
+    },
+    "content": "whatever",
+    "id": 5,
+    "tags": [
+      "a",
+      "best",
+      "react",
+    ],
+    "title": "hi ho",
+  },
+  CoolerArticle {
+    "author": null,
+    "content": "whatever",
+    "id": 1000,
+    "tags": [
+      "a",
+    ],
+    "title": "bob says",
+  },
+]
+`;
+
+exports[`ExternalDataProvider should filter Query based on arguments 3`] = `
+[
+  CoolerArticle {
+    "author": User {
+      "email": "bob@bob.com",
+      "id": 23,
+      "isAdmin": false,
+      "username": "charles",
+    },
+    "content": "whatever",
+    "id": 3,
+    "tags": [],
+    "title": "the next time",
+  },
+  CoolerArticle {
+    "author": User {
+      "email": "bob@bob.com",
+      "id": 23,
+      "isAdmin": false,
+      "username": "charles",
+    },
+    "content": "whatever",
+    "id": 5,
+    "tags": [
+      "a",
+      "best",
+      "react",
+    ],
+    "title": "hi ho",
+  },
+  CoolerArticle {
+    "author": null,
+    "content": "whatever",
+    "id": 1000,
+    "tags": [
+      "a",
+    ],
+    "title": "bob says",
+  },
+  CoolerArticle {
+    "author": null,
+    "content": "whatever",
+    "id": 2000,
+    "tags": [],
+    "title": "should not exist",
+  },
+]
+`;
+
+exports[`ExternalDataProvider should passthrough union with unexpected schema attribute 1`] = `
+[
+  [
+    "Schema attribute "another" is not expected.
+Expected one of: "first", "second"
+
+Value: {
+  "id": "5",
+  "body": "hi",
+  "type": "another"
+}",
+  ],
+  [
+    "Schema attribute undefined is not expected.
+Expected one of: "first", "second"
+
+Value: {
+  "id": "5",
+  "body": "hi"
+}",
+  ],
+  [
+    "TypeError: Unable to infer schema for UnionSchema
+Value: {
+  "id": "5",
+  "body": "hi",
+  "type": "another"
+}.",
+  ],
+  [
+    "TypeError: Unable to infer schema for UnionSchema
+Value: {
+  "id": "5",
+  "body": "hi"
+}.",
+  ],
+]
+`;
+
+exports[`ExternalDataProvider useSuspense() should throw errors on malformed response 1`] = `
+[Error: Error processing GET http://test.com/article-cooler/878
+
+Full Schema: {
+  "key": "CoolerArticle",
+  "schema": {
+    "author": {
+      "key": "User",
+      "schema": {}
+    }
+  }
+}
+
+Error:
+Attempted to initialize CoolerArticle with an array, but named members were expected
+
+This is likely due to a malformed response.
+Try inspecting the network response or fetch() return value.
+Or use debugging tools: https://dataclient.io/docs/getting-started/debugging
+Learn more about schemas: https://dataclient.io/docs/api/schema
+If this is a mistake, you can disable this check by setting static automaticValidation = 'silent'
+
+First three members: [
+  1
+]]
+`;

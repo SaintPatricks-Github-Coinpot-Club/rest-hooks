@@ -1,12 +1,12 @@
-import { Denormalize, Endpoint, EndpointOptions } from '@rest-hooks/endpoint';
-import type { Schema } from '@rest-hooks/endpoint';
+import { Denormalize, Endpoint, EndpointOptions } from '@data-client/endpoint';
+import type { Schema } from '@data-client/endpoint';
 
 import GQLNetworkError from './GQLNetworkError.js';
 
 export interface GQLOptions<
   Variables,
   S extends Schema | undefined = Schema | undefined,
-  M extends true | undefined = true | undefined,
+  M extends boolean | undefined = boolean | undefined,
 > extends EndpointOptions<(v: Variables) => Promise<any>, S, M> {
   getHeaders?(headers: HeadersInit): HeadersInit;
   getRequestInit?(variables: any): RequestInit;
@@ -17,8 +17,12 @@ export interface GQLOptions<
 export default class GQLEndpoint<
   Variables,
   S extends Schema | undefined = Schema | undefined,
-  M extends true | undefined = true | undefined,
-> extends Endpoint<(v: Variables) => Promise<Denormalize<S>>, S, M> {
+  M extends boolean | undefined = boolean | undefined,
+> extends Endpoint<
+  (v: Variables) => Promise<S extends undefined ? any : Denormalize<S>>,
+  S,
+  M
+> {
   declare readonly url: string;
   declare signal?: AbortSignal;
 
@@ -35,6 +39,10 @@ export default class GQLEndpoint<
   key(variables: Variables): string {
     // TODO: make this faster
     return `${this.getQuery(variables)} ${JSON.stringify(variables)}`;
+  }
+
+  testKey(key: string): boolean {
+    return key.startsWith(this.getQuery({} as any));
   }
 
   getQuery(variables: Variables): string {
@@ -68,7 +76,7 @@ export default class GQLEndpoint<
       .catch(error => {
         // ensure CORS, network down, and parse errors are still caught by NetworkErrorBoundary
         if (error instanceof TypeError) {
-          (error as any).status = 400;
+          (error as any).status = 500;
         }
         throw error;
       });
@@ -95,12 +103,16 @@ export default class GQLEndpoint<
     S,
     undefined
   > {
+    let getQuery: (...args: any) => any;
+    if (typeof queryOrGetQuery === 'function') {
+      getQuery = queryOrGetQuery;
+    } else {
+      const cleanedQuery = queryOrGetQuery.replaceAll(/\s+/gm, ' ').trim();
+      getQuery = () => cleanedQuery;
+    }
     const options: any = {
       schema,
-      getQuery:
-        typeof queryOrGetQuery === 'function'
-          ? queryOrGetQuery
-          : () => queryOrGetQuery,
+      getQuery,
     };
     return this.extend(options) as any;
   }
@@ -118,13 +130,17 @@ export default class GQLEndpoint<
     S,
     undefined
   > {
+    let getQuery: (...args: any) => any;
+    if (typeof queryOrGetQuery === 'function') {
+      getQuery = queryOrGetQuery;
+    } else {
+      const cleanedQuery = queryOrGetQuery.replaceAll(/\s+/gm, ' ').trim();
+      getQuery = () => cleanedQuery;
+    }
     const options: any = {
       sideEffect: true,
       schema,
-      getQuery:
-        typeof queryOrGetQuery === 'function'
-          ? queryOrGetQuery
-          : () => queryOrGetQuery,
+      getQuery,
     };
     return this.extend(options) as any;
   }

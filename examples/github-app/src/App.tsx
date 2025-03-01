@@ -1,13 +1,14 @@
-import React, { memo } from 'react';
-import { Layout, Menu } from 'antd';
-import Boundary, { Loading } from 'Boundary';
-import { MatchedRoute, Link } from '@anansi/router';
-import 'antd/dist/antd.css';
-import 'style/main.scss';
-import NavBar from 'navigation/NavBar';
-import FlexRow from 'components/FlexRow';
+import { MatchedRoute } from '@anansi/router';
+import { Layout } from 'antd';
+import { memo } from 'react';
 
-const { Header, Content } = Layout;
+import Boundary from '@/Boundary';
+import NavBar from '@/navigation/NavBar';
+
+import 'antd/dist/reset.css';
+import 'style/main.css';
+
+const { Content } = Layout;
 
 // Typically place global navigation and routing layer in here
 function App() {

@@ -1,28 +1,69 @@
 import { Link, useShowLoading } from '@anansi/router';
-import { Layout, Menu, Spin, Affix } from 'antd';
+import { AsyncBoundary, useCache, useSuspense } from '@data-client/react';
+import { Layout, Menu, Spin, Affix, MenuProps } from 'antd';
 import { Avatar } from 'antd';
-import { memo, Suspense, useContext, useState } from 'react';
-import { styled } from '@linaria/react';
-import { NetworkErrorBoundary, useSuspense } from 'rest-hooks';
-import UserResource from 'resources/User';
+import { memo, useContext, useMemo, useState } from 'react';
 
-import LoginModal from './LoginModal';
+import UserResource from '@/resources/User';
+
 import { authdContext } from './authdContext';
+import LoginModal from './LoginModal';
 
 const { Header } = Layout;
-
-const LoadContainer = styled.li`
-  flex: 1 1 auto;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-end;
-`;
 
 function NavBar() {
   const loading = useShowLoading(150);
   const [visibleLogin, setVisibleLogin] = useState(false);
-  const { authed, logout } = useContext(authdContext);
+  const user = useCache(UserResource.current);
+  const { logout } = useContext(authdContext);
+
+  const menuItems = useMemo(() => {
+    const items: MenuProps['items'] = [
+      {
+        key: 'home',
+        label: <Link name="Home">React Issues</Link>,
+      },
+      {
+        key: 'data-client',
+        label: (
+          <Link
+            name="IssueList"
+            props={{ repo: 'data-client', owner: 'reactive' }}
+          >
+            Data Client Issues
+          </Link>
+        ),
+      },
+    ];
+    if (user) {
+      items.push(
+        {
+          key: 'profile',
+          label: (
+            <AsyncBoundary>
+              <AuthedUser />
+            </AsyncBoundary>
+          ),
+        },
+        {
+          key: 'auth',
+          label: 'Logout',
+          onClick: logout,
+        },
+      );
+    } else {
+      items.push({
+        key: 'auth',
+        onClick: () => setVisibleLogin((visible: boolean) => !visible),
+        label: 'Login',
+      });
+    }
+    items.push({
+      key: 'loading',
+      label: loading && <Spin />,
+    });
+    return items;
+  }, [loading, logout, user]);
   return (
     <Affix offsetTop={0}>
       <Header className="header">
@@ -32,47 +73,12 @@ function NavBar() {
           handleClose={() => setVisibleLogin(false)}
         />
 
-        <Menu theme="dark" mode="horizontal" selectable={false}>
-          <Menu.Item key={'home'}>
-            <Link name="Home">React Issues</Link>
-          </Menu.Item>
-          <Menu.Item key={'rest-hooks'}>
-            <Link
-              name="IssueList"
-              props={{ repo: 'rest-hooks', owner: 'coinbase' }}
-            >
-              Rest Hooks Issues
-            </Link>
-          </Menu.Item>
-          {authed ? (
-            <>
-              <Menu.Item key="profile">
-                <NetworkErrorBoundary>
-                  <Suspense fallback={null}>
-                    <AuthedUser />
-                  </Suspense>
-                </NetworkErrorBoundary>
-              </Menu.Item>
-              <Menu.Item key={'auth'} onClick={logout}>
-                Logout
-              </Menu.Item>
-            </>
-          ) : (
-            <Menu.Item
-              key={'auth'}
-              onClick={() => setVisibleLogin((visible: boolean) => !visible)}
-            >
-              Login
-            </Menu.Item>
-          )}
-          {/*<Menu.Item key={'1'}>
-            <Link to="/closed">Closed</Link>
-          </Menu.Item>
-          <Menu.Item key={'2'}>
-            <Link to="/open">Open</Link>
-  </Menu.Item>*/}
-          <LoadContainer>{loading && <Spin />}</LoadContainer>
-        </Menu>
+        <Menu
+          theme="dark"
+          mode="horizontal"
+          selectable={false}
+          items={menuItems}
+        />
       </Header>
     </Affix>
   );

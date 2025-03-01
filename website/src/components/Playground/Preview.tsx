@@ -1,43 +1,45 @@
 import {
-  CacheProvider,
+  DataProvider,
   PollingSubscription,
   SubscriptionManager,
-} from 'rest-hooks';
-import { NetworkManager } from '@rest-hooks/core';
-import { FixtureEndpoint, MockResolver } from '@rest-hooks/test';
-import React, { memo, useCallback, useState, Suspense, useMemo } from 'react';
-import { LiveError, LivePreview } from 'react-live';
-import clsx from 'clsx';
+  NetworkManager,
+} from '@data-client/react';
 import {
-  useScrollPositionBlocker,
-  useTabGroupChoice,
-} from '@docusaurus/theme-common/internal';
-import BrowserOnly from '@docusaurus/BrowserOnly';
+  type Fixture,
+  type Interceptor,
+  MockResolver,
+} from '@data-client/test/browser';
+import { useScrollPositionBlocker } from '@docusaurus/theme-common/internal';
+import clsx from 'clsx';
+import React, { memo, useCallback, useState, useMemo, lazy } from 'react';
 
-import styles from './styles.module.css';
+import Boundary from './Boundary';
 import StoreInspector from './StoreInspector';
+import styles from './styles.module.css';
+import { useTabStorage } from '../../utils/tabStorage';
 
-function Preview({
+function Preview<T>({
   groupId,
   defaultOpen,
   row,
   fixtures,
+  getInitialInterceptorData,
 }: {
   groupId: string;
   row: boolean;
   defaultOpen: 'y' | 'n';
-  fixtures: FixtureEndpoint[];
+  fixtures: (Fixture | Interceptor<T>)[];
+  getInitialInterceptorData?: () => T;
 }) {
-  const { tabGroupChoices, setTabGroupChoices } = useTabGroupChoice();
+  const [choice, setTabGroupChoice] = useTabStorage(
+    `docusaurus.tab.${groupId}`,
+  );
   const [selectedValue, setSelectedValue] = useState(defaultOpen);
   const { blockElementScrollPositionUntilNextRender } =
     useScrollPositionBlocker();
 
-  if (groupId != null) {
-    const choice = tabGroupChoices[groupId];
-    if (choice != null && choice !== selectedValue) {
-      setSelectedValue(choice as any);
-    }
+  if (choice != null && choice !== selectedValue) {
+    setSelectedValue(choice as any);
   }
 
   const toggle = useCallback(
@@ -46,13 +48,12 @@ function Preview({
     ) => {
       blockElementScrollPositionUntilNextRender(event.currentTarget);
       setSelectedValue(open => (open === 'y' ? 'n' : 'y'));
-      setTabGroupChoices(groupId, selectedValue === 'y' ? 'n' : 'y');
+      setTabGroupChoice(selectedValue === 'y' ? 'n' : 'y');
     },
     [
       blockElementScrollPositionUntilNextRender,
-      groupId,
       selectedValue,
-      setTabGroupChoices,
+      setTabGroupChoice,
     ],
   );
 
@@ -62,31 +63,32 @@ function Preview({
   );
 
   const hiddenResult = !(selectedValue === 'n' || !row);
-
   return (
-    <CacheProvider managers={managers}>
-      <MockResolver fixtures={fixtures} silenceMissing={true}>
+    <DataProvider managers={managers}>
+      <MockResolver
+        fixtures={fixtures}
+        silenceMissing={true}
+        getInitialInterceptorData={getInitialInterceptorData}
+      >
         <div
-          className={clsx(styles.playgroundPreview, {
+          className={clsx('playground-preview', styles.playgroundPreview, {
             [styles.hidden]: hiddenResult,
           })}
         >
-          <BrowserOnly fallback={<LivePreviewLoader />}>
-            {() => (
-              <Suspense fallback={<LivePreviewLoader />}>
-                <LivePreview />
-                <LiveError className={styles.playgroundError} />
-              </Suspense>
-            )}
-          </BrowserOnly>
+          <Boundary fallback={null}>
+            <PreviewBlockLazy />
+          </Boundary>
         </div>
         <StoreInspector selectedValue={selectedValue} toggle={toggle} />
       </MockResolver>
-    </CacheProvider>
+    </DataProvider>
   );
 }
 export default memo(Preview);
 
-function LivePreviewLoader() {
-  return <div>Loading...</div>;
-}
+const PreviewBlockLazy = lazy(
+  () =>
+    import(
+      /* webpackChunkName: 'PreviewBlock', webpackPreload: true */ './PreviewBlock'
+    ),
+);
