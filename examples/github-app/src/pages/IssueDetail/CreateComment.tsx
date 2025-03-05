@@ -1,21 +1,16 @@
-import UserResource from 'resources/User';
-import { useCache, useController } from 'rest-hooks';
-import { Card, Avatar } from 'antd';
 import { Link } from '@anansi/router';
-import { memo, useCallback } from 'react';
-import { CommentResource } from 'resources/Comment';
-import { Issue } from 'resources/Issue';
+import { useCache, useController } from '@data-client/react';
 import { css } from '@linaria/core';
+import { Card, Avatar } from 'antd';
+import { memo, useCallback } from 'react';
+
+import { CommentResource } from '@/resources/Comment';
+import { Issue } from '@/resources/Issue';
+import UserResource from '@/resources/User';
 
 import CommentForm from './CommentForm';
 
 const { Meta } = Card;
-
-const comment = css`
-  .ant-card-meta-detail {
-    width: 100%;
-  }
-`;
 
 function CreateComment({ issue }: { issue: Issue }) {
   const currentUser = useCache(UserResource.current);
@@ -38,17 +33,23 @@ function CreateComment({ issue }: { issue: Issue }) {
 }
 export default memo(CreateComment);
 
+const comment = css`
+  .ant-card-meta-detail {
+    width: 100%;
+  }
+`;
+
 function CreateForm({ issue }: { issue: Issue }) {
-  const { fetch } = useController();
+  const ctrl = useController();
   const onFinish = useCallback(
     (data: { body: string }) => {
-      return fetch(
-        CommentResource.create,
+      return ctrl.fetch(
+        CommentResource.getList.push,
         { owner: issue.owner, repo: issue.repo, number: issue.number },
         data,
       );
     },
-    [fetch, issue.number, issue.owner, issue.repo],
+    [ctrl, issue.number, issue.owner, issue.repo],
   );
   return <CommentForm onFinish={onFinish} label="Comment" />;
 }

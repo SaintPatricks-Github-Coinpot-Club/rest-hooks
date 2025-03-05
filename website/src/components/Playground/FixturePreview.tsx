@@ -1,35 +1,73 @@
-import type { FixtureEndpoint } from '@rest-hooks/test';
-import React, { memo } from 'react';
+import type { Fixture, Interceptor } from '@data-client/test';
+import BrowserOnly from '@docusaurus/BrowserOnly';
+import CodeBlock from '@theme/CodeBlock';
+import { memo, type ReactElement } from 'react';
 
-function FixturePreview({ fixtures }: { fixtures: FixtureEndpoint[] }) {
+import styles from './styles.module.css';
+
+function FixturePreview({ fixtures }: { fixtures: (Fixture | Interceptor)[] }) {
   return (
-    <div
-      style={{
-        backgroundColor: 'rgb(41, 45, 62)',
-        font: 'var(--ifm-code-font-size) / var(--ifm-pre-line-height) var(--ifm-font-family-monospace) !important',
-        color: 'rgb(191, 199, 213)',
-        padding: '10px',
-      }}
-    >
-      {fixtures.map(fixture => (
-        <div key={fixture.endpoint.key(...fixture.args)}>
-          <span style={{ color: 'rgb(195, 232, 141)' }}>
-            {fixture.endpoint.key(...fixture.args)}
-          </span>
-          : <FixtureResponse fixture={fixture} />
-        </div>
+    <div className={styles.fixtureBlock}>
+      {fixtures.map((fixture, i) => (
+        <FixtureOrInterceptor key={i} fixture={fixture} />
       ))}
     </div>
   );
 }
 export default memo(FixturePreview);
 
-function FixtureResponse({ fixture }: { fixture: FixtureEndpoint }) {
+function FixtureResponse({
+  fixture,
+}: {
+  fixture: Fixture | Interceptor;
+}): ReactElement {
   return (
-    <span>
-      {typeof fixture.response === 'function'
-        ? 'function'
-        : JSON.stringify(fixture.response, undefined, 2)}
-    </span>
+    'fetchResponse' in fixture ?
+      <BrowserOnly>
+        {() => (
+          <CodeBlock language="javascript" className={styles.fixtureJson}>
+            {`${fixture.fetchResponse}`}
+          </CodeBlock>
+        )}
+      </BrowserOnly>
+    : typeof fixture.response === 'function' ?
+      <BrowserOnly>
+        {() => (
+          <CodeBlock language="javascript" className={styles.fixtureJson}>
+            {`${fixture.response}`}
+          </CodeBlock>
+        )}
+      </BrowserOnly>
+    : <CodeBlock language="json" className={styles.fixtureJson}>
+        {JSON.stringify(fixture.response)}
+      </CodeBlock>
+  );
+}
+
+function FixtureOrInterceptor({
+  fixture,
+}: {
+  fixture: Fixture | Interceptor;
+}): JSX.Element {
+  if ('args' in fixture) {
+    return (
+      <div
+        key={fixture.endpoint.key(...fixture.args)}
+        className={styles.fixtureItem}
+      >
+        <div className={styles.fixtureHeader}>
+          {fixture.endpoint.key(...fixture.args)}
+        </div>
+        <FixtureResponse fixture={fixture} />
+      </div>
+    );
+  }
+  return (
+    <div className={styles.fixtureItem}>
+      <div className={styles.fixtureHeader}>
+        {(fixture.endpoint as any).method} {(fixture.endpoint as any).path}
+      </div>
+      <FixtureResponse fixture={fixture} />
+    </div>
   );
 }

@@ -1,37 +1,40 @@
 ---
 title: Unit testing hooks
 ---
+
 import PkgTabs from '@site/src/components/PkgTabs';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-:::danger
+:::warning
 
-Do *not* use jest.mock on any rest-hooks library. This will likely result in hard-to trace
+Be careful when using [jest.mock](https://jestjs.io/docs/jest-object#jestmockmodulename-factory-options) on modules like Reactive Data Client. Eliminating expected
+exports can lead to hard-to trace
 errors like `TypeError: Class extends value undefined is not a function or null`.
+
+Instead either do a [partial mock](https://jestjs.io/docs/mock-functions#mocking-partials),
+or better [mockResolvedValue](https://jestjs.io/docs/mock-functions#mocking-modules) on your
+endpoints.
 
 :::
 
 Hooks allow you to pull complex behaviors out of your components into succinct,
 composable functions. This makes testing component behavior potentially much
-easier. But how does this work if you want to use hooks from `rest-hooks`?
+easier. But how does this work if you want to use hooks from `Reactive Data Client`?
 
 We have provided some simple utilities to reduce boilerplate for unit tests
 that are wrappers around [@testing-library/react-hooks](https://github.com/testing-library/react-hooks-testing-library)'s [renderHook()](https://react-hooks-testing-library.com/reference/api#renderhook-options).
 
-We want a [renderRestHook()](../api/makeRenderRestHook#renderresthook) function that renders in the context of both
+We want a [renderDataHook()](../api/renderDataHook.md) function that renders in the context of both
 a `Provider` and `Suspense` boundary.
-
-To support both providers, you must choose among two provider-generators to
-send as args to the [renderRestHook()](../api/makeRenderRestHook#renderresthook) generator.
 
 These will generally be done during test setup. It's important to call cleanup
 upon test completion.
 
-:::caution
+:::note
 
-`renderRestHook()` creates a Provider context with new manager instances. This means each call
-to `renderRestHook()` will result in a completely fresh cache state as well as manager state.
+`renderDataHook()` creates a Provider context with new manager instances. This means each call
+to `renderDataHook()` will result in a completely fresh cache state as well as manager state.
 
 :::
 
@@ -41,13 +44,7 @@ Node doesn't come with fetch out of the box, so we need to be sure to polyfill i
 
 <PkgTabs pkgs="whatwg-fetch" dev />
 
-<Tabs
-defaultValue="jest"
-values={[
-{ label: 'jest', value: 'jest' },
-]}>
-<TabItem value="jest">
-
+### Jest
 
 ```js
 // jest.config.js
@@ -56,31 +53,27 @@ module.exports = {
   setupFiles: ['./testSetup.js'],
 };
 ```
+
 ```js
 // testSetup.js
 require('whatwg-fetch');
 ```
 
-</TabItem>
-</Tabs>
-
 ### Example:
 
 <Tabs
-defaultValue="CacheProvider"
+defaultValue="DataProvider"
 values={[
-{ label: 'CacheProvider', value: 'CacheProvider' },
-{ label: 'ExternalCacheProvider', value: 'ExternalCacheProvider' },
+{ label: '@data-client/react', value: 'DataProvider' },
+{ label: '@data-client/react/redux', value: 'ExternalDataProvider' },
 ]}>
-<TabItem value="CacheProvider">
+<TabItem value="DataProvider">
 
 ```typescript
 import nock from 'nock';
-import { makeRenderRestHook, makeCacheProvider } from '@rest-hooks/test';
+import { renderDataHook } from '@data-client/test';
 
 describe('useSuspense()', () => {
-  let renderRestHook: ReturnType<typeof makeRenderRestHook>;
-
   beforeEach(() => {
     nock(/.*/)
       .persist()
@@ -92,7 +85,6 @@ describe('useSuspense()', () => {
       .reply(200)
       .get(`/article/0`)
       .reply(403, {});
-    renderRestHook = makeRenderRestHook(makeCacheProvider);
   });
 
   afterEach(() => {
@@ -100,13 +92,13 @@ describe('useSuspense()', () => {
   });
 
   it('should throw errors on bad network', async () => {
-    const { result, waitForNextUpdate } = renderRestHook(() => {
+    const { result, waitFor } = renderDataHook(() => {
       return useSuspense(ArticleResource.get, {
         title: '0',
       });
     });
     expect(result.current).toBeUndefined();
-    await waitForNextUpdate();
+    await waitFor(() => expect(result.current).toBeDefined());
     expect(result.error).toBeDefined();
     expect((result.error as any).status).toBe(403);
   });
@@ -114,14 +106,15 @@ describe('useSuspense()', () => {
 ```
 
 </TabItem>
-<TabItem value="ExternalCacheProvider">
+<TabItem value="ExternalDataProvider">
 
 ```typescript
 import nock from 'nock';
-import { makeRenderRestHook, makeExternalCacheProvider } from '@rest-hooks/test';
+import { makeRenderDataHook } from '@data-client/test';
+import { DataProvider } from '@data-client/react/redux';
 
 describe('useSuspense()', () => {
-  let renderRestHook: ReturnType<typeof makeRenderRestHook>;
+  let renderDataHook: ReturnType<typeof makeRenderDataHook>;
 
   beforeEach(() => {
     nock(/.*/)
@@ -134,7 +127,7 @@ describe('useSuspense()', () => {
       .reply(200)
       .get(`/article/0`)
       .reply(403, {});
-    renderRestHook = makeRenderRestHook(makeExternalCacheProvider);
+    renderDataHook = makeRenderDataHook(DataProvider);
   });
 
   afterEach(() => {
@@ -142,13 +135,13 @@ describe('useSuspense()', () => {
   });
 
   it('should throw errors on bad network', async () => {
-    const { result, waitForNextUpdate } = renderRestHook(() => {
+    const { result, waitFor } = renderDataHook(() => {
       return useSuspense(ArticleResource.get, {
         title: '0',
       });
     });
     expect(result.current).toBeUndefined();
-    await waitForNextUpdate();
+    await waitFor(() => expect(result.current).toBeDefined());
     expect(result.error).toBeDefined();
     expect((result.error as any).status).toBe(403);
   });

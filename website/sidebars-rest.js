@@ -2,7 +2,7 @@ module.exports = {
   docs: [
     {
       type: 'doc',
-      id: 'usage',
+      id: 'README',
     },
     {
       type: 'category',
@@ -33,6 +33,10 @@ module.exports = {
           type: 'doc',
           id: 'guides/abort',
         },
+        {
+          type: 'doc',
+          id: 'guides/django',
+        },
       ],
     },
     {
@@ -42,15 +46,23 @@ module.exports = {
       items: [
         {
           type: 'doc',
-          id: 'guides/nested-response',
+          id: 'guides/sorting-client-side',
         },
         {
           type: 'doc',
-          id: 'guides/rpc',
+          id: 'guides/relational-data',
+        },
+        {
+          type: 'doc',
+          id: 'guides/side-effects',
         },
         {
           type: 'doc',
           id: 'guides/computed-properties',
+        },
+        {
+          type: 'doc',
+          id: 'guides/partial-entities',
         },
       ],
     },
@@ -69,15 +81,11 @@ module.exports = {
         },
         {
           type: 'doc',
-          id: 'api/createResource',
+          id: 'api/resource',
         },
         {
           type: 'doc',
           id: 'api/hookifyResource',
-        },
-        {
-          type: 'doc',
-          id: 'api/Index',
         },
       ],
     },
@@ -85,7 +93,7 @@ module.exports = {
       type: 'category',
       label: 'Schema API',
       collapsed: false,
-      items: require('./sidebars-endpoint.json').slice(2),
+      items: require('./sidebars-endpoint.json').slice(1),
     },
   ],
 };

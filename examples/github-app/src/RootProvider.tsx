@@ -1,24 +1,34 @@
-import { CacheProvider } from 'rest-hooks';
+import {
+  DataProvider,
+  Controller,
+  LogoutManager,
+  getDefaultManagers,
+  ProviderProps,
+} from '@data-client/react';
 import type { ReactNode } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import type { FallbackProps } from 'react-error-boundary';
-import { AuthdProvider } from 'navigation/authdContext';
 
-import { Router } from './routing';
+import { AuthdProvider } from '@/navigation/authdContext';
+import { unAuth } from '@/resources/Auth';
+
 import Boundary from './Boundary';
+import { Router } from './routing';
 
-type ComponentProps<T> = T extends
-  | React.ComponentType<infer P>
-  | React.Component<infer P>
-  ? JSX.LibraryManagedAttributes<T, P>
-  : never;
-
-type Props = { children: ReactNode } & ComponentProps<typeof CacheProvider>;
+const managers = [
+  new LogoutManager({
+    handleLogout(controller: Controller) {
+      unAuth();
+      controller.resetEntireStore();
+    },
+  }),
+  ...getDefaultManagers(),
+];
 
 export default function RootProvider({ children, ...rest }: Props) {
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>
-      <CacheProvider {...rest}>
+      <DataProvider {...rest} managers={managers}>
         <Router>
           <AuthdProvider>
             <ErrorBoundary FallbackComponent={ErrorFallback}>
@@ -26,10 +36,13 @@ export default function RootProvider({ children, ...rest }: Props) {
             </ErrorBoundary>
           </AuthdProvider>
         </Router>
-      </CacheProvider>
+      </DataProvider>
     </ErrorBoundary>
   );
 }
+
+type Props = { children: ReactNode } & ProviderProps;
+
 function ErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
   return (
     <div role="alert">

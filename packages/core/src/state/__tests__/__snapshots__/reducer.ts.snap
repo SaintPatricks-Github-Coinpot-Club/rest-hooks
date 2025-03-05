@@ -1,7 +1,8 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`reducer should set error in meta for "receive" 1`] = `
+exports[`reducer should set error in meta for "set" 1`] = `
 {
+  "endpoints": {},
   "entities": {},
   "entityMeta": {},
   "indexes": {},
@@ -12,15 +13,18 @@ exports[`reducer should set error in meta for "receive" 1`] = `
       "error": [Error: hi],
       "errorPolicy": undefined,
       "expiresAt": 5000500000,
+      "fetchedAt": 5000000000,
     },
   },
   "optimistic": [],
-  "results": {},
 }
 `;
 
 exports[`reducer singles should update state correctly 1`] = `
 {
+  "endpoints": {
+    "http://test.com/article/20": "20",
+  },
   "entities": {
     "Article": {
       "20": {
@@ -45,12 +49,10 @@ exports[`reducer singles should update state correctly 1`] = `
     "http://test.com/article/20": {
       "date": 5000000000,
       "expiresAt": 5000500000,
+      "fetchedAt": 5000000000,
       "prevExpiresAt": undefined,
     },
   },
   "optimistic": [],
-  "results": {
-    "http://test.com/article/20": "20",
-  },
 }
 `;

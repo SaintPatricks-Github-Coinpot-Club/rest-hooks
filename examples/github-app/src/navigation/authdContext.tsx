@@ -1,11 +1,11 @@
-import React, { createContext, useState, useCallback, useMemo } from 'react';
-import { getAuth, setAuth, unAuth } from 'resources/Auth';
-import UserResource from 'resources/User';
-import { useController } from 'rest-hooks';
+import { useController } from '@data-client/react';
+import React, { createContext, useCallback, useMemo } from 'react';
+
+import { setAuth, unAuth } from '@/resources/Auth';
+import UserResource, { User } from '@/resources/User';
 
 export const authdContext = createContext({
-  authed: false,
-  login(data: { login: string; token: string }): void {
+  async login(data: { login: string; token: string }): Promise<User> {
     throw new Error('context not set for auth');
   },
   logout(): void {
@@ -14,23 +14,20 @@ export const authdContext = createContext({
 });
 
 export function AuthdProvider({ children }: { children: React.ReactNode }) {
-  const [authed, setAuthed] = useState(() => !!getAuth());
-  const { invalidate, fetch } = useController();
+  const ctrl = useController();
   const logout = useCallback(() => {
     unAuth();
     // current user no longer exists
-    invalidate(UserResource.current);
-    setAuthed(false);
-  }, []);
-  const login = useCallback((data: { login: string; token: string }) => {
-    fetch(UserResource.current);
-    setAuth(data);
-    setAuthed(true);
-  }, []);
-  const value = useMemo(
-    () => ({ authed, login, logout }),
-    [authed, login, logout],
+    ctrl.invalidate(UserResource.current);
+  }, [ctrl]);
+  const login = useCallback(
+    async (data: { login: string; token: string }) => {
+      setAuth(data);
+      return await ctrl.fetch(UserResource.current);
+    },
+    [ctrl],
   );
+  const value = useMemo(() => ({ login, logout }), [login, logout]);
   return (
     <authdContext.Provider value={value}>{children}</authdContext.Provider>
   );

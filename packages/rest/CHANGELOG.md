@@ -1,455 +1,1121 @@
-# Change Log
+# @data-client/rest
 
-All notable changes to this project will be documented in this file.
-See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+## 0.14.22
 
-## [6.0.0](https://github.com/coinbase/rest-hooks/compare/@rest-hooks/rest@5.2.0...@rest-hooks/rest@6.0.0) (2022-10-01)
+### Patch Changes
 
-### ⚠ 💥 BREAKING CHANGES
+- [#3390](https://github.com/reactive/data-client/pull/3390) [`32cccdb`](https://github.com/reactive/data-client/commit/32cccdb921cd8d7643b641a9e8872aa89782a94a) Thanks [@ntucker](https://github.com/ntucker)! - Improve performance by using Map() instead of Object for unbounded keys
 
-* Removed BaseResource, Resource, HookableResource
+## 0.14.21
 
-### 🚀 Features
+### Patch Changes
 
-* RestEndpoint, createResource, hookifyResource ([#2187](https://github.com/coinbase/rest-hooks/issues/2187)) ([b48314b](https://github.com/coinbase/rest-hooks/commit/b48314bfe56f162ca4094d6e436b1ac1c4a9d477))
+- [#3384](https://github.com/reactive/data-client/pull/3384) [`24ad679`](https://github.com/reactive/data-client/commit/24ad679f58c7eb0d0e6917790b4ebb5ee234e1d3) Thanks [@ntucker](https://github.com/ntucker)! - Reduce bundle sizes by 30% by removing unneeded polyfills
 
-### 📦 Package
+- Updated dependencies [[`24ad679`](https://github.com/reactive/data-client/commit/24ad679f58c7eb0d0e6917790b4ebb5ee234e1d3)]:
+  - @data-client/endpoint@0.14.21
 
-* Update all non-major dependencies ([#2190](https://github.com/coinbase/rest-hooks/issues/2190)) ([c2c7403](https://github.com/coinbase/rest-hooks/commit/c2c74033ecf2004ddebaf064af64f37894f20dec))
-* Update babel packages ([#2192](https://github.com/coinbase/rest-hooks/issues/2192)) ([7c9d3bc](https://github.com/coinbase/rest-hooks/commit/7c9d3bc8ea3019490a1f9e1978c3709b346d582d))
+## 0.14.20
 
-### 📝 Documentation
+### Patch Changes
 
-* Add react-native related keywords ([fe66dcd](https://github.com/coinbase/rest-hooks/commit/fe66dcdcf3948e6d2142004d0f6b0d043f9b4fb4))
+- [`c3514c6`](https://github.com/reactive/data-client/commit/c3514c6afa2cd76dafa02adcfad6f6481a34b5de) Thanks [@ntucker](https://github.com/ntucker)! - Remove unnecessary polyfills in build
 
-## [5.2.0](https://github.com/coinbase/rest-hooks/compare/@rest-hooks/rest@5.1.1...@rest-hooks/rest@5.2.0) (2022-09-19)
+- Updated dependencies [[`c3514c6`](https://github.com/reactive/data-client/commit/c3514c6afa2cd76dafa02adcfad6f6481a34b5de)]:
+  - @data-client/endpoint@0.14.20
 
-### 🚀 Features
+## 0.14.19
 
-* Move schema implementations to @rest-hooks/endpoint ([#2159](https://github.com/coinbase/rest-hooks/issues/2159)) ([a4be8c0](https://github.com/coinbase/rest-hooks/commit/a4be8c08ea515a27254ea480da2baffa1534b09d))
+### Patch Changes
 
-### 💅 Enhancement
+- [`cb4fb92`](https://github.com/reactive/data-client/commit/cb4fb922e305502ba8ab99c99b6012e753a87a3a) Thanks [@ntucker](https://github.com/ntucker)! - Remove typing redundancy
 
-* Object.prototype.hasOwnProperty -> Object.hasOwn ([bdbc6a4](https://github.com/coinbase/rest-hooks/commit/bdbc6a49350cae24a9d8cda0d4e360ce20cb91cd))
+- [#3371](https://github.com/reactive/data-client/pull/3371) [`679d76a`](https://github.com/reactive/data-client/commit/679d76a36234dcf5993c0358f94d7e1db0505cc6) Thanks [@ntucker](https://github.com/ntucker)! - Add react-native entry to package.json exports
 
-### 🐛 Bug Fix
+- [#3353](https://github.com/reactive/data-client/pull/3353) [`165afed`](https://github.com/reactive/data-client/commit/165afed083c0c63e9356bc8d1ee30dee8b916ed6) Thanks [@renovate](https://github.com/apps/renovate)! - Polyfills no longer pollute global scope
 
-* React native to use es6 modules ([#2180](https://github.com/coinbase/rest-hooks/issues/2180)) ([31524ea](https://github.com/coinbase/rest-hooks/commit/31524ea2cbe6ab4bf4cfe77659ac5e69b0319763))
+- Updated dependencies [[`cb4fb92`](https://github.com/reactive/data-client/commit/cb4fb922e305502ba8ab99c99b6012e753a87a3a), [`679d76a`](https://github.com/reactive/data-client/commit/679d76a36234dcf5993c0358f94d7e1db0505cc6), [`165afed`](https://github.com/reactive/data-client/commit/165afed083c0c63e9356bc8d1ee30dee8b916ed6)]:
+  - @data-client/endpoint@0.14.19
 
-### 📦 Package
+## 0.14.18
 
-* Update babel packages ([#2174](https://github.com/coinbase/rest-hooks/issues/2174)) ([dab7ac7](https://github.com/coinbase/rest-hooks/commit/dab7ac798850fc0519ffe5793601757b10d949b2))
+### Patch Changes
 
-## [5.2.0-beta.1](https://github.com/coinbase/rest-hooks/compare/@rest-hooks/rest@5.1.1...@rest-hooks/rest@5.2.0-beta.1) (2022-09-17)
+- [#3333](https://github.com/reactive/data-client/pull/3333) [`1777546`](https://github.com/reactive/data-client/commit/17775462d236bf714f518b861a63d5ae9f1f6357) Thanks [@renovate](https://github.com/apps/renovate)! - Resource.extend() compatibility with TypeScript 5
 
-### 🚀 Features
+  Previously [extending existing members](https://dataclient.io/rest/api/resource#extend-override) with no
+  typed overrides (like [path](https://dataclient.io/rest/api/resource#path)) would not work starting with
+  TypeScript 5.7.
 
-* Move schema implementations to @rest-hooks/endpoint ([#2159](https://github.com/coinbase/rest-hooks/issues/2159)) ([a4be8c0](https://github.com/coinbase/rest-hooks/commit/a4be8c08ea515a27254ea480da2baffa1534b09d))
+  ```ts
+  const UserResource = UserResourceBase.extend({
+    partialUpdate: {
+      getOptimisticResponse(snap, params, body) {
+        params.id;
+        params.group;
+        // @ts-expect-error
+        params.nothere;
+        return {
+          id: params.id,
+          ...body,
+        };
+      },
+    },
+  });
+  ```
 
-### 💅 Enhancement
+## 0.14.17
 
-* Object.prototype.hasOwnProperty -> Object.hasOwn ([bdbc6a4](https://github.com/coinbase/rest-hooks/commit/bdbc6a49350cae24a9d8cda0d4e360ce20cb91cd))
+### Patch Changes
 
-### 📦 Package
+- [#3281](https://github.com/reactive/data-client/pull/3281) [`99cd041`](https://github.com/reactive/data-client/commit/99cd04152532e13d8fb092ea800d381391d5aacd) Thanks [@ntucker](https://github.com/ntucker)! - Collections work with nested args
 
-* Update babel packages ([#2174](https://github.com/coinbase/rest-hooks/issues/2174)) ([dab7ac7](https://github.com/coinbase/rest-hooks/commit/dab7ac798850fc0519ffe5793601757b10d949b2))
+  This fixes [integration with qs library](https://dataclient.io/rest/api/RestEndpoint#using-qs-library) and more complex search parameters.
 
-## [5.2.0-beta.0](https://github.com/coinbase/rest-hooks/compare/@rest-hooks/rest@5.1.1...@rest-hooks/rest@5.2.0-beta.0) (2022-09-16)
+- [`25be07f`](https://github.com/reactive/data-client/commit/25be07f51c501003330d758993542bee3bd804e1) Thanks [@ntucker](https://github.com/ntucker)! - Update README to not say 'mixin' twice
 
-### 🚀 Features
+- Updated dependencies [[`99cd041`](https://github.com/reactive/data-client/commit/99cd04152532e13d8fb092ea800d381391d5aacd)]:
+  - @data-client/endpoint@0.14.17
 
-* Move schema implementations to @rest-hooks/endpoint ([#2159](https://github.com/coinbase/rest-hooks/issues/2159)) ([ffaed57](https://github.com/coinbase/rest-hooks/commit/ffaed57a3b397f6eeb69ab3a9fd51366b298b3e5))
+## 0.14.16
 
-### 📦 Package
+### Patch Changes
 
-* Update babel packages ([#2174](https://github.com/coinbase/rest-hooks/issues/2174)) ([dab7ac7](https://github.com/coinbase/rest-hooks/commit/dab7ac798850fc0519ffe5793601757b10d949b2))
+- [`4580e62`](https://github.com/reactive/data-client/commit/4580e628764ab43de3e4607f8584bc6cb4173021) Thanks [@ntucker](https://github.com/ntucker)! - Update docstring for EntityMixin
 
-### [5.1.1](https://github.com/coinbase/rest-hooks/compare/@rest-hooks/rest@5.0.6...@rest-hooks/rest@5.1.1) (2022-09-10)
+- [#3243](https://github.com/reactive/data-client/pull/3243) [`43a955c`](https://github.com/reactive/data-client/commit/43a955c18684b4e0f5c1d79b2504e8ad2910816b) Thanks [@ntucker](https://github.com/ntucker)! - `schema.Entity` -> [EntityMixin](https://dataclient.io/rest/api/EntityMixin)
 
-### 📦 Package
+  ```ts
+  import { EntityMixin } from '@data-client/rest';
 
-* Update all non-major dependencies ([#2119](https://github.com/coinbase/rest-hooks/issues/2119)) ([3003348](https://github.com/coinbase/rest-hooks/commit/3003348ba96781085a6f8a6a86a882438ba2b5ea))
-* Update all non-major dependencies ([#2136](https://github.com/coinbase/rest-hooks/issues/2136)) ([f7c8649](https://github.com/coinbase/rest-hooks/commit/f7c864998abc68cae1a4130f2de50e055c7a5269))
-* Update all non-major dependencies ([#2150](https://github.com/coinbase/rest-hooks/issues/2150)) ([eb480f1](https://github.com/coinbase/rest-hooks/commit/eb480f1f567944208483c9239256e7bcf81351e7))
-* Update babel packages ([#2124](https://github.com/coinbase/rest-hooks/issues/2124)) ([bab76ae](https://github.com/coinbase/rest-hooks/commit/bab76ae4ac54474634d3cb323b69ef9be5773a03))
-* Update babel packages ([#2140](https://github.com/coinbase/rest-hooks/issues/2140)) ([bc4d12d](https://github.com/coinbase/rest-hooks/commit/bc4d12d5369f4eee17f32d9379793cfc9b679d61))
-* Update babel packages ([#2161](https://github.com/coinbase/rest-hooks/issues/2161)) ([31b2c8f](https://github.com/coinbase/rest-hooks/commit/31b2c8ff3d9f9001c31f3f5c15bec1321a15361d))
-* Update JS test packages to v29 (major) ([#2141](https://github.com/coinbase/rest-hooks/issues/2141)) ([70759cf](https://github.com/coinbase/rest-hooks/commit/70759cfc8a2de9d42a060727d9f91fe4e6945296))
+  export class Article {
+    id = '';
+    title = '';
+    content = '';
+    tags: string[] = [];
+  }
 
-### [5.1.0](https://github.com/coinbase/rest-hooks/compare/@rest-hooks/rest@5.0.6...@rest-hooks/rest@5.1.0) (2022-09-04)
+  export class ArticleEntity extends EntityMixin(Article) {}
+  ```
 
-### 🚀 Features
+  We keep `schema.Entity` for legacy, and add schema.EntityMixin and [EntityMixin](https://dataclient.io/rest/api/EntityMixin) as direct export
 
-* Add EndpointInstanceInterface ([89a76b5](https://github.com/coinbase/rest-hooks/commit/89a76b50c8d89ea3d7fa19e70274f391b147017e))
-* Add validateRequired() ([#2116](https://github.com/coinbase/rest-hooks/issues/2116)) ([85e2bd9](https://github.com/coinbase/rest-hooks/commit/85e2bd9ef2696694ce18c713d35d2c9aaabbedc1))
+- Updated dependencies [[`4580e62`](https://github.com/reactive/data-client/commit/4580e628764ab43de3e4607f8584bc6cb4173021), [`1f7b191`](https://github.com/reactive/data-client/commit/1f7b1913e9301230d9fdae23baba9e3c582e005c), [`43a955c`](https://github.com/reactive/data-client/commit/43a955c18684b4e0f5c1d79b2504e8ad2910816b)]:
+  - @data-client/endpoint@0.14.16
 
-### 📦 Package
+## 0.14.13
 
-* Update all non-major dependencies ([#2119](https://github.com/coinbase/rest-hooks/issues/2119)) ([3003348](https://github.com/coinbase/rest-hooks/commit/3003348ba96781085a6f8a6a86a882438ba2b5ea))
-* Update all non-major dependencies ([#2136](https://github.com/coinbase/rest-hooks/issues/2136)) ([f7c8649](https://github.com/coinbase/rest-hooks/commit/f7c864998abc68cae1a4130f2de50e055c7a5269))
-* Update all non-major dependencies ([#2150](https://github.com/coinbase/rest-hooks/issues/2150)) ([eb480f1](https://github.com/coinbase/rest-hooks/commit/eb480f1f567944208483c9239256e7bcf81351e7))
-* Update babel packages ([#2124](https://github.com/coinbase/rest-hooks/issues/2124)) ([bab76ae](https://github.com/coinbase/rest-hooks/commit/bab76ae4ac54474634d3cb323b69ef9be5773a03))
-* Update babel packages ([#2140](https://github.com/coinbase/rest-hooks/issues/2140)) ([bc4d12d](https://github.com/coinbase/rest-hooks/commit/bc4d12d5369f4eee17f32d9379793cfc9b679d61))
-* Update JS test packages to v29 (major) ([#2141](https://github.com/coinbase/rest-hooks/issues/2141)) ([70759cf](https://github.com/coinbase/rest-hooks/commit/70759cfc8a2de9d42a060727d9f91fe4e6945296))
+### Patch Changes
 
-### [5.0.6](https://github.com/coinbase/rest-hooks/compare/@rest-hooks/rest@5.0.5...@rest-hooks/rest@5.0.6) (2022-07-26)
+- [#3215](https://github.com/reactive/data-client/pull/3215) [`e74f7dc`](https://github.com/reactive/data-client/commit/e74f7dc0750fdf32e455bf2c36eff119afba6476) Thanks [@renovate](https://github.com/apps/renovate)! - Update path-to-regexp for [CVE-2024-45296](https://redirect.github.com/pillarjs/path-to-regexp/security/advisories/GHSA-9wv6-86v2-598j)
 
-### 📦 Package
+## 0.14.12
 
-* Update all non-major dependencies ([#2113](https://github.com/coinbase/rest-hooks/issues/2113)) ([f9b7a6e](https://github.com/coinbase/rest-hooks/commit/f9b7a6e5b19a0d6f26208af517451affa161b070))
+### Patch Changes
 
-### [5.0.5](https://github.com/coinbase/rest-hooks/compare/@rest-hooks/rest@5.0.4...@rest-hooks/rest@5.0.5) (2022-07-23)
+- [`2b10a49`](https://github.com/reactive/data-client/commit/2b10a4997093570b96533ef7b99c89be722a6fa7) Thanks [@ntucker](https://github.com/ntucker)! - Add ResourceInterface export
 
-### 🐛 Bug Fix
+- [`3b337e7`](https://github.com/reactive/data-client/commit/3b337e74e3f22f2fe48f6eb37084bbf58859bbe1) Thanks [@ntucker](https://github.com/ntucker)! - Add schema table to README
 
-* Ensure dual package hazard solved for non-node ([#2099](https://github.com/coinbase/rest-hooks/issues/2099)) ([6206e64](https://github.com/coinbase/rest-hooks/commit/6206e6463a7c3699d5c1d1b248e4d5418b1327f1))
+- [`11d4ccf`](https://github.com/reactive/data-client/commit/11d4ccfb4c630c25b847bf59ca1028eed8c2369e) Thanks [@ntucker](https://github.com/ntucker)! - Fix: Collection adders (push/unshift) should _not_ be Queryable
 
-### [5.0.4](https://github.com/coinbase/rest-hooks/compare/@rest-hooks/rest@5.0.2...@rest-hooks/rest@5.0.4) (2022-07-20)
+- Updated dependencies [[`3b337e7`](https://github.com/reactive/data-client/commit/3b337e74e3f22f2fe48f6eb37084bbf58859bbe1), [`11d4ccf`](https://github.com/reactive/data-client/commit/11d4ccfb4c630c25b847bf59ca1028eed8c2369e)]:
+  - @data-client/endpoint@0.14.12
 
-### 🐛 Bug Fix
+## 0.14.11
 
-* Fix package exports support for latest resolve pkg ([#2062](https://github.com/coinbase/rest-hooks/issues/2062)) ([0088494](https://github.com/coinbase/rest-hooks/commit/0088494e5cab91da7becebe7d9b62796fb9f4f2e))
+### Patch Changes
 
-### [5.0.2](https://github.com/coinbase/rest-hooks/compare/@rest-hooks/rest@5.0.1...@rest-hooks/rest@5.0.2) (2022-05-30)
+- [`87a65ba`](https://github.com/reactive/data-client/commit/87a65ba8b5f266a299ac3d9c78b6605deee5f4e2) Thanks [@ntucker](https://github.com/ntucker)! - Fix Entity types for TS 4.0 and below
 
-### 📦 Package
+- [`a436050`](https://github.com/reactive/data-client/commit/a43605035d3791ad73393ce229ed85c8e8f2cb88) Thanks [@ntucker](https://github.com/ntucker)! - Fix README markup
 
-* Use @babel/runtime@^7.13.0 to use CJS/ESM exports support ([#2019](https://github.com/coinbase/rest-hooks/issues/2019)) ([78a22f2](https://github.com/coinbase/rest-hooks/commit/78a22f29f86527ac10eb2c9b031984e044226dce))
+- Updated dependencies [[`87a65ba`](https://github.com/reactive/data-client/commit/87a65ba8b5f266a299ac3d9c78b6605deee5f4e2)]:
+  - @data-client/endpoint@0.14.11
 
-### [5.0.1](https://github.com/coinbase/rest-hooks/compare/@rest-hooks/rest@5.0.0...@rest-hooks/rest@5.0.1) (2022-04-30)
+## 0.14.10
 
-### 📝 Documentation
+### Patch Changes
 
-* Update README with newest practices ([#1920](https://github.com/coinbase/rest-hooks/issues/1920)) ([9bbd76c](https://github.com/coinbase/rest-hooks/commit/9bbd76c4fb20125d6318bd8ac5cc4238be4ab3d5))
+- [#3188](https://github.com/reactive/data-client/pull/3188) [`cde7121`](https://github.com/reactive/data-client/commit/cde71212706a46bbfd13dd76e8cfc478b22fe2ab) Thanks [@ntucker](https://github.com/ntucker)! - Do not require [Entity.pk()](https://dataclient.io/rest/api/Entity#pk)
 
-## [5.0.0](https://github.com/coinbase/rest-hooks/compare/@rest-hooks/rest@4.0.0...@rest-hooks/rest@5.0.0) (2022-04-10)
+  Default implementation uses `this.id`
 
-### ⚠ 💥 BREAKING CHANGES
+- [#3188](https://github.com/reactive/data-client/pull/3188) [`cde7121`](https://github.com/reactive/data-client/commit/cde71212706a46bbfd13dd76e8cfc478b22fe2ab) Thanks [@ntucker](https://github.com/ntucker)! - Update README to remove Entity.pk() when it is default ('id')
 
-* fetch(Resource.create(), {}, body) -> fetch(Resource.create(), body)
-* Removed Resource.useFetchInit(). Use HookableResource
-instead
+- Updated dependencies [[`cde7121`](https://github.com/reactive/data-client/commit/cde71212706a46bbfd13dd76e8cfc478b22fe2ab), [`cde7121`](https://github.com/reactive/data-client/commit/cde71212706a46bbfd13dd76e8cfc478b22fe2ab)]:
+  - @data-client/endpoint@0.14.10
 
-### 🚀 Features
+## 0.14.9
 
-* HookableResource - endpoints as hooks ([#1891](https://github.com/coinbase/rest-hooks/issues/1891)) ([dcd9fbb](https://github.com/coinbase/rest-hooks/commit/dcd9fbb4f4ce5583503187317ea0e065f5d31f1a))
-* Resource.create() can take 1-2 args ([ed4f55c](https://github.com/coinbase/rest-hooks/commit/ed4f55c8b4b80eb93f3c01108c2177b97f5dc4e8))
-* Simplify Resource.create() & Resource.list() arguments ([153f8fa](https://github.com/coinbase/rest-hooks/commit/153f8fac3ff64a3b9fc3df31c7ce31ad8193633a))
+### Patch Changes
 
-## [4.0.0](https://github.com/coinbase/rest-hooks/compare/@rest-hooks/rest@3.0.3...@rest-hooks/rest@4.0.0) (2022-04-08)
+- [`c263931`](https://github.com/reactive/data-client/commit/c26393176518550a16a2e71aea55a8379f30385e) Thanks [@ntucker](https://github.com/ntucker)! - Update README
 
-### ⚠ 💥 BREAKING CHANGES
+- [`366c609`](https://github.com/reactive/data-client/commit/366c609dbda9707f8ecfaef5020c67dd1c7e262b) Thanks [@ntucker](https://github.com/ntucker)! - Make NetworkError messages include more useful information
 
-* - Removed EntityRecord
-- Removed SimpleResource
-- New BaseResource
-- RestFetch, FetchMutate, FetchGet first arg is entire args instead of
-just params
+  Add URL so it's clear _what_ is causing issues when response is
+  not 'ok'
 
-fix: imports
+## 0.14.8
 
-### 🚀 Features
+### Patch Changes
 
-* Improved Resource ([7d7c79c](https://github.com/coinbase/rest-hooks/commit/7d7c79cb062d564b6b591629c4e836eb00024d48))
+- [`bad1fb9`](https://github.com/reactive/data-client/commit/bad1fb909f8d60f19450bbf40df00d90e03a61c2) Thanks [@ntucker](https://github.com/ntucker)! - Update package description
 
-### [3.0.3](https://github.com/coinbase/rest-hooks/compare/@rest-hooks/rest@3.0.2...@rest-hooks/rest@3.0.3) (2022-02-26)
+## 0.14.6
 
-### 🐛 Bug Fix
+### Patch Changes
 
-* Resource.url properties are enumerable when provided ([#1737](https://github.com/coinbase/rest-hooks/issues/1737)) ([500ab87](https://github.com/coinbase/rest-hooks/commit/500ab87ebc49d5d573c6ed5a79f6e9501537fa70))
+- [#3165](https://github.com/reactive/data-client/pull/3165) [`3fa9eb9`](https://github.com/reactive/data-client/commit/3fa9eb907d8760171da065168796b87e802d6666) Thanks [@ntucker](https://github.com/ntucker)! - [Query](https://dataclient.io/rest/api/Query) can take [Object Schemas](https://dataclient.io/rest/api/Object)
 
-### [3.0.2](https://github.com/coinbase/rest-hooks/compare/@rest-hooks/rest@3.0.1...@rest-hooks/rest@3.0.2) (2022-02-15)
+  This enables joining arbitrary objects (whose pk works with the same arguments.)
 
-### 🐛 Bug Fix
+  ```ts
+  class Ticker extends Entity {
+    product_id = '';
+    price = 0;
 
-* Only import from explicit dependencies ([#1705](https://github.com/coinbase/rest-hooks/issues/1705)) ([b7c2eeb](https://github.com/coinbase/rest-hooks/commit/b7c2eeb38c41be0181e84bf0efbc3502bc85c75c))
+    pk(): string {
+      return this.product_id;
+    }
+  }
+  class Stats extends Entity {
+    product_id = '';
+    last = 0;
 
-### [3.0.1](https://github.com/coinbase/rest-hooks/compare/@rest-hooks/rest@3.0.0...@rest-hooks/rest@3.0.1) (2021-10-11)
+    pk(): string {
+      return this.product_id;
+    }
+  }
+  const queryPrice = new schema.Query(
+    { ticker: Ticker, stats: Stats },
+    ({ ticker, stats }) => ticker?.price ?? stats?.last,
+  );
+  ```
 
-### 📝 Documentation
+- Updated dependencies [[`3fa9eb9`](https://github.com/reactive/data-client/commit/3fa9eb907d8760171da065168796b87e802d6666)]:
+  - @data-client/endpoint@0.14.6
 
-* Only validate circleCI badge against master ([#1322](https://github.com/coinbase/rest-hooks/issues/1322)) ([04e9642](https://github.com/coinbase/rest-hooks/commit/04e96426a865cbef362947da3a8f74f7347859e9))
+## 0.14.4
 
-## [3.0.0](https://github.com/coinbase/rest-hooks/compare/@rest-hooks/rest@3.0.0-beta.2...@rest-hooks/rest@3.0.0) (2021-09-08)
+### Patch Changes
 
-**Note:** Version bump only for package @rest-hooks/rest
+- [`0adad92`](https://github.com/reactive/data-client/commit/0adad9209265c388eb6d334afe681610bccfb877) Thanks [@ntucker](https://github.com/ntucker)! - Update debugging link
 
-## [3.0.0-beta.2](https://github.com/coinbase/rest-hooks/compare/@rest-hooks/rest@3.0.0-beta.1...@rest-hooks/rest@3.0.0-beta.2) (2021-09-06)
+- Updated dependencies [[`0adad92`](https://github.com/reactive/data-client/commit/0adad9209265c388eb6d334afe681610bccfb877)]:
+  - @data-client/endpoint@0.14.4
 
-### 💅 Enhancement
+## 0.14.3
 
-* Give errors a name ([#1195](https://github.com/coinbase/rest-hooks/issues/1195)) ([caa1cd4](https://github.com/coinbase/rest-hooks/commit/caa1cd4c365eedc0e6bc8df6b00b9bfdf6492c63))
-* Improve NetworkError debuggability ([#1172](https://github.com/coinbase/rest-hooks/issues/1172)) ([9fb64bb](https://github.com/coinbase/rest-hooks/commit/9fb64bbf31827c65eaa1e6b0617e46f685d9ea58))
+### Patch Changes
 
-### 📝 Documentation
+- [`501cb82`](https://github.com/reactive/data-client/commit/501cb82c999030fd269b40eb760ae0dda568c569) Thanks [@ntucker](https://github.com/ntucker)! - Remove name in toJSON() for Entities
 
-* Add subscriptions to colocate ([#1175](https://github.com/coinbase/rest-hooks/issues/1175)) ([b311a61](https://github.com/coinbase/rest-hooks/commit/b311a6143d9b9087bae56591e531ff9030d6b704))
-* Rework introduction ([#614](https://github.com/coinbase/rest-hooks/issues/614)) ([85bc2a9](https://github.com/coinbase/rest-hooks/commit/85bc2a9a53ec751ca64b18894012167f6fb8e609))
+- [`501cb82`](https://github.com/reactive/data-client/commit/501cb82c999030fd269b40eb760ae0dda568c569) Thanks [@ntucker](https://github.com/ntucker)! - Add toString() to Collection
 
-## [3.0.0-beta.1](https://github.com/coinbase/rest-hooks/compare/@rest-hooks/rest@3.0.0-beta.0...@rest-hooks/rest@3.0.0-beta.1) (2021-08-21)
+- [`3058a8a`](https://github.com/reactive/data-client/commit/3058a8a7738eeea0a197c9ba2db2e8ee51e2fca3) Thanks [@ntucker](https://github.com/ntucker)! - Collection non-known (not Array/Values) key format improvement
 
-### 🐛 Bug Fix
+  Now wraps in parens `()`: "(Todo)"
 
-* useFetchInit() hook calls same amount every render ([#1123](https://github.com/coinbase/rest-hooks/issues/1123)) ([6cd0b7c](https://github.com/coinbase/rest-hooks/commit/6cd0b7cc57de59b5f394942dfa9a3a08d9f2e912))
+- [#3158](https://github.com/reactive/data-client/pull/3158) [`34e2e51`](https://github.com/reactive/data-client/commit/34e2e51e89908649f1297c23a71cdafecf1d3b6f) Thanks [@ntucker](https://github.com/ntucker)! - createResource() -> [resource()](https://dataclient.io/rest/api/resource)
 
-## [3.0.0-beta.0](https://github.com/coinbase/rest-hooks/compare/@rest-hooks/rest@2.1.4...@rest-hooks/rest@3.0.0-beta.0) (2021-06-30)
+  Note: `createResource` is still exported (it is the same)
 
-### ⚠ 💥 BREAKING CHANGES
+- Updated dependencies [[`501cb82`](https://github.com/reactive/data-client/commit/501cb82c999030fd269b40eb760ae0dda568c569), [`501cb82`](https://github.com/reactive/data-client/commit/501cb82c999030fd269b40eb760ae0dda568c569), [`3058a8a`](https://github.com/reactive/data-client/commit/3058a8a7738eeea0a197c9ba2db2e8ee51e2fca3)]:
+  - @data-client/endpoint@0.14.3
 
-* * Importing directly from hidden files is no longer supported
-* Node>=12
-* - Removed: SyntheticError (untriggerable since https://github.com/coinbase/rest-hooks/pull/938)
-- @rest-hooks/rest: 500s are 'soft', else 'hard'
-- PollingSubscription: any errors are 'soft'
-- @rest-hooks/endpoint: no default errorPolicy, therefore all errors are
-'hard'
-* - fromJS() -> process() to customize init
-- normalize results in POJO rather than instances
-- FlatEntity, SimpleRecord removed (use @rest-hooks/legacy)
-- peerDep @rest-hooks/endpoint > 2
+## 0.14.1
 
-### 🚀 Features
+### Patch Changes
 
-* Add errorPolicy to endpoint options ([#971](https://github.com/coinbase/rest-hooks/issues/971)) ([836f05b](https://github.com/coinbase/rest-hooks/commit/836f05b407b5ac96c8f094e652221aa5a95300b0))
-* Normalize merges entities, entitymeta, indexes ([#915](https://github.com/coinbase/rest-hooks/issues/915)) ([bd21d8c](https://github.com/coinbase/rest-hooks/commit/bd21d8ce0d004a56e6853918d9fb9ecaa2c730a8))
-* Use 'exports' package.json member ([#955](https://github.com/coinbase/rest-hooks/issues/955)) ([7e9d39f](https://github.com/coinbase/rest-hooks/commit/7e9d39f15b4b321352ece0caddb93e2c414df8ae))
+- [#3151](https://github.com/reactive/data-client/pull/3151) [`428d618`](https://github.com/reactive/data-client/commit/428d618ce057d4eef23592a64ec9d1c6fb82f43f) Thanks [@ntucker](https://github.com/ntucker)! - Collection.key is shorter and more readable
 
-### 💅 Enhancement
+  `[Todo]` for Arrays or `{Todo}` for Values
 
-* Different babel targets for cjs and umd builds ([#989](https://github.com/coinbase/rest-hooks/issues/989)) ([f054814](https://github.com/coinbase/rest-hooks/commit/f05481410cf8daa2101d4dbda826e56ad10ec723))
-* Entities normalize to POJO ([#940](https://github.com/coinbase/rest-hooks/issues/940)) ([75ebdfe](https://github.com/coinbase/rest-hooks/commit/75ebdfe641ccf57fca35c44a94077e4a314e44d7))
-* Remove 'fallback' package.json exports ([#992](https://github.com/coinbase/rest-hooks/issues/992)) ([dc95f9d](https://github.com/coinbase/rest-hooks/commit/dc95f9dbad20d5740218c52c906596b6a3d6eae4))
-* SimpleResource is deprecated ([#991](https://github.com/coinbase/rest-hooks/issues/991)) ([cf5c0bf](https://github.com/coinbase/rest-hooks/commit/cf5c0bfb5f732b9dd80945cf670d1ffbf9913942))
+- [#3151](https://github.com/reactive/data-client/pull/3151) [`428d618`](https://github.com/reactive/data-client/commit/428d618ce057d4eef23592a64ec9d1c6fb82f43f) Thanks [@ntucker](https://github.com/ntucker)! - fix: Collection.key robust against class name mangling
 
-### 📝 Documentation
+- [#3151](https://github.com/reactive/data-client/pull/3151) [`428d618`](https://github.com/reactive/data-client/commit/428d618ce057d4eef23592a64ec9d1c6fb82f43f) Thanks [@ntucker](https://github.com/ntucker)! - Collections now work with polymorhpic schemas like Union
 
-* Add doc links to jsdocs ([#966](https://github.com/coinbase/rest-hooks/issues/966)) ([dc7fcfe](https://github.com/coinbase/rest-hooks/commit/dc7fcfec24c30d5f405d24ccc1828620d837ea6b))
+  Collections.key on polymorphic types lists their possible Entity keys: `[PushEvent;PullRequestEvent]`
 
-### [2.1.4](https://github.com/coinbase/rest-hooks/compare/@rest-hooks/rest@2.1.3...@rest-hooks/rest@2.1.4) (2021-06-09)
+- Updated dependencies [[`428d618`](https://github.com/reactive/data-client/commit/428d618ce057d4eef23592a64ec9d1c6fb82f43f), [`428d618`](https://github.com/reactive/data-client/commit/428d618ce057d4eef23592a64ec9d1c6fb82f43f), [`428d618`](https://github.com/reactive/data-client/commit/428d618ce057d4eef23592a64ec9d1c6fb82f43f)]:
+  - @data-client/endpoint@0.14.1
 
-### 💅 Enhancement
+## 0.14.0
 
-* 'module' entrypoint targets 2019 browsers ([#905](https://github.com/coinbase/rest-hooks/issues/905)) ([d988abe](https://github.com/coinbase/rest-hooks/commit/d988abe063fc67c74fce12e234c9c3ffdb7cc230))
+### Minor Changes
 
-### [2.1.3](https://github.com/coinbase/rest-hooks/compare/@rest-hooks/rest@2.1.2...@rest-hooks/rest@2.1.3) (2021-06-02)
+- [#3134](https://github.com/reactive/data-client/pull/3134) [`2ad1811`](https://github.com/reactive/data-client/commit/2ad1811149cdc419f6462ace08efdb7766195b36) Thanks [@ntucker](https://github.com/ntucker)! - Change Schema.normalize `visit()` interface; removing non-contextual arguments.
 
-### 💅 Enhancement
+  ```ts
+  /** Visits next data + schema while recurisvely normalizing */
+  export interface Visit {
+    (schema: any, value: any, parent: any, key: any, args: readonly any[]): any;
+    creating?: boolean;
+  }
+  ```
 
-* Improve autoimport handling in vscode ([#890](https://github.com/coinbase/rest-hooks/issues/890)) ([f8f2bef](https://github.com/coinbase/rest-hooks/commit/f8f2bef411183676009c6a9df24a26d147c6d9f6))
+  This results in a 10% normalize performance boost.
 
-### [2.1.2](https://github.com/coinbase/rest-hooks/compare/@rest-hooks/rest@2.1.1...@rest-hooks/rest@2.1.2) (2021-05-24)
+  ```ts title="Before"
+  processedEntity[key] = visit(
+    processedEntity[key],
+    processedEntity,
+    key,
+    this.schema[key],
+    addEntity,
+    visitedEntities,
+    storeEntities,
+    args,
+  );
+  ```
 
-### 💅 Enhancement
+  ```ts title="After"
+  processedEntity[key] = visit(
+    this.schema[key],
+    processedEntity[key],
+    processedEntity,
+    key,
+    args,
+  );
+  ```
 
-* Simplify url logic for Resource ([#806](https://github.com/coinbase/rest-hooks/issues/806)) ([8f1bb8a](https://github.com/coinbase/rest-hooks/commit/8f1bb8a2ea1eec3e24a5f9e7e2d534cd818d05ab))
+  The information needed from these arguments are provided by [closing](<https://en.wikipedia.org/wiki/Closure_(computer_programming)>) `visit()` around them.
 
-### [2.1.1](https://github.com/coinbase/rest-hooks/compare/@rest-hooks/rest@2.1.0...@rest-hooks/rest@2.1.1) (2021-04-26)
+- [#3134](https://github.com/reactive/data-client/pull/3134) [`2ad1811`](https://github.com/reactive/data-client/commit/2ad1811149cdc419f6462ace08efdb7766195b36) Thanks [@ntucker](https://github.com/ntucker)! - Change Schema.normalize interface from direct data access, to using functions like `getEntity`
 
-### 💅 Enhancement
+  ```ts
+  interface SchemaSimple {
+    normalize(
+      input: any,
+      parent: any,
+      key: any,
+      args: any[],
+      visit: (
+        schema: any,
+        value: any,
+        parent: any,
+        key: any,
+        args: readonly any[],
+      ) => any,
+      addEntity: (...args: any) => any,
+      getEntity: (...args: any) => any,
+      checkLoop: (...args: any) => any,
+    ): any;
+  }
+  ```
 
-* Flexible url parameters for RestEndpoint ([#776](https://github.com/coinbase/rest-hooks/issues/776)) ([382d3b1](https://github.com/coinbase/rest-hooks/commit/382d3b112ebee0141260b0a41600568a02fda3fb))
+  We also add `checkLoop()`, which moves some logic in [Entity](https://dataclient.io/rest/api/Entity)
+  to the core normalize algorithm.
 
-## [2.1.0](https://github.com/coinbase/rest-hooks/compare/@rest-hooks/rest@2.0.6...@rest-hooks/rest@2.1.0) (2021-04-24)
+  ```ts
+  /** Returns true if a circular reference is found */
+  export interface CheckLoop {
+    (entityKey: string, pk: string, input: object): boolean;
+  }
+  ```
 
-### 🚀 Features
+- [#3134](https://github.com/reactive/data-client/pull/3134) [`2ad1811`](https://github.com/reactive/data-client/commit/2ad1811149cdc419f6462ace08efdb7766195b36) Thanks [@ntucker](https://github.com/ntucker)! - Change Schema.denormalize `unvisit` to have [schema](https://dataclient.io/rest/api/schema) argument first.
 
-* Endpoint parameters can be of any length ([#767](https://github.com/coinbase/rest-hooks/issues/767)) ([552f837](https://github.com/coinbase/rest-hooks/commit/552f83740279376288879a661ff487c5c6f1d469))
+  ```ts
+  interface SchemaSimple {
+    denormalize(
+      input: {},
+      args: readonly any[],
+      unvisit: (schema: any, input: any) => any,
+    ): T;
+  }
+  ```
 
-### 💅 Enhancement
+### Patch Changes
 
-* Schema assistance for Delete ([#756](https://github.com/coinbase/rest-hooks/issues/756)) ([4dd6a5a](https://github.com/coinbase/rest-hooks/commit/4dd6a5a3f6f0f6bf024731a082dc48afa74cb327))
-* Support TypeScript 3.7 ([#752](https://github.com/coinbase/rest-hooks/issues/752)) ([68a10e0](https://github.com/coinbase/rest-hooks/commit/68a10e06dc0718f5e480097e6056a7a7954d1161))
+- Updated dependencies [[`2ad1811`](https://github.com/reactive/data-client/commit/2ad1811149cdc419f6462ace08efdb7766195b36), [`2ad1811`](https://github.com/reactive/data-client/commit/2ad1811149cdc419f6462ace08efdb7766195b36), [`2ad1811`](https://github.com/reactive/data-client/commit/2ad1811149cdc419f6462ace08efdb7766195b36), [`7bd322d`](https://github.com/reactive/data-client/commit/7bd322d585b0893561b3ffb3c5ad47b2764c18bd)]:
+  - @data-client/endpoint@0.14.0
 
-### [2.0.6](https://github.com/coinbase/rest-hooks/compare/@rest-hooks/rest@2.0.5...@rest-hooks/rest@2.0.6) (2021-04-12)
+## 0.13.4
 
-### 🐛 Bug Fix
+### Patch Changes
 
-* Relax DeleteShape def to be back-compat ([#743](https://github.com/coinbase/rest-hooks/issues/743)) ([20aa3a0](https://github.com/coinbase/rest-hooks/commit/20aa3a09bbe4419c23e37b331ca3208349f0e07c))
+- [`720ff0c`](https://github.com/reactive/data-client/commit/720ff0c3d833ff4d1eb5020694131e87282b585d) Thanks [@ntucker](https://github.com/ntucker)! - Update keywords
 
-### [2.0.5](https://github.com/coinbase/rest-hooks/compare/@rest-hooks/rest@2.0.4...@rest-hooks/rest@2.0.5) (2021-04-12)
+- Updated dependencies [[`720ff0c`](https://github.com/reactive/data-client/commit/720ff0c3d833ff4d1eb5020694131e87282b585d)]:
+  - @data-client/endpoint@0.13.4
 
-### 💅 Enhancement
+## 0.12.8
 
-* Refined deleteShape() definition ([#734](https://github.com/coinbase/rest-hooks/issues/734)) ([e34526d](https://github.com/coinbase/rest-hooks/commit/e34526d5dde5a2cc317cd9428ededc6a9893dc41))
+### Patch Changes
 
-### [2.0.4](https://github.com/coinbase/rest-hooks/compare/@rest-hooks/rest@2.0.3...@rest-hooks/rest@2.0.4) (2021-04-04)
+- [`9c04770`](https://github.com/reactive/data-client/commit/9c04770414e52cfc932878581736a3a93721ab7c) Thanks [@ntucker](https://github.com/ntucker)! - Improve clarity of Resource method docstrings
 
-### 💅 Enhancement
+## 0.12.7
 
-* Throw error when urlRoot is not defined ([#688](https://github.com/coinbase/rest-hooks/issues/688)) ([038bfcf](https://github.com/coinbase/rest-hooks/commit/038bfcf79963043f1f991b54dc1badfa5d70775c))
+### Patch Changes
 
-### [2.0.3](https://github.com/coinbase/rest-hooks/compare/@rest-hooks/rest@2.0.2...@rest-hooks/rest@2.0.3) (2021-03-26)
+- [`4bc9145`](https://github.com/reactive/data-client/commit/4bc914574116d285f81546ffe37ead3e8aa339dc) Thanks [@ntucker](https://github.com/ntucker)! - Improve readability of Collection generics by naming DefaultArgs
 
-### 🐛 Bug Fix
+- [#3063](https://github.com/reactive/data-client/pull/3063) [`2080c87`](https://github.com/reactive/data-client/commit/2080c8751df147a839f03eade9804d57291d12fb) Thanks [@ntucker](https://github.com/ntucker)! - Polymorphic (Union) types should still denormalize when handling passthrough (non-normalized) data
 
-* Compatibility with TypeScript strict: false ([#683](https://github.com/coinbase/rest-hooks/issues/683)) ([8a6e7ed](https://github.com/coinbase/rest-hooks/commit/8a6e7ed4d179555c4ba5cb8957b1c63697a1ce1a))
+  When denormalizing non-normalized (like return of ctrl.fetch), it is still expected to handle
+  all steps like constructing class instances if possible. However, to do this for Polymorphic
+  types we need to fallback to using part of the normalize process to find out _which_ schema
+  to use for the remainder of denormalization.
 
-### [2.0.2](https://github.com/coinbase/rest-hooks/compare/@rest-hooks/rest@2.0.1...@rest-hooks/rest@2.0.2) (2021-03-16)
+- [`4bc9145`](https://github.com/reactive/data-client/commit/4bc914574116d285f81546ffe37ead3e8aa339dc) Thanks [@ntucker](https://github.com/ntucker)! - Add docstrings to schema constructors
 
-### 🐛 Bug Fix
+- [`bf1f9bb`](https://github.com/reactive/data-client/commit/bf1f9bbfce9efc293cdb40939227795ea750452f) Thanks [@ntucker](https://github.com/ntucker)! - Add docstrings to RestGenerics, ResourceGenerics, and RestEndpointOptions members
 
-* typeof Resource === typeof SimpleResource ([#662](https://github.com/coinbase/rest-hooks/issues/662)) ([4174149](https://github.com/coinbase/rest-hooks/commit/417414947a8a470ee84d3d98ee47646d6ca12798))
+- Updated dependencies [[`4bc9145`](https://github.com/reactive/data-client/commit/4bc914574116d285f81546ffe37ead3e8aa339dc), [`2080c87`](https://github.com/reactive/data-client/commit/2080c8751df147a839f03eade9804d57291d12fb), [`4bc9145`](https://github.com/reactive/data-client/commit/4bc914574116d285f81546ffe37ead3e8aa339dc)]:
+  - @data-client/endpoint@0.12.7
 
-### [2.0.1](https://github.com/coinbase/rest-hooks/compare/@rest-hooks/rest@2.0.0...@rest-hooks/rest@2.0.1) (2021-03-14)
+## 0.12.6
 
-### 📝 Documentation
+### Patch Changes
 
-* Update package tags ([#650](https://github.com/coinbase/rest-hooks/issues/650)) ([4ef465a](https://github.com/coinbase/rest-hooks/commit/4ef465a129cd59668cd9c3542bb9ec03c84d2a4d))
+- [`9551e9a`](https://github.com/reactive/data-client/commit/9551e9aa64f16562e440bb8393e5a4b31b638fb5) Thanks [@ntucker](https://github.com/ntucker)! - Export RestEndpoint interface type to remove TS warnings about portability
 
-## [2.0.0](https://github.com/coinbase/rest-hooks/compare/@rest-hooks/rest@1.0.4...@rest-hooks/rest@2.0.0) (2021-03-08)
+- [`19832bc`](https://github.com/reactive/data-client/commit/19832bc1ee15805788697748b275c134ea81ebf6) Thanks [@ntucker](https://github.com/ntucker)! - Add docstrings to Collection methods
 
-### ⚠ 💥 BREAKING CHANGES
+- Updated dependencies [[`19832bc`](https://github.com/reactive/data-client/commit/19832bc1ee15805788697748b275c134ea81ebf6)]:
+  - @data-client/endpoint@0.12.6
 
-* getFetchInit() -> useFetchInit()
-- getFetchInit() is called during fetch
-- useFetchInit() should be used for hooks
+## 0.12.5
 
-### 🚀 Features
+### Patch Changes
 
-* Add Resource.useFetchInit() ([#635](https://github.com/coinbase/rest-hooks/issues/635)) ([9571870](https://github.com/coinbase/rest-hooks/commit/957187071bc5b654e2f8273b7527f44f27cf0139))
+- [`019e1bc`](https://github.com/reactive/data-client/commit/019e1bc2ecf3651540f905912aaae30c545dd521) Thanks [@ntucker](https://github.com/ntucker)! - Improve readability of RestEndpoint instance types
 
-### [1.0.4](https://github.com/coinbase/rest-hooks/compare/@rest-hooks/rest@1.0.3...@rest-hooks/rest@1.0.4) (2021-02-24)
+  Now `new RestEndpoint()` will show a `RestEndpoint` type with the relevant
+  options.
 
-### 💅 Enhancement
+## 0.12.4
 
-* Explicitly defined Resource endpoint return types ([#576](https://github.com/coinbase/rest-hooks/issues/576)) ([bc72fa7](https://github.com/coinbase/rest-hooks/commit/bc72fa76a76f769479e6ae3f2e8515a8a9e2e8d2))
+### Patch Changes
 
-### [1.0.3](https://github.com/coinbase/rest-hooks/compare/@rest-hooks/rest@1.0.2...@rest-hooks/rest@1.0.3) (2021-02-23)
+- [`a6b4f4a`](https://github.com/reactive/data-client/commit/a6b4f4aabbfd06f5106a96e809a6c1a5e7045172) Thanks [@ntucker](https://github.com/ntucker)! - Support + and \* in RestEndpoint.path
 
-### 🐛 Bug Fix
+- [`a6b4f4a`](https://github.com/reactive/data-client/commit/a6b4f4aabbfd06f5106a96e809a6c1a5e7045172) Thanks [@ntucker](https://github.com/ntucker)! - Add support for {} to RestEndpoint.path
 
-* Support non-JSON payloads (like FormData) ([#552](https://github.com/coinbase/rest-hooks/issues/552)) ([82e68ac](https://github.com/coinbase/rest-hooks/commit/82e68ac8975fc4fa8ba468fe525662b6cbd627c1))
+  ```ts
+  const getThing = new RestEndpoint({
+    path: '/:attr1?{-:attr2}?{-:attr3}?',
+  });
 
-### 📝 Documentation
+  getThing({ attr1: 'hi' });
+  getThing({ attr2: 'hi' });
+  getThing({ attr3: 'hi' });
+  getThing({ attr1: 'hi', attr3: 'ho' });
+  getThing({ attr2: 'hi', attr3: 'ho' });
+  ```
 
-* Typos and minor improvements ([#561](https://github.com/coinbase/rest-hooks/issues/561)) ([aed902a](https://github.com/coinbase/rest-hooks/commit/aed902a7ee8a50f7f08fab261efa528a82c52b19))
+## 0.12.3
 
-### [1.0.2](https://github.com/coinbase/rest-hooks/compare/@rest-hooks/rest@1.0.1...@rest-hooks/rest@1.0.2) (2021-02-04)
+### Patch Changes
 
-### 📦 Package
+- [`00d4205`](https://github.com/reactive/data-client/commit/00d4205f03562cfe4acd18215718e23ae5466b8d) Thanks [@ntucker](https://github.com/ntucker)! - Add funding package.json field
 
-* Relax @babel/runtime requirement to ^7.7.2 ([#513](https://github.com/coinbase/rest-hooks/issues/513)) ([cc95b21](https://github.com/coinbase/rest-hooks/commit/cc95b219fbddebfbf334728887ca6d2fa070fce1))
+- [`8a8634c`](https://github.com/reactive/data-client/commit/8a8634c7a263cf99e9ce426b2c9b92fd2a12a259) Thanks [@ntucker](https://github.com/ntucker)! - Update SnapshotInterface to include improvements in getError type
 
-### 📝 Documentation
+- Updated dependencies [[`00d4205`](https://github.com/reactive/data-client/commit/00d4205f03562cfe4acd18215718e23ae5466b8d), [`8a8634c`](https://github.com/reactive/data-client/commit/8a8634c7a263cf99e9ce426b2c9b92fd2a12a259)]:
+  - @data-client/endpoint@0.12.3
 
-* Link improvements, flesh out test readme ([#511](https://github.com/coinbase/rest-hooks/issues/511)) ([9cab431](https://github.com/coinbase/rest-hooks/commit/9cab431803a8b7d9c18e02b3e9cb7e336215ccdb))
+## 0.11.5
 
-### [1.0.1](https://github.com/coinbase/rest-hooks/compare/@rest-hooks/rest@1.0.0...@rest-hooks/rest@1.0.1) (2021-01-30)
+### Patch Changes
 
-### 💅 Enhancement
+- [#3028](https://github.com/reactive/data-client/pull/3028) [`b173c52`](https://github.com/reactive/data-client/commit/b173c52aa00bc9d57337983f01b2ce5c8ee84f6f) Thanks [@ntucker](https://github.com/ntucker)! - Warn for capitalization mistakes when calling createResource()
 
-* Add jsdocs deprecations to deprecated methods ([#487](https://github.com/coinbase/rest-hooks/issues/487)) ([cc7d626](https://github.com/coinbase/rest-hooks/commit/cc7d6269e752335e6502b7ada0da21a881c2afb6))
-* Expand matches peerdeps for endpoint ([#504](https://github.com/coinbase/rest-hooks/issues/504)) ([9682b7c](https://github.com/coinbase/rest-hooks/commit/9682b7ce955419fa7e1095c377b45400758fd101))
-* Improve malformed entity detection ([#494](https://github.com/coinbase/rest-hooks/issues/494)) ([b8bb07f](https://github.com/coinbase/rest-hooks/commit/b8bb07f480549a97254a4fdf6b00acd9cb89a9eb))
+  `Endpoint` and `Collection` are both capitalized because they
+  are classes. However, this may not be intuitive since other arguments are lower-first. Let's add a console.warn() to help
+  guide, since this may be intentional?
 
-### 🐛 Bug Fix
+  ```ts
+  export const UserResource = createResource({
+    urlPrefix: CONFIG.API_ROOT,
+    path: '/users/:id',
+    schema: User,
+    // this should be 'Endpoint:'
+    endpoint: AuthedEndpoint,
+  });
+  ```
 
-* Widen Resource.delete() just like other endpoints ([#503](https://github.com/coinbase/rest-hooks/issues/503)) ([2aaa882](https://github.com/coinbase/rest-hooks/commit/2aaa8829487574ca05d71163af44053f52b304d8))
+## 0.11.3
 
-### 📝 Documentation
+### Patch Changes
 
-* Add chat badge ([#501](https://github.com/coinbase/rest-hooks/issues/501)) ([787e250](https://github.com/coinbase/rest-hooks/commit/787e25022f8a8949e5dfb818c63fd1574dbd2787))
+- [#3017](https://github.com/reactive/data-client/pull/3017) [`ce164d2`](https://github.com/reactive/data-client/commit/ce164d286c8afcb2593a86abbf23948a08aa40ba) Thanks [@ntucker](https://github.com/ntucker)! - Queries pass-through suspense rather than ever being undefined
 
-## 1.0.0 (2021-01-19)
+  - [useSuspense()](https://dataclient.io/docs/api/useSuspense) return values will not be nullable
+  - [useQuery()](https://dataclient.io/docs/api/useQuery) will still be nullable due to it handling `INVALID` as `undefined` return
+  - [Query.process](https://dataclient.io/rest/api/Query#process) does not need to handle nullable cases
 
-### ⚠ 💥 BREAKING CHANGES
+- Updated dependencies [[`ce164d2`](https://github.com/reactive/data-client/commit/ce164d286c8afcb2593a86abbf23948a08aa40ba)]:
+  - @data-client/endpoint@0.11.3
 
-* Resources will resolve with any nested
-entities from their schemas, rather than the `pk` of those
-entities
+## 0.11.1
 
-### 🚀 Features
+### Patch Changes
 
-* Add @rest-hooks/rest package ([#375](https://github.com/coinbase/rest-hooks/issues/375)) ([5e5c125](https://github.com/coinbase/rest-hooks/commit/5e5c125d3396ebbb8514aea6fc80b4dfceb0da27))
-* Add RestEndpoint type ([#427](https://github.com/coinbase/rest-hooks/issues/427)) ([dc47667](https://github.com/coinbase/rest-hooks/commit/dc47667cca768d16f3c11e42af5daf8cfa1c2fcf))
-* Re-export normalizr from 'rest' lib ([4362686](https://github.com/coinbase/rest-hooks/commit/436268601a482e2358d873f8aa1a1c1eecc6f652))
-* Resources can have nested entities ([#469](https://github.com/coinbase/rest-hooks/issues/469)) ([4eeeaae](https://github.com/coinbase/rest-hooks/commit/4eeeaae1026715be4e72a66cd94d81934f2b0ce7))
-* Simple AbortController integration ([#392](https://github.com/coinbase/rest-hooks/issues/392)) ([899563d](https://github.com/coinbase/rest-hooks/commit/899563deccaccc214c3504b91b96e1460ddfab2f))
-* Support extra endpoint members and inheritance ([#387](https://github.com/coinbase/rest-hooks/issues/387)) ([6ad5486](https://github.com/coinbase/rest-hooks/commit/6ad5486b6e333d8721b74fd4fb1b7ed783461435))
+- [#3006](https://github.com/reactive/data-client/pull/3006) [`13c6466`](https://github.com/reactive/data-client/commit/13c64662bce3813869140bc709badffc59929c5e) Thanks [@ntucker](https://github.com/ntucker)! - Endpoint.sideEffect can be `false`
 
-### 💅 Enhancement
+- [#3004](https://github.com/reactive/data-client/pull/3004) [`18ec81e`](https://github.com/reactive/data-client/commit/18ec81eaacd1ab6e860653fa23ea95a0f5889e36) Thanks [@ntucker](https://github.com/ntucker)! - Allow sideEffect overrides when using .extend()
 
-* Keep legacy Resource ([#376](https://github.com/coinbase/rest-hooks/issues/376)) ([fdd1f7c](https://github.com/coinbase/rest-hooks/commit/fdd1f7cd276871d1f92e2a7bd17118a3e6df12e9))
-* Memoize Resource endpoints ([#390](https://github.com/coinbase/rest-hooks/issues/390)) ([67bc90f](https://github.com/coinbase/rest-hooks/commit/67bc90f1417bc11f2836574e92618439b6289b22))
-* Remove Readonly on Resource endpoint schemas ([#468](https://github.com/coinbase/rest-hooks/issues/468)) ([0b98987](https://github.com/coinbase/rest-hooks/commit/0b989872d2712c92114061b541cdf74f51ed189d))
-* Simplify endpoint memoization and provide new extensions ([#391](https://github.com/coinbase/rest-hooks/issues/391)) ([d874d0b](https://github.com/coinbase/rest-hooks/commit/d874d0b3e6433a616d2dbecd8076715f5caefaeb))
-* Widen RestFetch types to make overriding not break ([#479](https://github.com/coinbase/rest-hooks/issues/479)) ([2bccf12](https://github.com/coinbase/rest-hooks/commit/2bccf12f7892ccbc1d342bd529b3659c2935fb71))
+- Updated dependencies [[`13c6466`](https://github.com/reactive/data-client/commit/13c64662bce3813869140bc709badffc59929c5e)]:
+  - @data-client/endpoint@0.11.1
 
-### 🐛 Bug Fix
+## 0.11.0
 
-* Handle entities updated with new indexes ([#384](https://github.com/coinbase/rest-hooks/issues/384)) ([2ee3bb6](https://github.com/coinbase/rest-hooks/commit/2ee3bb60217bed1f91a6d3d086b354ce151b8e0c))
-* Infer useFetcher() has no body when not present in fetch ([#385](https://github.com/coinbase/rest-hooks/issues/385)) ([22dd399](https://github.com/coinbase/rest-hooks/commit/22dd3995c519e1990f2388b6365494cec873d04a))
-* Resource endpoint memoization ([744431e](https://github.com/coinbase/rest-hooks/commit/744431ef435dfab1969cd883f01b6a4b50b6c75d))
-* TypeScript 4 compatibility ([#406](https://github.com/coinbase/rest-hooks/issues/406)) ([5d82e24](https://github.com/coinbase/rest-hooks/commit/5d82e2416b68992f6efccb63f694010ef1ea28e8))
+[Release notes and migration guide](https://dataclient.io/blog/2024/04/08/v0.11-queries-querable-usequery)
 
-### 📦 Package
+### Minor Changes
 
-* Rely on latest endpoint ([801f5e7](https://github.com/coinbase/rest-hooks/commit/801f5e7fcdd10bc8526615042a2e40a946222a9c))
-* Use @babel/runtime @ 7.12 ([e631f6a](https://github.com/coinbase/rest-hooks/commit/e631f6a8c435c5ef74b3809c8950a2caceca8763))
+- [#2921](https://github.com/reactive/data-client/pull/2921) [`6e55026`](https://github.com/reactive/data-client/commit/6e550260672507592d75c4781dc2563a50e664fa) Thanks [@ntucker](https://github.com/ntucker)! - BREAKING: new AbortOptimistic() -> [snapshot.abort](https://dataclient/docs/api/Snapshot#abort)
 
-### 📝 Documentation
+  #### Before
 
-* Update nested response docs with behaviors of rest package ([#471](https://github.com/coinbase/rest-hooks/issues/471)) ([04fe9b3](https://github.com/coinbase/rest-hooks/commit/04fe9b390e4e097605a96f268168d8918c4948df))
+  ```ts
+  getOptimisticResponse(snapshot, { id }) {
+    const { data } = snapshot.getResponse(Base.get, { id });
+    if (!data) throw new AbortOptimistic();
+    return {
+      id,
+      votes: data.votes + 1,
+    };
+  }
+  ```
 
-### [0.6.1](https://github.com/coinbase/rest-hooks/compare/@rest-hooks/rest@0.6.0...@rest-hooks/rest@0.6.1) (2021-01-19)
+  #### After
 
-### 💅 Enhancement
+  ```ts
+  getOptimisticResponse(snapshot, { id }) {
+    const { data } = snapshot.getResponse(Base.get, { id });
+    if (!data) throw snapshot.abort;
+    return {
+      id,
+      votes: data.votes + 1,
+    };
+  }
+  ```
 
-* Widen RestFetch types to make overriding not break ([#479](https://github.com/coinbase/rest-hooks/issues/479)) ([2bccf12](https://github.com/coinbase/rest-hooks/commit/2bccf12f7892ccbc1d342bd529b3659c2935fb71))
+- [#2921](https://github.com/reactive/data-client/pull/2921) [`6e55026`](https://github.com/reactive/data-client/commit/6e550260672507592d75c4781dc2563a50e664fa) Thanks [@ntucker](https://github.com/ntucker)! - BREAKING: new Query -> [new schema.Query](https://dataclient.io/rest/api/Query)
 
-### 📝 Documentation
+  #### Before
 
-* Update nested response docs with behaviors of rest package ([#471](https://github.com/coinbase/rest-hooks/issues/471)) ([04fe9b3](https://github.com/coinbase/rest-hooks/commit/04fe9b390e4e097605a96f268168d8918c4948df))
+  ```jsx
+  const getUserCount = new Query(
+    new schema.All(User),
+    (entries, { isAdmin } = {}) => {
+      if (isAdmin !== undefined)
+        return entries.filter(user => user.isAdmin === isAdmin).length;
+      return entries.length;
+    },
+  );
 
-## 0.6.0 (2021-01-15)
+  const userCount = useCache(getUserCount);
+  const adminCount = useCache(getUserCount, { isAdmin: true });
+  ```
 
-* feat: Resources can have nested entities (#469) ([4eeeaae](https://github.com/coinbase/rest-hooks/commit/4eeeaae)), closes [#469](https://github.com/coinbase/rest-hooks/issues/469)
-* enhance: Remove Readonly on Resource endpoint schemas (#468) ([0b98987](https://github.com/coinbase/rest-hooks/commit/0b98987)), closes [#468](https://github.com/coinbase/rest-hooks/issues/468)
+  #### After
 
-### BREAKING CHANGE
+  ```jsx
+  const getUserCount = new schema.Query(
+    new schema.All(User),
+    (entries, { isAdmin } = {}) => {
+      if (isAdmin !== undefined)
+        return entries.filter(user => user.isAdmin === isAdmin).length;
+      return entries.length;
+    },
+  );
 
-* Resources will resolve with any nested
-entities from their schemas, rather than the `pk` of those
-entities
+  const userCount = useQuery(getUserCount);
+  const adminCount = useQuery(getUserCount, { isAdmin: true });
+  ```
 
-## <small>0.5.1 (2021-01-06)</small>
+- [#2957](https://github.com/reactive/data-client/pull/2957) [`c129a25`](https://github.com/reactive/data-client/commit/c129a2558ecb21b5d9985c13747c555b88c51b3a) Thanks [@ntucker](https://github.com/ntucker)! - BREAKING CHANGE: Remove new AbortOptimistic() in favor of [snapshot.abort](https://dataclient.io/docs/api/Snapshot#abort)
 
-* pkg: Use @babel/runtime @ 7.12 ([e631f6a](https://github.com/coinbase/rest-hooks/commit/e631f6a))
+  ```ts
+  getOptimisticResponse(snapshot, { id }) {
+    const { data } = snapshot.getResponse(Base.get, { id });
+    if (!data) throw snapshot.abort;
+    return {
+      id,
+      votes: data.votes + 1,
+    };
+  }
+  ```
 
-## 0.5.0 (2020-12-08)
+- [#2972](https://github.com/reactive/data-client/pull/2972) [`bb24601`](https://github.com/reactive/data-client/commit/bb24601e5ca5b0d92b8db75f115fcfb99fb97563) Thanks [@ntucker](https://github.com/ntucker)! - BREAKING: Entity.useIncoming → [Entity.shouldUpdate](https://dataclient.io/rest/api/Entity#shouldupdate))
 
-* feat: Add RestEndpoint type (#427) ([dc47667](https://github.com/coinbase/rest-hooks/commit/dc47667)), closes [#427](https://github.com/coinbase/rest-hooks/issues/427)
+  ```ts title="Before"
+  class MyEntity extends Entity {
+    // highlight-next-line
+    static useIncoming(
+      existingMeta: { date: number },
+      incomingMeta: { date: number },
+      existing: any,
+      incoming: any,
+    ) {
+      return !deepEquals(existing, incoming);
+    }
+  }
+  ```
 
-## <small>0.4.1 (2020-09-08)</small>
+  ```ts title="After"
+  class MyEntity extends Entity {
+    // highlight-next-line
+    static shouldUpdate(
+      existingMeta: { date: number },
+      incomingMeta: { date: number },
+      existing: any,
+      incoming: any,
+    ) {
+      return !deepEquals(existing, incoming);
+    }
+  }
+  ```
 
-* fix: TypeScript 4 compatibility (#406) ([5d82e24](https://github.com/coinbase/rest-hooks/commit/5d82e24)), closes [#406](https://github.com/coinbase/rest-hooks/issues/406)
+- [#2921](https://github.com/reactive/data-client/pull/2921) [`6e55026`](https://github.com/reactive/data-client/commit/6e550260672507592d75c4781dc2563a50e664fa) Thanks [@ntucker](https://github.com/ntucker)! - BREAKING: useCache(new Index(MyEntity)) -> useQuery(MyEntity)
 
-## 0.4.0 (2020-08-09)
+  #### Before
 
-* feat: Simple AbortController integration (#392) ([899563d](https://github.com/coinbase/rest-hooks/commit/899563d)), closes [#392](https://github.com/coinbase/rest-hooks/issues/392)
-* pkg: Rely on latest endpoint ([801f5e7](https://github.com/coinbase/rest-hooks/commit/801f5e7))
+  ```jsx
+  const UserIndex = new Index(User);
 
-## <small>0.3.1 (2020-08-09)</small>
+  const bob = useCache(UserIndex, { username: 'bob' });
+  ```
 
-* enhance: Simplify endpoint memoization and provide new extensions (#391) ([d874d0b](https://github.com/coinbase/rest-hooks/commit/d874d0b)), closes [#391](https://github.com/coinbase/rest-hooks/issues/391)
-* fix: Resource endpoint memoization ([744431e](https://github.com/coinbase/rest-hooks/commit/744431e))
+  #### After
 
-## 0.3.0 (2020-08-08)
+  ```jsx
+  const bob = useQuery(User, { username: 'bob' });
+  ```
 
-* enhance: Memoize Resource endpoints (#390) ([67bc90f](https://github.com/coinbase/rest-hooks/commit/67bc90f)), closes [#390](https://github.com/coinbase/rest-hooks/issues/390)
-* internal: Test using endpoints directly (#389) ([bb0e8fd](https://github.com/coinbase/rest-hooks/commit/bb0e8fd)), closes [#389](https://github.com/coinbase/rest-hooks/issues/389)
-* feat: Support extra endpoint members and inheritance (#387) ([6ad5486](https://github.com/coinbase/rest-hooks/commit/6ad5486)), closes [#387](https://github.com/coinbase/rest-hooks/issues/387)
+### Patch Changes
 
-## <small>0.2.1 (2020-08-04)</small>
+- [`2e169b7`](https://github.com/reactive/data-client/commit/2e169b705e4f8e2eea8005291a0e76e9d11764a4) Thanks [@ntucker](https://github.com/ntucker)! - Fix schema.All denormalize INVALID case should also work when class name mangling is performed in production builds
 
-* fix: Handle entities updated with new indexes (#384) ([2ee3bb6](https://github.com/coinbase/rest-hooks/commit/2ee3bb6)), closes [#384](https://github.com/coinbase/rest-hooks/issues/384)
-* fix: Infer useFetcher() has no body when not present in fetch (#385) ([22dd399](https://github.com/coinbase/rest-hooks/commit/22dd399)), closes [#385](https://github.com/coinbase/rest-hooks/issues/385)
+  - `unvisit()` always returns `undefined` with `undefined` as input.
+  - `All` returns INVALID from `queryKey()` to invalidate what was previously a special case in `unvisit()` (when there is no table entry for the given entity)
 
-## 0.2.0 (2020-07-31)
+- [#2962](https://github.com/reactive/data-client/pull/2962) [`f6f195d`](https://github.com/reactive/data-client/commit/f6f195d573c7c51dc63361a48b2ef804181a348b) Thanks [@ntucker](https://github.com/ntucker)! - Improve .extend() typing when using loose null checks and no body parameter
 
-* feat: Re-export normalizr from 'rest' lib ([4362686](https://github.com/coinbase/rest-hooks/commit/4362686))
+- [#2921](https://github.com/reactive/data-client/pull/2921) [`6e55026`](https://github.com/reactive/data-client/commit/6e550260672507592d75c4781dc2563a50e664fa) Thanks [@ntucker](https://github.com/ntucker)! - Update README
 
-## 0.1.0 (2020-07-27)
+- [`8377e0a`](https://github.com/reactive/data-client/commit/8377e0a157419f0f4c237c392a895fec1772854d) Thanks [@ntucker](https://github.com/ntucker)! - fix: Resource.getList.schema args types
 
-* enhance: Keep legacy Resource (#376) ([fdd1f7c](https://github.com/coinbase/rest-hooks/commit/fdd1f7c)), closes [#376](https://github.com/coinbase/rest-hooks/issues/376)
-* feat: Add @rest-hooks/rest package (#375) ([5e5c125](https://github.com/coinbase/rest-hooks/commit/5e5c125)), closes [#375](https://github.com/coinbase/rest-hooks/issues/375)
+- [#2961](https://github.com/reactive/data-client/pull/2961) [`446f0b9`](https://github.com/reactive/data-client/commit/446f0b905f57c290e120c6f11a6b4708554283d1) Thanks [@ntucker](https://github.com/ntucker)! - Allow pk() to return numbers
+
+  Before:
+
+  ```ts
+  class MyEntity extends Entity {
+    id = 0;
+    pk() {
+      return `${this.id}`;
+    }
+  }
+  ```
+
+  After:
+
+  ```ts
+  class MyEntity extends Entity {
+    id = 0;
+    pk() {
+      return this.id;
+    }
+  }
+  ```
+
+- Updated dependencies [[`2e169b7`](https://github.com/reactive/data-client/commit/2e169b705e4f8e2eea8005291a0e76e9d11764a4), [`6e55026`](https://github.com/reactive/data-client/commit/6e550260672507592d75c4781dc2563a50e664fa), [`6e55026`](https://github.com/reactive/data-client/commit/6e550260672507592d75c4781dc2563a50e664fa), [`73de27f`](https://github.com/reactive/data-client/commit/73de27fadb214c3c2995ca558daa9736312de7a9), [`59a407a`](https://github.com/reactive/data-client/commit/59a407a5bcaa8e5c6a948a85f5c52f106b24c5af), [`8377e0a`](https://github.com/reactive/data-client/commit/8377e0a157419f0f4c237c392a895fec1772854d), [`c129a25`](https://github.com/reactive/data-client/commit/c129a2558ecb21b5d9985c13747c555b88c51b3a), [`6e55026`](https://github.com/reactive/data-client/commit/6e550260672507592d75c4781dc2563a50e664fa), [`446f0b9`](https://github.com/reactive/data-client/commit/446f0b905f57c290e120c6f11a6b4708554283d1), [`bb24601`](https://github.com/reactive/data-client/commit/bb24601e5ca5b0d92b8db75f115fcfb99fb97563), [`6e55026`](https://github.com/reactive/data-client/commit/6e550260672507592d75c4781dc2563a50e664fa), [`446f0b9`](https://github.com/reactive/data-client/commit/446f0b905f57c290e120c6f11a6b4708554283d1), [`f68750f`](https://github.com/reactive/data-client/commit/f68750f8b0cafa66f6d50521e474db5e3d3c9cdd)]:
+  - @data-client/endpoint@0.11.0
+
+## 0.10.0
+
+### Minor Changes
+
+- [#2919](https://github.com/reactive/data-client/pull/2919) [`44f9ec2`](https://github.com/reactive/data-client/commit/44f9ec2801fe389a5afb215553a3441143078803) Thanks [@ntucker](https://github.com/ntucker)! - Add exports getUrlBase, getUrlTokens used to construct URLs
+
+  This enables custom [RestEndpoint.url()](https://dataclient.io/rest/api/RestEndpoint#url) implementations
+
+- [#2919](https://github.com/reactive/data-client/pull/2919) [`44f9ec2`](https://github.com/reactive/data-client/commit/44f9ec2801fe389a5afb215553a3441143078803) Thanks [@ntucker](https://github.com/ntucker)! - Add [RestEndpoint.searchToString()](https://dataclient.io/rest/api/RestEndpoint#searchToString)
+
+  For example:
+
+  To encode complex objects in the searchParams, you can use the [qs](https://github.com/ljharb/qs) library.
+
+  ```typescript
+  import { RestEndpoint, RestGenerics } from '@data-client/rest';
+  import qs from 'qs';
+
+  class MyEndpoint<O extends RestGenerics = any> extends RestEndpoint<O> {
+    searchToString(searchParams) {
+      return qs.stringify(searchParams);
+    }
+  }
+  ```
+
+### Patch Changes
+
+- [`69834b5`](https://github.com/reactive/data-client/commit/69834b50c6d2b33f46d7c63cabdc0744abf160ae) Thanks [@ntucker](https://github.com/ntucker)! - Update README with API links
+
+- Updated dependencies [[`922be79`](https://github.com/reactive/data-client/commit/922be79169a3eeea8e336eee519c165431ead474), [`69834b5`](https://github.com/reactive/data-client/commit/69834b50c6d2b33f46d7c63cabdc0744abf160ae), [`bf9c79c`](https://github.com/reactive/data-client/commit/bf9c79cb42e3df091eafe63fee619764a7ae4350)]:
+  - @data-client/endpoint@0.10.0
+
+## 0.9.9
+
+### Patch Changes
+
+- [`e3314a7`](https://github.com/reactive/data-client/commit/e3314a7ca64919c093b838048caaa8b7530fa7c8) Thanks [@ntucker](https://github.com/ntucker)! - docs: Add keywords to package
+
+- Updated dependencies [[`e3314a7`](https://github.com/reactive/data-client/commit/e3314a7ca64919c093b838048caaa8b7530fa7c8)]:
+  - @data-client/endpoint@0.9.9
+
+## 0.9.8
+
+### Patch Changes
+
+- [#2837](https://github.com/reactive/data-client/pull/2837) [`57d87d6d85`](https://github.com/reactive/data-client/commit/57d87d6d851c19b4fd22eb57c629a7f2cab01f87) Thanks [@ntucker](https://github.com/ntucker)! - Query works with any Schema - including Collections
+
+  ```ts
+  export const queryRemainingTodos = new Query(
+    TodoResource.getList.schema,
+    entries => entries && entries.filter(todo => !todo.completed).length,
+  );
+  ```
+
+  NOTE: Query.schema internals are laid out differently
+
+- Updated dependencies [[`57d87d6d85`](https://github.com/reactive/data-client/commit/57d87d6d851c19b4fd22eb57c629a7f2cab01f87)]:
+  - @data-client/endpoint@0.9.8
+
+## 0.9.5
+
+### Patch Changes
+
+- [`bb4b9583c5`](https://github.com/reactive/data-client/commit/bb4b9583c52e2b2fe45765af10b385b571901ee7) Thanks [@ntucker](https://github.com/ntucker)! - docs: Update readme
+
+## 0.9.4
+
+### Patch Changes
+
+- [`d1b51af7ac`](https://github.com/reactive/data-client/commit/d1b51af7ac4a8a7c0559f478cc9503be8e61514c) Thanks [@ntucker](https://github.com/ntucker)! - Fix unpkg bundles by ensuring dependencies are built in order
+
+- Updated dependencies [[`d1b51af7ac`](https://github.com/reactive/data-client/commit/d1b51af7ac4a8a7c0559f478cc9503be8e61514c)]:
+  - @data-client/endpoint@0.9.4
+
+## 0.9.3
+
+### Patch Changes
+
+- [#2818](https://github.com/reactive/data-client/pull/2818) [`fc0092883f`](https://github.com/reactive/data-client/commit/fc0092883f5af42a5d270250482b7f0ba9845e95) Thanks [@ntucker](https://github.com/ntucker)! - Fix unpkg bundles and update names
+
+  - Client packages namespace into RDC
+    - @data-client/react - RDC
+    - @data-client/core - RDC.Core
+    - @data-client/redux - RDC.Redux
+  - Definition packages namespace top level
+    - @data-client/rest - Rest
+    - @data-client/graphql - GraphQL
+    - @data-client/img - Img
+    - @data-client/endpoint - Endpoint
+  - Utility
+    - @data-client/normalizr - normalizr
+    - @data-client/use-enhanced-reducer - EnhancedReducer
+
+- Updated dependencies [[`fc0092883f`](https://github.com/reactive/data-client/commit/fc0092883f5af42a5d270250482b7f0ba9845e95)]:
+  - @data-client/endpoint@0.9.3
+
+## 0.9.2
+
+### Patch Changes
+
+- [`4ea0bc83f6`](https://github.com/reactive/data-client/commit/4ea0bc83f65f49cb2155f6aecdc5f8d1b168fd5e) Thanks [@ntucker](https://github.com/ntucker)! - Docs: Update repo links to reactive organization
+
+- Updated dependencies [[`4ea0bc83f6`](https://github.com/reactive/data-client/commit/4ea0bc83f65f49cb2155f6aecdc5f8d1b168fd5e)]:
+  - @data-client/endpoint@0.9.2
+
+## 0.9.0
+
+### Patch Changes
+
+- Updated dependencies [[`386372ed4d`](https://github.com/reactive/data-client/commit/386372ed4d0b454687847ba2b8eed4369ef7cdf7)]:
+  - @data-client/endpoint@0.9.0
+
+## 0.8.2
+
+### Patch Changes
+
+- [`664d3eacff`](https://github.com/reactive/data-client/commit/664d3eacff08c3c75e8ed7c3ccc64ee21faa6f7f) Thanks [@ntucker](https://github.com/ntucker)! - Remove dev warning for old versions of client
+
+- [#2799](https://github.com/reactive/data-client/pull/2799) [`26a3843d1b`](https://github.com/reactive/data-client/commit/26a3843d1b61900c385d8626d7062d6f0424c137) Thanks [@ntucker](https://github.com/ntucker)! - Removed some forms of automatic entity validation
+
+  - Now allow missing schemas making it easier to declare partials
+  - Removed logic for certain keys found out of defaults
+
+  We are generally trying to be more lax and focus on catching
+  clearly wrong signals. A lot of help comes from network response
+  form detection.
+
+- Updated dependencies [[`664d3eacff`](https://github.com/reactive/data-client/commit/664d3eacff08c3c75e8ed7c3ccc64ee21faa6f7f), [`26a3843d1b`](https://github.com/reactive/data-client/commit/26a3843d1b61900c385d8626d7062d6f0424c137)]:
+  - @data-client/endpoint@0.8.2
+
+## 0.8.1
+
+### Patch Changes
+
+- [#2797](https://github.com/reactive/data-client/pull/2797) [`c6ee872c7d`](https://github.com/reactive/data-client/commit/c6ee872c7d4bb669fa7b08a5343b24419c797cee) Thanks [@ntucker](https://github.com/ntucker)! - Fix published dependency range
+
+## 0.8.0
+
+### Minor Changes
+
+- [`f65cf832f0`](https://github.com/reactive/data-client/commit/f65cf832f0cdc4d01cb2f389a2dc2b37f1e5cf04) Thanks [@ntucker](https://github.com/ntucker)! - BREAKING: Remove all /next exports
+
+- [#2790](https://github.com/reactive/data-client/pull/2790) [`3f36f56939`](https://github.com/reactive/data-client/commit/3f36f5693961fe2c38af172fe192bd57bda488cb) Thanks [@ntucker](https://github.com/ntucker)! - Remove support for non-Collection [pagination](https://dataclient.io/rest/guides/pagination)
+
+  BREAKING CHANGE: [RestEndpoint](https://dataclient.io/rest/api/RestEndpoint) with Arrays no longer support [.paginated()](https://dataclient.io/rest/api/RestEndpoint#paginated)
+
+- [#2789](https://github.com/reactive/data-client/pull/2789) [`440d415bc8`](https://github.com/reactive/data-client/commit/440d415bc81f1d44db2f192ff9634d2144403c61) Thanks [@ntucker](https://github.com/ntucker)! - getPage,push,unshift,assign should not match name of parent
+
+  ```ts
+  const getTodos = new RestEndpoint({
+    urlPrefix: 'https://jsonplaceholder.typicode.com',
+    path: '/todos',
+    schema: new schema.Collection([Todo]),
+    name: 'gettodos',
+  });
+
+  getTodos.getPage.name === 'gettodos.getPage';
+  getTodos.push.name === 'gettodos.create';
+  getTodos.unshift.name === 'gettodos.create';
+  ```
+
+- [#2795](https://github.com/reactive/data-client/pull/2795) [`79e286109b`](https://github.com/reactive/data-client/commit/79e286109b5566f8e7acfdf0f44201263072d1d1) Thanks [@ntucker](https://github.com/ntucker)! - BREAKING: [Schema Serializers](https://dataclient.io/rest/guides/network-transform#deserializing-fields) _must_ support function calls
+
+  This means Date will no longer work like before. Possible migrations:
+
+  ```ts
+  class Ticker extends Entity {
+    trade_id = 0;
+    price = 0;
+    time = Temporal.Instant.fromEpochSeconds(0);
+
+    pk(): string {
+      return `${this.trade_id}`;
+    }
+    static key = 'Ticker';
+
+    static schema = {
+      price: Number,
+      time: Temporal.Instant.from,
+    };
+  }
+  ```
+
+  or to continue using Date:
+
+  ```ts
+  class Ticker extends Entity {
+    trade_id = 0;
+    price = 0;
+    time = Temporal.Instant.fromEpochSeconds(0);
+
+    pk(): string {
+      return `${this.trade_id}`;
+    }
+    static key = 'Ticker';
+
+    static schema = {
+      price: Number,
+      time: (iso: string) => new Date(iso),
+    };
+  }
+  ```
+
+### Patch Changes
+
+- [#2779](https://github.com/reactive/data-client/pull/2779) [`ff51e71f45`](https://github.com/reactive/data-client/commit/ff51e71f45857eb172f3fe05829e34c9abb68252) Thanks [@ntucker](https://github.com/ntucker)! - Update jsdocs references to dataclient.io
+
+- Updated dependencies [[`ff51e71f45`](https://github.com/reactive/data-client/commit/ff51e71f45857eb172f3fe05829e34c9abb68252), [`c535f6c0ac`](https://github.com/reactive/data-client/commit/c535f6c0ac915b5242c1c7694308b7ee7aab16a1), [`79e286109b`](https://github.com/reactive/data-client/commit/79e286109b5566f8e7acfdf0f44201263072d1d1)]:
+  - @data-client/endpoint@0.8.0
+
+## 0.7.6
+
+### Patch Changes
+
+- 8d9f6fe15c: fix: Export types needed for Resource.extend
+
+  ```
+  cannot be named without a reference to '../../node_modules/@data-client/rest/lib/resourceExtensionTypes'. This is likely not portable. A type annotation is necessary.ts(2742)
+  ```
+
+- a8936f5e6d: Entity.process() now gets an addition argument of 'args' (sent from endpoint)
+
+  ```ts
+  class Stream extends Entity {
+    username = '';
+    title = '';
+    game = '';
+    currentViewers = 0;
+    live = false;
+
+    pk() {
+      return this.username;
+    }
+    static key = 'Stream';
+
+    process(value, parent, key, args) {
+      const processed = super.process(value, parent, key, args);
+      processed.username = args[0]?.username;
+      return processed;
+    }
+  }
+  ```
+
+- Updated dependencies [a8936f5e6d]
+  - @data-client/endpoint@0.2.8
+
+## 0.7.5
+
+### Patch Changes
+
+- b60a4a558e: Change internal organization of some types
+- Updated dependencies [b60a4a558e]
+  - @data-client/endpoint@0.2.7
+
+## 0.7.4
+
+### Patch Changes
+
+- 7436b43f78: Fix Resource.extend() for builtin endpoints with zero typing options
+
+  ```ts
+  const RatingResource = createResource({
+    path: '/ratings/:id',
+    schema: Rating,
+  }).extend({
+    getList: {
+      dataExpiryLength: 10 * 60 * 1000, // 10 minutes
+    },
+  });
+  ```
+
+  This would previously break the types of RatingResource.getList.
+  This would only occur because dataExpiryLength is not a type-influencing option.
+
+## 0.7.3
+
+### Patch Changes
+
+- e934b53551: Add [Collection](https://dataclient.io/rest/api/createResource#collection) option to [createResource](https://dataclient.io/rest/api/createResource)
+
+## 0.7.2
+
+### Patch Changes
+
+- 318df89bf7: Add nonFilterArgumentKeys argument to Collection
+
+  `nonFilterArgumentKeys` defines a test to determine which argument keys
+  are not used for filtering the results. For instance, if your API uses
+  'orderBy' to choose a sort - this argument would not influence which
+  entities are included in the response.
+
+  This allows customizing `createCollectionFilter` for the
+  most common case
+
+- Updated dependencies [318df89bf7]
+- Updated dependencies [1fcaeb1a7b]
+  - @data-client/endpoint@0.2.6
+
+## 0.7.1
+
+### Patch Changes
+
+- 4317adb94c: Collection based pagination now replaces the non-list members on page
+
+  This allows members like nextPage or 'cursor' to be updated when
+  each page is fetched making it easier to know which page to fetch next.
+
+- Updated dependencies [5a16f86668]
+- Updated dependencies [4317adb94c]
+  - @data-client/endpoint@0.2.5
+
+## 0.7.0
+
+### Minor Changes
+
+- c8c5575e5a: Add 'paginationField' parameter to [RestEndpoint](https://dataclient.io/rest/api/RestEndpoint#paginationfield) and [createResource](https://dataclient.io/rest/api/createResource#paginationfield)
+
+  This adds a '[getPage](https://dataclient.io/rest/api/RestEndpoint#getPage)' member; similar to getList.push/unshift but for [pagination](https://dataclient.io/rest/guides/pagination).
+
+  ```ts
+  const TodoResource = createResource({
+    path: '/todos/:id',
+    schema: Todo,
+    paginationField: 'page',
+  }).getList.getPage({ page: '2' });
+  ```
+
+### Patch Changes
+
+- c8c5575e5a: Fix case where sometimes paginating would not update a collection
+
+  This was due to the comparison not using string serialization (canonical form for collection comparisons)
+
+- c8c5575e5a: Ignore 'undefined' parameters in collection matching
+- Updated dependencies [c8c5575e5a]
+- Updated dependencies [4e9d34ebc1]
+  - @data-client/endpoint@0.2.4
+
+## 0.6.0
+
+### Minor Changes
+
+- af8b76079f: Support FormData in Resource updates and creates
+
+## 0.5.0
+
+### Minor Changes
+
+- 51b4b0d188: Deprecate Resource.create
+- 51b4b0d188: Add Resource.extend()
+
+  This is polymorphic, and has three forms
+
+  Set any field based on arguments:
+
+  ```ts
+  Resource.extend('fieldName', { path: 'mypath/:id' });
+  ```
+
+  Override any of the provided endpoints with options:
+
+  ```ts
+  Resource.extend({
+    getList: {
+      path: 'mypath/:id',
+    },
+    update: {
+      body: {} as Other,
+    },
+  });
+  ```
+
+  Function to compute derived endpoints:
+
+  ```ts
+  Resource.extend(base => ({
+    getByComment: base.getList.extend({
+      path: 'repos/:owner/:repo/issues/comments/:comment/reactions',
+    }),
+  }));
+  ```
+
+  Idea credits: @Dav3rs
+
+- 51b4b0d188: Remove createResource pagination field in favor of getList.paginated
+
+### Patch Changes
+
+- 51b4b0d188: Fix endpoint.push/unshift/assign method type
+
+## 0.4.1
+
+### Patch Changes
+
+- 6e790725ae: Add more docstrings to RestEndpoint members
+- 27274bcf21: Allow DELETE to have body if specified
+
+## 0.4.0
+
+### Minor Changes
+
+- 8a71700644: push/unshift/assign inherit body type
+
+### Patch Changes
+
+- 8a71700644: scheam.push/unshift type denormalize to singular item (for now)
+- 8a71700644: fix: Support Collections with boolean parameters
+- Updated dependencies [8a71700644]
+- Updated dependencies [8a71700644]
+- Updated dependencies [8a71700644]
+  - @data-client/endpoint@0.2.3
+
+## 0.3.1
+
+### Patch Changes
+
+- 7b835f113a: Improve package tags
+- 8af1b5a8ef: Detect unusable pk when pk is serialized
+- Updated dependencies [f4b625df5a]
+- Updated dependencies [8af1b5a8ef]
+- Updated dependencies [6f3b39b585]
+  - @data-client/endpoint@0.2.2
+
+## 0.3.0
+
+### Minor Changes
+
+- ab9c805a6c: Add createResource() paginationField argument
+  When supplied, will enable Resource.getNextPage
+
+### Patch Changes
+
+- 1efd401bef: fix(types): RestEndpoint.push/unshift/assign return type is no longer nested Promises
+- 12c2596453: fix: Ensure Entit.key can be set in v8 browsers
+- 1efd401bef: enhance: createResource() throws with path not containing any :path
+- Updated dependencies [69ce1f8b6b]
+- Updated dependencies [12c2596453]
+- Updated dependencies [6c8f0be900]
+  - @data-client/endpoint@0.2.1
+
+## 0.2.0
+
+### Minor Changes
+
+BREAKING: Calling super.getRequestInit() will return a promise - so you must resolve it:
+
+```ts
+class AuthdEndpoint<O extends RestGenerics = any> extends RestEndpoint<O> {
+  getRequestInit(body: any): RequestInit {
+    return {
+      ...super.getRequestInit(body),
+      credentials: 'same-origin',
+    };
+  }
+}
+```
+
+->
+
+```ts
+class AuthdEndpoint<O extends RestGenerics = any> extends RestEndpoint<O> {
+  async getRequestInit(body: any): Promise<RequestInit> {
+    return {
+      ...(await super.getRequestInit(body)),
+      credentials: 'same-origin',
+    };
+  }
+}
+```
+
+- bf141cb5a5: Removed deprecated Endpoint.optimisticUpdate -> use Endpoint.getOptimisticResponse
+- 9788090c55: RestEndpoint's getRequestInit and getHeaders optionally return a promise
+- 9788090c55: GetEndpoint and MutateEndpoint parameters changed to what NewXEndpoint was.
+- 9788090c55: createResource() generics changed to O extends ResourceGenerics
+  This allows customizing the Resource type with body and searchParams
+- 9788090c55: createResource().getList uses a Collection, which .create appends to
+  Remove any Endpoint.update as it is not necessary and will not work
+- 011cc20732: Remove FetchShape compatibility.
+  This removes support for the legacy hooks in 'rest-hooks' like useResource()
+
+### Patch Changes
+
+- 9788090c55: Fix Collection creates (like push, unshift) normalizing when no collections are in store
+- 9788090c55: Fix Collections handling single item with Union schema
+- Updated dependencies [bf141cb5a5]
+- Updated dependencies [9788090c55]
+- Updated dependencies [9788090c55]
+- Updated dependencies [011cc20732]
+  - @data-client/endpoint@0.2.0

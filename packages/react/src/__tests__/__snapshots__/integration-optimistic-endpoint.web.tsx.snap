@@ -1,0 +1,25 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CacheProvider Optimistic Updates race conditions should error when user error happens 1`] = `
+[Error: Error processing toggle [5]
+
+Full Schema: {
+  "key": "Toggle",
+  "schema": {}
+}
+
+Error:
+this should fail]
+`;
+
+exports[`ExternalDataProvider Optimistic Updates race conditions should error when user error happens 1`] = `
+[Error: Error processing toggle [5]
+
+Full Schema: {
+  "key": "Toggle",
+  "schema": {}
+}
+
+Error:
+this should fail]
+`;

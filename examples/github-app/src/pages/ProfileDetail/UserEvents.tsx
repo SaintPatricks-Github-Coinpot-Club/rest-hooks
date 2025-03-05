@@ -1,16 +1,11 @@
-import React, { useMemo } from 'react';
-import { useSuspense } from 'rest-hooks';
-import { Card, List, Layout, Space, Timeline, Typography, Divider } from 'antd';
-import Markdown from 'react-markdown';
 import { Link } from '@anansi/router';
-import { UserResource, User } from 'resources/User';
-import RepositoryResource, { Repository } from 'resources/Repository';
-import {
-  BranchesOutlined,
-  ForkOutlined,
-  PullRequestOutlined,
-  StarOutlined,
-} from '@ant-design/icons';
+import { BranchesOutlined, PullRequestOutlined } from '@ant-design/icons';
+import { useSuspense } from '@data-client/react';
+import { Intl } from '@js-temporal/polyfill';
+import { Timeline, Typography, Divider } from 'antd';
+import { groupBy } from 'lodash';
+import { useMemo } from 'react';
+
 import {
   EventResource,
   typeToIcon,
@@ -19,13 +14,11 @@ import {
   IssuesEvent,
   PushEvent,
   PullRequestReviewEvent,
-} from 'resources/Event';
-import { groupBy } from 'lodash';
+} from '@/resources/Event';
+import { User } from '@/resources/User';
 
 import FlexRow from '../../components/FlexRow';
 
-const { Meta } = Card;
-const { Sider, Content } = Layout;
 const { Title, Text } = Typography;
 
 function UserEvents({ user }: { user: User }) {
