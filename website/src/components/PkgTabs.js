@@ -1,7 +1,7 @@
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
-import React from 'react';
 import CodeBlock from '@theme/CodeBlock';
+import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs';
+import React from 'react';
 
 export default function PkgTabs({ pkgs, dev = false }) {
   return (
@@ -11,6 +11,8 @@ export default function PkgTabs({ pkgs, dev = false }) {
       values={[
         { label: 'NPM', value: 'npm' },
         { label: 'Yarn', value: 'yarn' },
+        { label: 'pnpm', value: 'pnpm' },
+        { label: 'esm.sh', value: 'esm' },
       ]}
     >
       <TabItem value="yarn">
@@ -22,6 +24,21 @@ export default function PkgTabs({ pkgs, dev = false }) {
       <TabItem value="npm">
         <CodeBlock className="language-bash">
           npm install --save{dev ? 'Dev ' : ''} {pkgs}
+        </CodeBlock>
+      </TabItem>
+      <TabItem value="pnpm">
+        <CodeBlock className="language-bash">
+          pnpm add{dev ? ' -D' : ''} {pkgs}
+        </CodeBlock>
+      </TabItem>
+      <TabItem value="esm">
+        <CodeBlock className="language-html">
+          {`<script type="module">
+${pkgs
+  .split(' ')
+  .map(pkg => `  import * from 'https://esm.sh/${pkg}${dev ? '?dev' : ''}';`)
+  .join('\n')}
+</script>`}
         </CodeBlock>
       </TabItem>
     </Tabs>

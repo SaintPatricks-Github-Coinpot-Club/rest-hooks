@@ -1,10 +1,11 @@
-import { useSuspense, useController, useCache } from 'rest-hooks';
-import React, { useCallback } from 'react';
-import { UserResource } from 'resources/User';
-import { v4 as uuid } from 'uuid';
-import { Reaction, ReactionResource } from 'resources/Reaction';
-import { Issue } from 'resources/Issue';
+import { useController, useCache } from '@data-client/react';
 import { Tag } from 'antd';
+import React, { useCallback } from 'react';
+import { v4 as uuid } from 'uuid';
+
+import { Issue } from '@/resources/Issue';
+import { Reaction, ReactionResource } from '@/resources/Reaction';
+import { UserResource } from '@/resources/User';
 
 const { CheckableTag } = Tag;
 
@@ -15,7 +16,7 @@ export function ReactionSpan({
   reactions: Reaction[];
   issue: Issue;
 }) {
-  const { fetch } = useController();
+  const ctrl = useController();
   const currentUser = useCache(UserResource.current);
   const userReaction: Reaction | undefined = currentUser
     ? reactions.find((reaction) => reaction.user.login === currentUser.login)
@@ -25,8 +26,8 @@ export function ReactionSpan({
     (checked: boolean) => {
       if (!currentUser) return;
       if (!userReaction) {
-        fetch(
-          ReactionResource.create,
+        ctrl.fetch(
+          ReactionResource.getList.push,
           {
             owner: issue.owner,
             number: issue.number,
@@ -39,7 +40,7 @@ export function ReactionSpan({
           },
         );
       } else {
-        fetch(ReactionResource.delete, {
+        ctrl.fetch(ReactionResource.delete, {
           owner: issue.owner,
           number: issue.number,
           repo: issue.repo,
@@ -50,7 +51,7 @@ export function ReactionSpan({
     [
       currentUser,
       userReaction,
-      fetch,
+      ctrl,
       issue.owner,
       issue.number,
       issue.repo,

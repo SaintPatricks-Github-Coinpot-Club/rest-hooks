@@ -1,280 +1,309 @@
 ---
-title: Co-locate Data Dependencies
-sidebar_label: Data Dependencies
+title: Rendering Asynchronous Data in React
+sidebar_label: Render Data
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+<head>
+  <meta name="docsearch:pagerank" content="40"/>
+</head>
+
+import ThemedImage from '@theme/ThemedImage';
+import useBaseUrl from '@docusaurus/useBaseUrl';
 import LanguageTabs from '@site/src/components/LanguageTabs';
 import HooksPlayground from '@site/src/components/HooksPlayground';
 import ConditionalDependencies from '../shared/\_conditional_dependencies.mdx';
+import { postFixtures } from '@site/src/fixtures/posts';
+import { detailFixtures, listFixtures } from '@site/src/fixtures/profiles';
+import UseLive from '../shared/\_useLive.mdx';
+import AsyncBoundaryExamples from '../shared/\_AsyncBoundary.mdx';
 
-Co-locating data dependencies means we only use data-binding hooks like [useSuspense()](../api/useSuspense)
-in components where we display/use their data directly.
+# Rendering Asynchronous Data
 
-<Tabs
-defaultValue="Single"
-values={[
-{ label: 'Single', value: 'Single' },
-{ label: 'List', value: 'List' },
-]}>
-<TabItem value="Single">
+Make your components reusable by binding the data where you **use** it with the one-line [useSuspense()](../api/useSuspense.md),
+which guarantees data like [await](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await).
 
-```tsx
-import { useSuspense } from 'rest-hooks';
-// local directory for API definitions
-import { todoDetail } from 'endpoints/todo';
+<HooksPlayground defaultOpen="n" row fixtures={postFixtures}>
 
-export default function TodoDetail({ id }: { id: number }) {
-  // highlight-next-line
-  const todo = useSuspense(todoDetail, { id });
-  return <div>{todo.title}</div>;
+```ts title="Resources" collapsed
+import { Entity, resource } from '@data-client/rest';
+
+export class User extends Entity {
+  id = 0;
+  name = '';
+  username = '';
+  email = '';
+  phone = '';
+  website = '';
+
+  get profileImage() {
+    return `https://i.pravatar.cc/64?img=${this.id + 4}`;
+  }
+
+  static key = 'User';
 }
+export const UserResource = resource({
+  urlPrefix: 'https://jsonplaceholder.typicode.com',
+  path: '/users/:id',
+  schema: User,
+});
+
+export class Post extends Entity {
+  id = 0;
+  author = User.fromJS();
+  title = '';
+  body = '';
+
+  static key = 'Post';
+
+  static schema = {
+    author: User,
+  };
+}
+export const PostResource = resource({
+  path: '/posts/:id',
+  schema: Post,
+  paginationField: 'page',
+});
 ```
 
-</TabItem>
-<TabItem value="List">
+```tsx title="PostDetail" {5} collapsed
+import { useSuspense } from '@data-client/react';
+import { PostResource } from './Resources';
 
-```tsx
-import { useSuspense } from 'rest-hooks';
-// local directory for API definitions
-import { todoList } from 'endpoints/todo';
-
-export default function TodoList() {
-  // highlight-next-line
-  const todos = useSuspense(todoList, {});
+export default function PostDetail({ setRoute, id }) {
+  const post = useSuspense(PostResource.get, { id });
   return (
-    <section>
-      {todos.map(todo => (
-        <div key={todo.id}>{todo.title}</div>
-      ))}
-    </section>
+    <div>
+      <header>
+        <div className="listItem spaced">
+          <div className="author">
+            <Avatar src={post.author.profileImage} />
+            <small>{post.author.name}</small>
+          </div>
+          <h4>{post.title}</h4>
+        </div>
+      </header>
+      <p>{post.body}</p>
+      <a
+        href="#"
+        onClick={e => {
+          e.preventDefault();
+          setRoute('list');
+        }}
+      >
+        « Back
+      </a>
+    </div>
   );
 }
 ```
 
-</TabItem>
-</Tabs>
+```tsx title="PostItem" collapsed
+import { type Post } from './Resources';
 
-[useSuspense()](../api/useSuspense) guarantees access to data with sufficient [freshness](/rest/api/Endpoint#dataexpirylength-number).
-This means it may issue network calls, and it may [suspend](#boundaries) until the the fetch completes.
-Param changes will result in accessing the appropriate data, which also sometimes results in new network calls and/or
-suspends.
-
-- Fetches are centrally controlled, and thus automatically deduplicated
-- Data is centralized and normalized guaranteeing consistency across uses, even with different [endpoints](/rest/api/Endpoint).
-  - (For example: navigating to a detail page with a single entry from a list view will instantly show the same data as the list without
-    requiring a refetch.)
-
-<ConditionalDependencies />
-
-## Async Fallbacks (loading/error) {#async-fallbacks}
-
-This works great if the client already has the data. But while it's waiting on a response from the server,
-we need some kind of loading indication. Similarly if there is an error in the fetch, we should indicate such.
-These are called 'fallbacks'.
-
-### Boundaries (Suspense/NetworkErrorBoundary) {#boundaries}
-
-In React 18, the best way to achieve this is with boundaries. ([React 16.3+ supported](#stateful), but less powerful.)
-`<Suspense />` and `<NetworkErrorBoundary />`
-are wrapper components which show fallback [elements](https://reactjs.org/docs/rendering-elements.html)
-when any component rendered as a descendent is loading or errored while loading their data dependency.
-
-<LanguageTabs>
-
-```tsx {6,12,23-25}
-import React, { Suspense } from 'react';
-import { NetworkErrorBoundary } from 'rest-hooks';
-
-export default function TodoPage({ id }: { id: number }) {
+export default function PostItem({ post, setRoute }: Props) {
   return (
-    <AsyncBoundary>
-      <section>
-        <TodoDetail id={1} />
-        <TodoDetail id={5} />
-        <TodoDetail id={10} />
-      </section>
-    </AsyncBoundary>
+    <div className="listItem spaced">
+      <Avatar src={post.author.profileImage} />
+      <div>
+        <h4>
+          <a
+            href="#"
+            onClick={e => {
+              e.preventDefault();
+              setRoute(`detail/${post.id}`);
+            }}
+          >
+            {post.title}
+          </a>
+        </h4>
+        <small>by {post.author.name}</small>
+      </div>
+    </div>
   );
 }
 
 interface Props {
-  fallback: React.ReactElement;
-  children: React.ReactNode;
+  post: Post;
+  setRoute: Function;
 }
+```
 
-function AsyncBoundary({ children, fallback = 'loading' }: Props) {
+```tsx title="PostList" {6}
+import { useSuspense } from '@data-client/react';
+import PostItem from './PostItem';
+import { PostResource } from './Resources';
+
+export default function PostList({ setRoute }) {
+  const posts = useSuspense(PostResource.getList);
   return (
-    <Suspense fallback={fallback}>
-      <NetworkErrorBoundary>{children}</NetworkErrorBoundary>
-    </Suspense>
+    <div>
+      {posts.map(post => (
+        <PostItem key={post.pk()} post={post} setRoute={setRoute} />
+      ))}
+    </div>
   );
 }
 ```
 
-```jsx {6,12,18-20}
-import React, { Suspense } from 'react';
-import { NetworkErrorBoundary } from 'rest-hooks';
+```tsx title="Navigation" collapsed
+import { useController, useLoading } from '@data-client/react';
+import { PostResource } from './Resources';
+import PostList from './PostList';
+import PostDetail from './PostDetail';
 
-export default function TodoPage({ id }: { id: number }) {
+function Navigation() {
+  const [route, setRoute] = React.useState('list');
+  if (route.startsWith('detail'))
+    return <PostDetail setRoute={setRoute} id={route.split('/')[1]} />;
+
   return (
-    <AsyncBoundary>
-      <section>
-        <TodoDetail id={1} />
-        <TodoDetail id={5} />
-        <TodoDetail id={10} />
-      </section>
-    </AsyncBoundary>
+    <>
+      <PostList setRoute={setRoute} />
+      <LoadMore />
+    </>
   );
 }
 
-function AsyncBoundary({ children, fallback = 'loading' }: Props) {
+function LoadMore() {
+  const ctrl = useController();
+  const posts = useQuery(PostResource.getList.schema);
+  const [nextPage, isPending] = useLoading(() =>
+    ctrl.fetch(PostResource.getList.getPage, { page: 2 }),
+  );
+  if (!posts || posts.length % 3 !== 0) return null;
   return (
-    <Suspense fallback={fallback}>
-      <NetworkErrorBoundary>{children}</NetworkErrorBoundary>
-    </Suspense>
+    <center>
+      <button onClick={nextPage}>{isPending ? '...' : 'Load more'}</button>
+    </center>
   );
 }
+render(<Navigation />);
 ```
 
-</LanguageTabs>
+</HooksPlayground>
 
-:::note
+<a href="https://react.dev/learn/passing-data-deeply-with-context" target="_blank">
+<ThemedImage
+alt="Endpoints used in many contexts"
+sources={{
+    light: useBaseUrl('/img/passing_data_context_far.webp'),
+    dark: useBaseUrl('/img/passing_data_context_far.webp'),
+  }}
+style={{float: "right",marginLeft:"10px"}}
+width="415" height="184"
+/>
+</a>
 
-This greatly simplifies complex orchestrations of data dependencies by decoupling where to show fallbacks
-from the components using the data.
+Do not [prop drill](https://react.dev/learn/passing-data-deeply-with-context#the-problem-with-passing-props). Instead, [useSuspense()](../api/useSuspense.md) in the components that render the data from it. This is
+known as _data co-location_.
 
-:::
+Instead of writing complex update functions or invalidations cascades, Reactive Data Client automatically updates
+bound components immediately upon [data change](./mutations.md). This is known as _reactive programming_.
 
-For instance, here we have three different components requesting different todo data. These will all loading in
-parallel and only show one loading indicator instead of filling the screen with them. Although this case
-is obviously contrived; in practice this comes up quite often, especially when data dependencies end up deeply nesting.
+## Loading and Error {#async-fallbacks}
+
+You might have noticed the return type shows the value is always there. [useSuspense()](../api/useSuspense.md) operates very much
+like [await](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await). This enables
+us to make error/loading disjoint from data usage.
+
+### Async Boundaries {#boundaries}
+
+Instead we place [&lt;AsyncBoundary /\>](../api/AsyncBoundary.md) to handling loading and error conditions at or above navigational boundaries like **pages,
+routes, or [modals](https://www.appcues.com/blog/modal-dialog-windows)**.
+
+<AsyncBoundaryExamples />
+
+React 18's [useTransition](https://react.dev/reference/react/useTransition) and [Server Side Rendering](../guides/ssr.md)
+powered routers or navigation means never seeing a loading fallback again. In React 16 and 17 fallbacks can be centralized
+to eliminate redundant loading indicators while keeping components reusable.
+
+[&lt;AsyncBoundary /\>](../api/AsyncBoundary.md) also allows [Server Side Rendering](../guides/ssr.md) to incrementally stream HTML,
+greatly reducing [TTFB](https://web.dev/ttfb/). [Reactive Data Client SSR's](../guides/ssr.md) automatic store hydration
+means immediate user interactivity with **zero** client-side fetches on first load.
+
+AsyncBoundary's [error fallback](../api/AsyncBoundary.md#errorcomponent) and [loading fallback](../api/AsyncBoundary.md#fallback) can both
+be customized.
 
 ### Stateful
 
 You may find cases where it's still useful to use a stateful approach to fallbacks when using React 16 and 17.
-For these cases, or compatibility with some component libraries, [useDLE()](../api/useDLE.md) is provided.
+For these cases, or compatibility with some component libraries, [useDLE()](../api/useDLE.md) - [D]ata [L]oading [E]rror - is provided.
 
-```tsx
-import { useDLE } from 'rest-hooks';
-// local directory for API definitions
-import { todoDetail } from 'endpoints/todo';
+<HooksPlayground fixtures={listFixtures} row>
 
-export default function TodoDetail({ id }: { id: number }) {
-  const { loading, error, data: todo } = useDLE(todoDetail, { id });
-  if (loading) return 'loading';
-  if (error) return error.status;
-  return <div>{todo.title}</div>;
+```typescript title="ProfileResource" collapsed
+import { Entity, resource } from '@data-client/rest';
+
+export class Profile extends Entity {
+  id: number | undefined = undefined;
+  avatar = '';
+  fullName = '';
+  bio = '';
+
+  static key = 'Profile';
 }
+
+export const ProfileResource = resource({
+  path: '/profiles/:id',
+  schema: Profile,
+});
 ```
+
+```tsx title="ProfileList"
+import { useDLE } from '@data-client/react';
+import { ProfileResource } from './ProfileResource';
+
+function ProfileList(): JSX.Element {
+  const { data, loading, error } = useDLE(ProfileResource.getList);
+  if (error) return <div>Error {`${error.status}`}</div>;
+  if (loading || !data) return <Loading />;
+  return (
+    <div>
+      {data.map(profile => (
+        <div className="listItem" key={profile.pk()}>
+          <Avatar src={profile.avatar} />
+          <div>
+            <h4>{profile.fullName}</h4>
+            <p>{profile.bio}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+render(<ProfileList />);
+```
+
+</HooksPlayground>
+
+Since [useDLE](../api/useDLE.md) does not [useSuspense](../api/useSuspense.md), you won't be able to easily centrally
+orchestrate loading and error code. Additionally, React 18 features like [useTransition](https://react.dev/reference/react/useTransition),
+and [incrementally streaming SSR](../guides/ssr.md) won't work with components that use it.
+
+## Conditional
+
+<ConditionalDependencies />
 
 ## Subscriptions
 
 When data is likely to change due to external factor; [useSubscription()](../api/useSubscription.md)
-ensures continual updates while a component is mounted.
+ensures continual updates while a component is mounted. [useLive()](../api/useLive.md) calls both
+[useSubscription()](../api/useSubscription.md) and [useSuspense()](../api/useSuspense.md), making it quite
+easy to use fresh data.
 
-<Tabs
-defaultValue="Single"
-values={[
-{ label: 'Single', value: 'Single' },
-{ label: 'List', value: 'List' },
-]}>
-<TabItem value="Single">
-
-```tsx
-import { useSuspense } from 'rest-hooks';
-// local directory for API definitions
-import { todoDetail } from 'endpoints/todo';
-
-export default function TodoDetail({ id }: { id: number }) {
-  const todo = useSuspense(todoDetail, { id });
-  // highlight-next-line
-  useSubscription(todoDetail, { id });
-  return <div>{todo.title}</div>;
-}
-```
-
-</TabItem>
-<TabItem value="List">
-
-```tsx
-import { useSuspense } from 'rest-hooks';
-// local directory for API definitions
-import { todoList } from 'endpoints/todo';
-
-export default function TodoList() {
-  const todos = useSuspense(todoList, {});
-  // highlight-next-line
-  useSubscription(todoList, {});
-  return (
-    <section>
-      {todos.map(todo => (
-        <div key={todo.id}>{todo.title}</div>
-      ))}
-    </section>
-  );
-}
-```
-
-</TabItem>
-</Tabs>
+<UseLive />
 
 Subscriptions are orchestrated by [Managers](../api/Manager.md). Out of the box,
-polling based subscriptions can be used by adding [pollFrequency](/rest/api/Endpoint#pollfrequency-number) to an endpoint.
-For pushed based networking protocols like websockets, see the [example websocket stream manager](../api/Manager.md#middleware-data-stream).
+polling based subscriptions can be used by adding [pollFrequency](/rest/api/Endpoint#pollfrequency) to an Endpoint or Resource.
+For pushed based networking protocols like SSE and websockets, see the [example stream manager](../concepts/managers.md#data-stream).
 
 ```typescript
-const fetchTodoDetail = ({ id }) =>
-  fetch(`https://jsonplaceholder.typicode.com/todos/${id}`).then(res =>
-    res.json(),
-  );
-const todoDetail = new Endpoint(
-  fetchTodoDetail,
+export const getTicker = new RestEndpoint({
+  urlPrefix: 'https://api.exchange.coinbase.com',
+  path: '/products/:productId/ticker',
+  schema: Ticker,
   // highlight-next-line
-  { pollFrequency: 1000 },
-);
-```
-
-### Live Crypto Price Example
-
-<HooksPlayground  defaultOpen="n">
-
-```tsx
-class ExchangeRate extends Entity {
-  readonly currency: string = 'USD';
-  readonly rates: Record<string, string> = {};
-
-  pk(): string {
-    return this.currency;
-  }
-}
-const getExchangeRates = new RestEndpoint({
-  urlPrefix: 'https://www.coinbase.com/api/v2',
-  path: '/exchange-rates',
-  schema: { data: ExchangeRate },
-  pollFrequency: 5000,
+  pollFrequency: 2000,
 });
-
-function AssetPrice({ symbol }: { symbol: string }) {
-  const { data: price } = useSuspense(getExchangeRates, {
-    currency: 'USD',
-  });
-  useSubscription(getExchangeRates, {
-    currency: 'USD',
-  });
-  const displayPrice = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-  }).format(1 / Number.parseFloat(price.rates[symbol]));
-  return (
-    <span>
-      {symbol} {displayPrice}
-    </span>
-  );
-}
-
-render(<AssetPrice symbol="BTC" />);
 ```
-
-</HooksPlayground>

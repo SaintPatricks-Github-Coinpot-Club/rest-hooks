@@ -3,12 +3,11 @@
   "compilerOptions": {
     "outDir": "lib",
     "rootDir": "src",
-    "skipLibCheck": false
   },
   "include": ["src"],
   "references": [
     { "path": "../../__tests__" },
     { "path": "../endpoint" },
-    { "path": "../core" }
+    { "path": "../react" }
   ]
 }

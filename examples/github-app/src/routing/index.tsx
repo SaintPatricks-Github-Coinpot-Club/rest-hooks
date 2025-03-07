@@ -1,6 +1,6 @@
-import { createBrowserHistory } from 'history';
 import { RouteProvider, RouteController } from '@anansi/router';
-import { useController } from 'rest-hooks';
+import { useController } from '@data-client/react';
+import { createBrowserHistory } from 'history';
 
 import { routes, namedPaths } from './routes';
 

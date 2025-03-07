@@ -1,12 +1,15 @@
-import ReactDOM from 'react-dom';
+import { StrictMode } from 'react';
+import ReactDOM from 'react-dom/client';
 
-import RootProvider from './RootProvider';
 import App from './App';
+import RootProvider from './RootProvider';
 
 const content = (
-  <RootProvider>
-    <App />
-  </RootProvider>
+  <StrictMode>
+    <RootProvider>
+      <App />
+    </RootProvider>
+  </StrictMode>
 );
 
 ReactDOM.createRoot(document.getElementById('react') || document.body).render(

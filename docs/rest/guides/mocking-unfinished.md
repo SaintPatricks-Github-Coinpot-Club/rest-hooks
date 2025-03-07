@@ -2,39 +2,37 @@
 title: Mocking unfinished endpoints
 ---
 
+import HooksPlayground from '@site/src/components/HooksPlayground';
+
 You have agreed to an API schema with a backend engineer who will implement it;
 but they are starting to code the same time as you. It would be nice to easily
 mock the endpoint and use it in a way such that when the endpoint is done
 you won't need to make major changes to your code.
 
-```typescript title="resource/RatingResource.ts"
-import { Entity, createResource } from '@rest-hooks/rest';
-import { EndpointExtraOptions } from '@rest-hooks/endpoint';
+<HooksPlayground>
+
+```typescript title="resources/Rating"
+import { Entity, resource } from '@data-client/rest';
 
 export class Rating extends Entity {
-  readonly id: string = '';
-  readonly rating: number = 4.6;
-  readonly author: string = '';
-  readonly date: Date = new Date(0);
+  id = '';
+  rating = 4.6;
+  author = '';
+  date = Temporal.Instant.fromEpochSeconds(0);
 
-  pk() {
-    return this.id;
-  }
+  static key = 'Rating';
 
   static schema = {
-    date: Date,
+    date: Temporal.Instant.from,
   };
 }
 
-const BaseRatingResource = createResource({
+export const RatingResource = resource({
   path: '/ratings/:id',
   schema: Rating,
-});
-
-export const RatingResource = {
-  ...BaseRatingResource,
-  getList: BaseRatingResource.getList.extend({
-    dataExpiryLength: 10 * 60 * 1000, // 10 minutes
+}).extend({
+  getList: {
+    dataExpiryLength: Infinity,
     fetch() {
       return Promise.resolve(
         ['Morningstar', 'Seekingalpha', 'Morningstar', 'CNBC'].map(author => ({
@@ -45,9 +43,34 @@ export const RatingResource = {
         })),
       );
     },
-  }),
-};
+  },
+});
 ```
+
+```tsx title="Demo" collapsed
+import { RatingResource } from './resources/Rating';
+
+function Demo() {
+  const ratings = useSuspense(RatingResource.getList);
+  return (
+    <div>
+      {ratings.map(rating => (
+        <div key={rating.pk()}>
+          {rating.author}: {rating.rating}{' '}
+          <time>
+            {DateTimeFormat('en-US', { dateStyle: 'medium' }).format(
+              rating.date,
+            )}
+          </time>
+        </div>
+      ))}
+    </div>
+  );
+}
+render(<Demo />);
+```
+
+</HooksPlayground>
 
 By mocking the
 [RestEndpoint](../api/RestEndpoint.md) we can easily fake the data the server will return. Doing

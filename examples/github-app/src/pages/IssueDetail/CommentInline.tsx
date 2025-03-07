@@ -1,26 +1,22 @@
-import React, { memo, useCallback, useState } from 'react';
-import { useCache, useController } from 'rest-hooks';
-import { Card, Avatar, Button, Tag, Popover } from 'antd';
-import Markdown from 'react-markdown';
 import { Link, useRoutes } from '@anansi/router';
+import { EllipsisOutlined } from '@ant-design/icons';
+import { useCache, useController } from '@data-client/react';
+import { Intl } from '@js-temporal/polyfill';
+import { css } from '@linaria/core';
+import { Card, Avatar, Button, Tag, Popover } from 'antd';
+import React, { memo, useCallback, useState } from 'react';
+import Markdown from 'react-markdown';
+import rehypeHighlight from 'rehype-highlight';
 import remarkGfm from 'remark-gfm';
 import remarkRemoveComments from 'remark-remove-comments';
-import rehypeHighlight from 'rehype-highlight';
-import { UserResource } from 'resources/User';
-import { css } from '@linaria/core';
-import { EllipsisOutlined } from '@ant-design/icons';
-import { CommentResource, Comment } from 'resources/Comment';
-import FlexRow from 'components/FlexRow';
+
+import FlexRow from '@/components/FlexRow';
+import { CommentResource, Comment } from '@/resources/Comment';
+import { UserResource } from '@/resources/User';
 
 import CommentForm from './CommentForm';
 
 const { Meta } = Card;
-
-const commentList = css`
-  .ant-card-meta-detail {
-    width: 100%;
-  }
-`;
 
 function CommentInline({ comment }: { comment: Comment }) {
   const [editing, setEditing] = useState(false);
@@ -64,6 +60,12 @@ function CommentInline({ comment }: { comment: Comment }) {
 }
 export default memo(CommentInline);
 
+const commentList = css`
+  .ant-card-meta-detail {
+    width: 100%;
+  }
+`;
+
 function CommentControls({
   comment,
   setEditing,
@@ -92,11 +94,11 @@ function PopControls({
   setEditing: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const route = useRoutes<{ owner: string; repo: string }>()[0];
-  const { fetch } = useController();
+  const ctrl = useController();
 
   const handleEdit = () => setEditing(true);
   const handleDelete = () =>
-    fetch(CommentResource.delete, {
+    ctrl.fetch(CommentResource.delete, {
       owner: route.owner,
       repo: route.repo,
       id: comment.id,
@@ -133,16 +135,18 @@ function EditForm({
   comment: Comment;
   onFinish: () => void;
 }) {
-  const { fetch } = useController();
+  const ctrl = useController();
   const handleFinish = useCallback(
     ({ body }: { body: string }) => {
-      return fetch(
-        CommentResource.partialUpdate,
-        { owner: comment.owner, repo: comment.repo, id: comment.id },
-        { body },
-      ).then(onFinish);
+      return ctrl
+        .fetch(
+          CommentResource.partialUpdate,
+          { owner: comment.owner, repo: comment.repo, id: comment.id },
+          { body },
+        )
+        .then(onFinish);
     },
-    [comment.id, comment.owner, comment.repo, fetch, onFinish],
+    [comment.id, comment.owner, comment.repo, ctrl, onFinish],
   );
   const handleCancel = onFinish;
   return (
