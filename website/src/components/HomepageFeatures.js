@@ -1,8 +1,8 @@
-import React from 'react';
-import clsx from 'clsx';
-import ThemedImage from '@theme/ThemedImage';
-import useBaseUrl from '@docusaurus/useBaseUrl';
 import Link from '@docusaurus/Link';
+import useBaseUrl from '@docusaurus/useBaseUrl';
+import ThemedImage from '@theme/ThemedImage';
+import clsx from 'clsx';
+import React from 'react';
 
 import styles from './HomepageFeatures.module.css';
 
@@ -35,8 +35,7 @@ const FeatureList = [
       <>
         <b>Declare</b> what you need <b>where</b> you need it. <b>Share</b> data
         definitions <b>across platforms</b>, components,{' '}
-        <Link to="/docs#protocol-specific-patterns">protocols</Link>, and
-        behaviors.
+        <Link to="/docs#endpoint">protocols</Link>, and behaviors.
       </>
     ),
     Svg: require(`../../static/img/chemical-composition.svg`).default,

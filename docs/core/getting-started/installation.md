@@ -1,80 +1,70 @@
 ---
 id: installation
-title: Installation
+title: Getting Started with Reactive Data Client
+sidebar_label: Installation
+hide_title: true
 ---
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import PkgTabs from '@site/src/components/PkgTabs';
+import Installation from '../shared/\_installation.mdx';
+import StackBlitz from '@site/src/components/StackBlitz';
+import Link from '@docusaurus/Link';
 
-<PkgTabs pkgs="rest-hooks @rest-hooks/test @rest-hooks/hooks @rest-hooks/rest" />
-
-TypeScript is optional, but requires at least version [3.7](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-7.html#more-recursive-type-aliases) for full type enforcement.
+<PkgTabs pkgs="@data-client/react @data-client/test @data-client/rest" />
 
 ## Add provider at top-level component
 
+<Installation />
 
-<Tabs
-defaultValue="web"
-groupId="platform"
-values={[
-{ label: 'React Web 16+', value: 'web' },
-{ label: 'React Web 18+', value: '18-web' },
-{ label: 'React Native', value: 'native' },
-]}>
-<TabItem value="web">
+<center>
 
-```tsx title="/index.tsx"
-import { CacheProvider } from 'rest-hooks';
-import ReactDOM from 'react-dom';
+<Link className="button button--secondary" to="./resource">Next: Define Data »</Link>
 
-ReactDOM.render(
-  <CacheProvider>
-    <App />
-  </CacheProvider>,
-  document.body,
-);
-```
+</center>
 
-</TabItem>
+## Example
 
-  <TabItem value="18-web">
+<StackBlitz app="todo-app" file="src/index.tsx,src/RootProvider.tsx" view="both" ctl="1" />
 
-```tsx title="/index.tsx"
-import { CacheProvider } from 'rest-hooks';
-import ReactDOM from 'react-dom';
+## Supported Tools
 
-ReactDOM.createRoot(document.body).render(
-  <CacheProvider>
-    <App />
-  </CacheProvider>,
-);
-```
+<details>
+<summary><b>TypeScript 3.7+</b></summary>
 
-</TabItem>
+TypeScript is optional, but requires at least version [3.7](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-7.html#more-recursive-type-aliases) and [strictNullChecks](https://www.typescriptlang.org/tsconfig#strictNullChecks) for full type enforcement.
 
-  <TabItem value="native">
+</details>
 
-```tsx title="/index.tsx"
-import { CacheProvider } from 'rest-hooks';
-import { AppRegistry } from 'react-native';
+<details>
+<summary><b>Older browser support</b></summary>
 
-const Root = () => (
-  <CacheProvider>
-    <App />
-  </CacheProvider>
-);
-AppRegistry.registerComponent('MyApp', () => Root);
-```
+If your application targets older browsers (a few years or more), be sure to load polyfills.
+Typically this is done with [@babel/preset-env useBuiltIns: 'entry'](https://babeljs.io/docs/en/babel-preset-env#usebuiltins),
+coupled with importing [core-js](https://www.npmjs.com/package/core-js) at the entrypoint of your application.
 
-</TabItem>
-</Tabs>
+This ensures only the needed polyfills for your browser support targets are included in your application bundle.
 
-Alternatively [integrate state with redux](../guides/redux.md)
+For instance `TypeError: Object.hasOwn is not a function`
 
-<details><summary><b>Legacy (IE) browser support</b></summary>
+</details>
+<details>
+<summary><b>Internet Explorer support</b></summary>
 
 If you see `Uncaught TypeError: Class constructor Resource cannot be invoked without 'new'`,
 follow the instructions to [add legacy browser support to packages](../guides/legacy-browser)
+
+</details>
+
+<details>
+<summary><b>ReactJS 16-19 and React Native</b></summary>
+
+ReactJS 16.2 and above is supported (the one with hooks!). React 18 provides improved [Suspense](../api/useSuspense.md)
+support and features. Both React Native, [React Navigation](https://reactnavigation.org/) and [Expo](https://docs.expo.dev) are supported.
+
+If you have a working project using other
+React libraries, [feel free to share with others](https://github.com/reactive/data-client/discussions/2422) in our
+discussions.
 
 </details>

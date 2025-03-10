@@ -1,9 +1,14 @@
-import makeRenderRestHook from './makeRenderRestHook.js';
-import { makeExternalCacheProvider, makeCacheProvider } from './providers.js';
-import MockProvider from './MockProvider.js';
-import mockInitialState from './mockState.js';
-export * from './managers.js';
 export { default as MockResolver } from './MockResolver.js';
+export {
+  default as makeRenderDataClient,
+  default as makeRenderDataHook,
+} from './makeRenderDataClient/index.js';
+export type {
+  RenderDataHook,
+  DataProviderProps,
+} from './makeRenderDataClient/index.js';
+export * from './renderDataHook.js';
+import mockInitialState from './mockState.js';
 export type {
   FixtureEndpoint,
   SuccessFixtureEndpoint,
@@ -11,12 +16,9 @@ export type {
   Fixture,
   SuccessFixture,
   ErrorFixture,
-} from './mockState.js';
+  Interceptor,
+} from './fixtureTypes.js';
+export { act, renderHook } from './makeRenderDataClient/renderHook.cjs';
+export type { RenderHookOptions } from './makeRenderDataClient/renderHook.cjs';
 
-export {
-  makeRenderRestHook,
-  makeExternalCacheProvider,
-  makeCacheProvider,
-  MockProvider,
-  mockInitialState,
-};
+export { mockInitialState };

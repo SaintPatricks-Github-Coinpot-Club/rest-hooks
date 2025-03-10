@@ -1,42 +1,68 @@
 ---
-title: useController()
+title: useController() - Type safe store manipulation in React
+sidebar_label: useController()
+description: Controller provides type-safe methods to access and dispatch actions to the store.
 ---
 
 <head>
-  <title>useController() - Imperative Controls for Rest Hooks</title>
+  <meta name="docsearch:pagerank" content="10"/>
 </head>
 
-```typescript
-function useController(): Controller;
-```
+import TypeScriptEditor from '@site/src/components/TypeScriptEditor';
+import StackBlitz from '@site/src/components/StackBlitz';
 
-Provides access to [Controller](./Controller.md)
+# useController()
+
+[Controller](./Controller.md) provides type-safe methods to access and dispatch actions to the store.
+
+For instance [fetch](./Controller.md#fetch), [invalidate](./Controller.md#invalidate),
+and [setResponse](./Controller.md#setResponse)
 
 ```tsx
-import { useController } from 'rest-hooks';
+import { useController } from '@data-client/react';
 
 function MyComponent({ id }) {
-  const { fetch, invalidate, resetEntireStore } = useController();
+  const ctrl = useController();
 
   const handleRefresh = useCallback(
     async e => {
-      await fetch(MyResource.get, { id });
+      await ctrl.fetch(MyResource.get, { id });
     },
     [fetch, id],
   );
 
   const handleSuspend = useCallback(
     async e => {
-      await invalidate(MyResource.get, { id });
+      await ctrl.invalidate(MyResource.get, { id });
     },
     [invalidate, id],
   );
 
   const handleLogout = useCallback(
     async e => {
-      resetEntireStore();
+      ctrl.resetEntireStore();
     },
     [resetEntireStore],
   );
 }
 ```
+
+## Examples
+
+### Using the resolution
+
+`controller.fetch()` matches the return type [useSuspense()](./useSuspense.md) - utilizing the [Endpoint.schema](/rest/api/RestEndpoint#schema)
+when possible. This allows us to use any class members.
+
+```ts
+import { useController } from '@data-client/react';
+
+const post = await controller.fetch(PostResource.getList.push, createPayload);
+post.title;
+post.computedField
+post.pk();
+```
+
+### Todo App
+
+<StackBlitz app="todo-app" file="src/resources/TodoResource.ts,src/pages/Home/TodoListItem.tsx" view="both" />

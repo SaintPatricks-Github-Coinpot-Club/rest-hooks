@@ -1,158 +1,102 @@
-# Change Log
+# @data-client/use-enhanced-reducer
 
-All notable changes to this project will be documented in this file.
-See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+## 0.1.14
 
-### [1.1.6](https://github.com/coinbase/rest-hooks/compare/@rest-hooks/use-enhanced-reducer@1.1.5...@rest-hooks/use-enhanced-reducer@1.1.6) (2022-10-01)
+### Patch Changes
 
-### 📦 Package
+- [#3384](https://github.com/reactive/data-client/pull/3384) [`24ad679`](https://github.com/reactive/data-client/commit/24ad679f58c7eb0d0e6917790b4ebb5ee234e1d3) Thanks [@ntucker](https://github.com/ntucker)! - Reduce bundle sizes by 30% by removing unneeded polyfills
 
-* Update all non-major dependencies ([#2190](https://github.com/coinbase/rest-hooks/issues/2190)) ([c2c7403](https://github.com/coinbase/rest-hooks/commit/c2c74033ecf2004ddebaf064af64f37894f20dec))
-* Update babel packages ([#2192](https://github.com/coinbase/rest-hooks/issues/2192)) ([7c9d3bc](https://github.com/coinbase/rest-hooks/commit/7c9d3bc8ea3019490a1f9e1978c3709b346d582d))
+## 0.1.13
 
-### [1.1.5](https://github.com/coinbase/rest-hooks/compare/@rest-hooks/use-enhanced-reducer@1.1.4...@rest-hooks/use-enhanced-reducer@1.1.5) (2022-09-19)
+### Patch Changes
 
-### 🐛 Bug Fix
+- [`c3514c6`](https://github.com/reactive/data-client/commit/c3514c6afa2cd76dafa02adcfad6f6481a34b5de) Thanks [@ntucker](https://github.com/ntucker)! - Remove unnecessary polyfills in build
 
-* React native to use es6 modules ([#2180](https://github.com/coinbase/rest-hooks/issues/2180)) ([31524ea](https://github.com/coinbase/rest-hooks/commit/31524ea2cbe6ab4bf4cfe77659ac5e69b0319763))
+## 0.1.12
 
-### 📦 Package
+### Patch Changes
 
-* Update babel packages ([#2174](https://github.com/coinbase/rest-hooks/issues/2174)) ([dab7ac7](https://github.com/coinbase/rest-hooks/commit/dab7ac798850fc0519ffe5793601757b10d949b2))
+- [#3353](https://github.com/reactive/data-client/pull/3353) [`165afed`](https://github.com/reactive/data-client/commit/165afed083c0c63e9356bc8d1ee30dee8b916ed6) Thanks [@renovate](https://github.com/apps/renovate)! - Polyfills no longer pollute global scope
 
-### [1.1.5-beta.1](https://github.com/coinbase/rest-hooks/compare/@rest-hooks/use-enhanced-reducer@1.1.4...@rest-hooks/use-enhanced-reducer@1.1.5-beta.1) (2022-09-17)
+## 0.1.11
 
-### 📦 Package
+### Patch Changes
 
-* Update babel packages ([#2174](https://github.com/coinbase/rest-hooks/issues/2174)) ([dab7ac7](https://github.com/coinbase/rest-hooks/commit/dab7ac798850fc0519ffe5793601757b10d949b2))
+- [`4095003`](https://github.com/reactive/data-client/commit/4095003f40f4f6436a790d108ee13bcae1a2cdfa) Thanks [@ntucker](https://github.com/ntucker)! - Improve compatibility with React 19
 
-### [1.1.5-beta.0](https://github.com/coinbase/rest-hooks/compare/@rest-hooks/use-enhanced-reducer@1.1.4...@rest-hooks/use-enhanced-reducer@1.1.5-beta.0) (2022-09-16)
+## 0.1.10
 
-### 📦 Package
+### Patch Changes
 
-* Update babel packages ([#2174](https://github.com/coinbase/rest-hooks/issues/2174)) ([dab7ac7](https://github.com/coinbase/rest-hooks/commit/dab7ac798850fc0519ffe5793601757b10d949b2))
+- [`764728e`](https://github.com/reactive/data-client/commit/764728e45c26088a815e2f49b55d4f4ccab4d388) Thanks [@ntucker](https://github.com/ntucker)! - Support unreleased versions of React 19
 
-### [1.1.4](https://github.com/coinbase/rest-hooks/compare/@rest-hooks/use-enhanced-reducer@1.1.3...@rest-hooks/use-enhanced-reducer@1.1.4) (2022-09-10)
+## 0.1.9
 
-### 📦 Package
+### Patch Changes
 
-* Update babel packages ([#2161](https://github.com/coinbase/rest-hooks/issues/2161)) ([31b2c8f](https://github.com/coinbase/rest-hooks/commit/31b2c8ff3d9f9001c31f3f5c15bec1321a15361d))
+- [#3074](https://github.com/reactive/data-client/pull/3074) [`1f1f66a`](https://github.com/reactive/data-client/commit/1f1f66a54219d65019f8c3cea380e627b317bbef) Thanks [@ntucker](https://github.com/ntucker)! - Compatibility with server/client component build rules
 
-### [1.1.3](https://github.com/coinbase/rest-hooks/compare/@rest-hooks/use-enhanced-reducer@1.1.2...@rest-hooks/use-enhanced-reducer@1.1.3) (2022-09-04)
+## 0.1.8
 
-### 📦 Package
+### Patch Changes
 
-* Update all non-major dependencies ([#2119](https://github.com/coinbase/rest-hooks/issues/2119)) ([3003348](https://github.com/coinbase/rest-hooks/commit/3003348ba96781085a6f8a6a86a882438ba2b5ea))
-* Update all non-major dependencies ([#2136](https://github.com/coinbase/rest-hooks/issues/2136)) ([f7c8649](https://github.com/coinbase/rest-hooks/commit/f7c864998abc68cae1a4130f2de50e055c7a5269))
-* Update all non-major dependencies ([#2150](https://github.com/coinbase/rest-hooks/issues/2150)) ([eb480f1](https://github.com/coinbase/rest-hooks/commit/eb480f1f567944208483c9239256e7bcf81351e7))
-* Update babel packages ([#2124](https://github.com/coinbase/rest-hooks/issues/2124)) ([bab76ae](https://github.com/coinbase/rest-hooks/commit/bab76ae4ac54474634d3cb323b69ef9be5773a03))
-* Update babel packages ([#2140](https://github.com/coinbase/rest-hooks/issues/2140)) ([bc4d12d](https://github.com/coinbase/rest-hooks/commit/bc4d12d5369f4eee17f32d9379793cfc9b679d61))
+- [#3071](https://github.com/reactive/data-client/pull/3071) [`7fba440`](https://github.com/reactive/data-client/commit/7fba44050a4e3fdcc37ab8405730b35366c293e1) Thanks [@ntucker](https://github.com/ntucker)! - React 19 JSX runtime compatibility.
 
-### [1.1.2](https://github.com/coinbase/rest-hooks/compare/@rest-hooks/use-enhanced-reducer@1.1.1...@rest-hooks/use-enhanced-reducer@1.1.2) (2022-07-26)
+  BREAKING CHANGE: Min React version 16.8.4 -> 16.14
 
-### 📦 Package
+  16.14 is the first version of React to include JSX runtime.
 
-* Update all non-major dependencies ([#2113](https://github.com/coinbase/rest-hooks/issues/2113)) ([f9b7a6e](https://github.com/coinbase/rest-hooks/commit/f9b7a6e5b19a0d6f26208af517451affa161b070))
+## 0.1.7
 
-### [1.1.1](https://github.com/coinbase/rest-hooks/compare/@rest-hooks/use-enhanced-reducer@1.1.0...@rest-hooks/use-enhanced-reducer@1.1.1) (2021-10-11)
+### Patch Changes
 
-### 💅 Enhancement
+- [`00d4205`](https://github.com/reactive/data-client/commit/00d4205f03562cfe4acd18215718e23ae5466b8d) Thanks [@ntucker](https://github.com/ntucker)! - Add funding package.json field
 
-* Unified unset dispatch function ([#1362](https://github.com/coinbase/rest-hooks/issues/1362)) ([1b6d718](https://github.com/coinbase/rest-hooks/commit/1b6d71850d5adf38de879181ba62115db73e4e45))
+## 0.1.6
 
-### 📝 Documentation
+### Patch Changes
 
-* Only validate circleCI badge against master ([#1322](https://github.com/coinbase/rest-hooks/issues/1322)) ([04e9642](https://github.com/coinbase/rest-hooks/commit/04e96426a865cbef362947da3a8f74f7347859e9))
+- [#3023](https://github.com/reactive/data-client/pull/3023) [`9dea825`](https://github.com/reactive/data-client/commit/9dea825cc979eeb1558f1e686cbbaacee6d137c5) Thanks [@renovate](https://github.com/apps/renovate)! - Compatibility with React 19 by removing defaultProps
 
-## [1.1.0](https://github.com/coinbase/rest-hooks/compare/@rest-hooks/use-enhanced-reducer@1.0.9...@rest-hooks/use-enhanced-reducer@1.1.0) (2021-06-13)
+## 0.1.5
 
-### 🚀 Features
+### Patch Changes
 
-* Support React 18 ([#907](https://github.com/coinbase/rest-hooks/issues/907)) ([63e8bc9](https://github.com/coinbase/rest-hooks/commit/63e8bc9887a080e1aa510d972645c037dfc96128))
+- [`056737e`](https://github.com/reactive/data-client/commit/056737ec98a2f4406b0239bcb86a5668cbd0ad92) Thanks [@ntucker](https://github.com/ntucker)! - Add Manager examples to readme
 
-### [1.0.9](https://github.com/coinbase/rest-hooks/compare/@rest-hooks/use-enhanced-reducer@1.0.8...@rest-hooks/use-enhanced-reducer@1.0.9) (2021-06-09)
+## 0.1.4
 
-### 💅 Enhancement
+### Patch Changes
 
-* 'module' entrypoint targets 2019 browsers ([#905](https://github.com/coinbase/rest-hooks/issues/905)) ([d988abe](https://github.com/coinbase/rest-hooks/commit/d988abe063fc67c74fce12e234c9c3ffdb7cc230))
+- [`e3314a7`](https://github.com/reactive/data-client/commit/e3314a7ca64919c093b838048caaa8b7530fa7c8) Thanks [@ntucker](https://github.com/ntucker)! - docs: Add keywords to package
 
-### [1.0.8](https://github.com/coinbase/rest-hooks/compare/@rest-hooks/use-enhanced-reducer@1.0.7...@rest-hooks/use-enhanced-reducer@1.0.8) (2021-06-02)
+## 0.1.3
 
-### 💅 Enhancement
+### Patch Changes
 
-* Improve autoimport handling in vscode ([#890](https://github.com/coinbase/rest-hooks/issues/890)) ([f8f2bef](https://github.com/coinbase/rest-hooks/commit/f8f2bef411183676009c6a9df24a26d147c6d9f6))
+- [`d1b51af7ac`](https://github.com/reactive/data-client/commit/d1b51af7ac4a8a7c0559f478cc9503be8e61514c) Thanks [@ntucker](https://github.com/ntucker)! - Fix unpkg bundles by ensuring dependencies are built in order
 
-### [1.0.7](https://github.com/coinbase/rest-hooks/compare/@rest-hooks/use-enhanced-reducer@1.0.6...@rest-hooks/use-enhanced-reducer@1.0.7) (2021-05-24)
+## 0.1.2
 
-**Note:** Version bump only for package @rest-hooks/use-enhanced-reducer
+### Patch Changes
 
-### [1.0.6](https://github.com/coinbase/rest-hooks/compare/@rest-hooks/use-enhanced-reducer@1.0.6...@rest-hooks/use-enhanced-reducer@1.0.6) (2021-04-24)
+- [#2818](https://github.com/reactive/data-client/pull/2818) [`fc0092883f`](https://github.com/reactive/data-client/commit/fc0092883f5af42a5d270250482b7f0ba9845e95) Thanks [@ntucker](https://github.com/ntucker)! - Fix unpkg bundles and update names
 
-### 💅 Enhancement
+  - Client packages namespace into RDC
+    - @data-client/react - RDC
+    - @data-client/core - RDC.Core
+    - @data-client/redux - RDC.Redux
+  - Definition packages namespace top level
+    - @data-client/rest - Rest
+    - @data-client/graphql - GraphQL
+    - @data-client/img - Img
+    - @data-client/endpoint - Endpoint
+  - Utility
+    - @data-client/normalizr - normalizr
+    - @data-client/use-enhanced-reducer - EnhancedReducer
 
-* Support TypeScript 3.7 ([#752](https://github.com/coinbase/rest-hooks/issues/752)) ([68a10e0](https://github.com/coinbase/rest-hooks/commit/68a10e06dc0718f5e480097e6056a7a7954d1161))
+## 0.1.1
 
-## <small>1.0.5 (2020-08-12)</small>
+### Patch Changes
 
-* enhance: Support React 17 (#397) ([a833f07](https://github.com/coinbase/rest-hooks/commit/a833f07)), closes [#397](https://github.com/coinbase/rest-hooks/issues/397)
-
-## <small>1.0.4 (2020-06-06)</small>
-
-* internal: eslint major, plugin minor ([1532f7a](https://github.com/coinbase/rest-hooks/commit/1532f7a))
-* internal: Prepare tests to run in React Native env (#309) ([64efd70](https://github.com/coinbase/rest-hooks/commit/64efd70)), closes [#309](https://github.com/coinbase/rest-hooks/issues/309)
-
-### [1.0.3](https://github.com/coinbase/rest-hooks/compare/@rest-hooks/use-enhanced-reducer@1.0.2...@rest-hooks/use-enhanced-reducer@1.0.3) (2020-04-26)
-
-### 📦 Package
-
-* Bump internal pkgs ([#306](https://github.com/coinbase/rest-hooks/issues/306)) ([46bebad](https://github.com/coinbase/rest-hooks/commit/46bebad79d848404d02423fd2a3e2d647ee5bbbb))
-
-### 🏠 Internal
-
-* Better test coverage by using type-only exports ([1867dd7](https://github.com/coinbase/rest-hooks/commit/1867dd7e2d732540b1814076c88359ba299a2367))
-* Hoist coveralls to root, since testing is done there ([3b1dbaa](https://github.com/coinbase/rest-hooks/commit/3b1dbaac303048a1b1e543f99fb9758b21feb083))
-
-### [1.0.2](https://github.com/coinbase/rest-hooks/compare/@rest-hooks/use-enhanced-reducer@1.0.1...@rest-hooks/use-enhanced-reducer@1.0.2) (2020-03-08)
-
-### 🏠 Internal
-
-* Add zero middleware test for use-enhanced-reducer ([af77661](https://github.com/coinbase/rest-hooks/commit/af77661924f4233e0420b43edcb35a329201407c))
-* Only allow building types from root ([0c3d7ae](https://github.com/coinbase/rest-hooks/commit/0c3d7ae1a9d6130848f31850ed8b15e6ed01d0ab))
-
-### 📝 Documentation
-
-* Improve logging middleware example ([80b2553](https://github.com/coinbase/rest-hooks/commit/80b2553f765970fe4da1e23d506834f5cfc769e0))
-
-### [1.0.1](https://github.com/coinbase/rest-hooks/compare/@rest-hooks/use-enhanced-reducer@1.0.0...@rest-hooks/use-enhanced-reducer@1.0.1) (2020-02-19)
-
-### 🐛 Bug Fix
-
-* Fix commonjs bundle ([#271](https://github.com/coinbase/rest-hooks/issues/271)) ([a898bd0](https://github.com/coinbase/rest-hooks/commit/a898bd0c3497711a25c584f78d1e9c0cbde29949))
-
-### 🏠 Internal
-
-* Check compressed size changes on PR ([#270](https://github.com/coinbase/rest-hooks/issues/270)) ([d70ccbf](https://github.com/coinbase/rest-hooks/commit/d70ccbf44ac5ba8fdc4f70886851ab18349f37e6))
-
-### 📝 Documentation
-
-* Add more tags ([cf99994](https://github.com/coinbase/rest-hooks/commit/cf99994f03e5a4b0e972e268a15f408aefe5318c))
-
-## [1.0.0](https://github.com/coinbase/rest-hooks/compare/@rest-hooks/use-enhanced-reducer@0.1.1-beta.0...@rest-hooks/use-enhanced-reducer@1.0.0) (2020-02-18)
-
-### ⚠ 💥 BREAKING CHANGES
-
-* Adjust package tags
-
-### 📝 Documentation
-
-* Adjust package tags ([d485d9e](https://github.com/coinbase/rest-hooks/commit/d485d9e2315b1a3e0cf4982bc220c5d0e2f87300))
-
-### 0.1.1-beta.0 (2020-02-18)
-
-### 🏠 Internal
-
-* Pull out new package @rest-hooks/use-enhanced-reducer ([#269](https://github.com/coinbase/rest-hooks/issues/269)) ([bb99aeb](https://github.com/coinbase/rest-hooks/commit/bb99aebf6133b34950b1ce3c422fb034fd2971ed))
-
-### 📝 Documentation
-
-* Fix use-enhanced-reducer readme ([a3c8007](https://github.com/coinbase/rest-hooks/commit/a3c800734b8fb5c249b7a88fb35ae3cee0bfdb97))
+- [`4ea0bc83f6`](https://github.com/reactive/data-client/commit/4ea0bc83f65f49cb2155f6aecdc5f8d1b168fd5e) Thanks [@ntucker](https://github.com/ntucker)! - Docs: Update repo links to reactive organization

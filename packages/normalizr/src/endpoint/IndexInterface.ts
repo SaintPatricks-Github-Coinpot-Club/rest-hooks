@@ -1,5 +1,5 @@
-import type { AbstractInstanceType } from '../types.js';
 import type { Schema } from '../interface.js';
+import type { AbstractInstanceType } from '../types.js';
 
 export interface IndexInterface<S extends Schema = Schema, P = object> {
   key(params?: P): string;
@@ -9,10 +9,13 @@ export interface IndexInterface<S extends Schema = Schema, P = object> {
 export type ArrayElement<ArrayType extends unknown[] | readonly unknown[]> =
   ArrayType[number];
 
-export type IndexParams<S extends Schema> = S extends {
-  indexes: readonly string[];
-}
-  ? {
+export type IndexParams<S extends Schema> =
+  S extends (
+    {
+      indexes: readonly string[];
+    }
+  ) ?
+    {
       [K in Extract<
         ArrayElement<S['indexes']>,
         keyof AbstractInstanceType<S>

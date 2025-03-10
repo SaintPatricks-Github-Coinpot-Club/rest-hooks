@@ -1,8 +1,64 @@
 ---
-title: useFetch()
+title: useFetch() - Declarative fetch triggers for React
+sidebar_label: useFetch()
+description: Fetch without the data rendering. Prevent fetch waterfalls by prefetching without duplicate requests.
 ---
 
 import GenericsTabs from '@site/src/components/GenericsTabs';
+import ConditionalDependencies from '../shared/\_conditional_dependencies.mdx';
+import StackBlitz from '@site/src/components/StackBlitz';
+
+<head>
+  <meta name="docsearch:pagerank" content="10"/>
+</head>
+
+# useFetch()
+
+Fetch without the data rendering.
+
+This can be useful for ensuring resources early in a render tree before they are needed.
+
+:::tip
+
+Use in combination with a data-binding hook ([useCache()](./useCache.md), [useSuspense()](./useSuspense.md), [useDLE()](./useDLE.md), [useLive()](./useLive.md))
+in another component.
+
+:::
+
+## Usage
+
+```tsx
+function MasterPost({ id }: { id: number }) {
+  useFetch(PostResource.get, { id });
+  // ...
+}
+```
+
+## Behavior
+
+| Expiry Status | Fetch           | Returns     | Conditions                                                                                            |
+| ------------- | --------------- | ----------- | ----------------------------------------------------------------------------------------------------- |
+| Invalid       | yes<sup>1</sup> | Promise     | not in store, [deletion](/rest/api/resource#delete), [invalidation](./Controller.md#invalidate) |
+| Stale         | yes<sup>1</sup> | Promise     | (first-render, arg change) & [expiry &lt; now](../concepts/expiry-policy.md)                          |
+| Valid         | no              | `undefined` | fetch completion                                                                                      |
+|               | no              | `undefined` | `null` used as second argument                                                                        |
+
+:::note
+
+1. Identical fetches are automatically deduplicated
+
+:::
+
+:::info React Native
+
+When using React Navigation, useFetch() will trigger fetches on focus if the data is considered
+stale.
+
+:::
+
+<ConditionalDependencies hook="useFetch" />
+
+## Types
 
 <GenericsTabs>
 
@@ -15,54 +71,21 @@ function useFetch(
 
 ```typescript
 function useFetch<
-  E extends EndpointInterface<FetchFunction, Schema | undefined, undefined>,
+  E extends EndpointInterface<
+    FetchFunction,
+    Schema | undefined,
+    undefined
+  >,
   Args extends readonly [...Parameters<E>] | readonly [null],
 >(endpoint: E, ...args: Args): ReturnType<E>;
 ```
 
 </GenericsTabs>
 
-Great for retrieving resources optimistically before they are needed.
+## Examples
 
-This can be useful for ensuring resources early in a render tree before they are needed.
+### NextJS Preload
 
-- Triggers fetch:
-  - On first-render
-    - or parameters change
-    - or required entity is deleted
-    - or imperative [invalidation](./Controller.md#invalidate) triggered
-  - and When not in cache or result is considered stale
-  - and When no identical requests are in flight
-  - and when params are not null
-- [On Error (404, 500, etc)](https://www.restapitutorial.com/httpstatuscodes.html):
-  - Returned promise will reject
-- On fetch returns a promise else undefined.
+To prevent fetch waterfalls in NextJS, sometimes you might need to add [preloads](https://nextjs.org/docs/app/building-your-application/data-fetching/patterns#preloading-data) to top level routes.
 
-## Example
-
-### Simple
-
-```tsx
-function MasterPost({ id }: { id: number }) {
-  useFetch(PostResource.get, { id });
-  // ...
-}
-```
-
-### Conditional
-
-```tsx
-function MasterPost({ id, doNotFetch }: { id: number; doNotFetch: boolean }) {
-  useFetch(PostResource.get, doNotFetch ? null : { id });
-  // ...
-}
-```
-
-## Useful `Endpoint`s to send
-
-[Resource](/rest/api/createResource#members) provides these built-in:
-
-- get
-- getList
-
-Feel free to add your own [RestEndpoint](/rest/api/RestEndpoint) as well.
+<StackBlitz repo="coin-app" file="src/app/[id]/page.tsx" initialpath="/BTC" view="editor" height="700" />

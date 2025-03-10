@@ -1,12 +1,13 @@
+import { schema, Entity, Schema } from '@data-client/endpoint';
+import { useController } from '@data-client/react';
+import { useSuspense } from '@data-client/react';
+import { CacheProvider } from '@data-client/react';
 import nock from 'nock';
-import { useController } from '@rest-hooks/core';
-import { act } from '@testing-library/react-hooks';
-import { Entity, Schema } from '@rest-hooks/endpoint';
-import { useSuspense } from '@rest-hooks/core';
 
+import { makeRenderDataClient } from '../../../test';
+import { ResourcePath } from '../pathTypes';
+import resource from '../resource';
 import RestEndpoint from '../RestEndpoint';
-import createResource from '../createResource';
-import { makeRenderRestHook, makeCacheProvider } from '../../../test';
 import {
   payload,
   createPayload,
@@ -17,17 +18,15 @@ import {
   paginatedSecondPage,
 } from '../test-fixtures';
 
+const { Collection } = schema;
+
 export class User extends Entity {
   readonly id: number | undefined = undefined;
   readonly username: string = '';
   readonly email: string = '';
   readonly isAdmin: boolean = false;
-
-  pk() {
-    return this.id?.toString();
-  }
 }
-export const UserResource = createResource({
+export const UserResource = resource({
   path: 'http\\://test.com/user/:id',
   schema: User,
 });
@@ -38,15 +37,11 @@ export class PaginatedArticle extends Entity {
   readonly author: number | null = null;
   readonly tags: string[] = [];
 
-  pk() {
-    return this.id?.toString();
-  }
-
   static schema = {
     author: User,
   };
 }
-function createPaginatableResource<U extends string, S extends Schema>({
+function createPaginatableResource<U extends ResourcePath, S extends Schema>({
   path,
   schema,
   Endpoint = RestEndpoint,
@@ -55,12 +50,12 @@ function createPaginatableResource<U extends string, S extends Schema>({
   readonly schema: S;
   readonly Endpoint?: typeof RestEndpoint;
 }) {
-  const baseResource = createResource({ path, schema, Endpoint });
+  const baseResource = resource({ path, schema, Endpoint });
   const getList = baseResource.getList.extend({
     path: 'http\\://test.com/article-paginated',
     schema: {
       nextPage: '',
-      data: { results: [PaginatedArticle] },
+      data: { results: new Collection([PaginatedArticle]) },
     },
   });
   const getNextPage = getList.paginated((v: { cursor: string | number }) => []);
@@ -79,9 +74,9 @@ export class UrlArticle extends PaginatedArticle {
   readonly url: string = 'happy.com';
 }
 
-describe('createResource()', () => {
-  const renderRestHook: ReturnType<typeof makeRenderRestHook> =
-    makeRenderRestHook(makeCacheProvider);
+describe('resource()', () => {
+  const renderDataClient: ReturnType<typeof makeRenderDataClient> =
+    makeRenderDataClient(CacheProvider);
   let mynock: nock.Scope;
 
   beforeEach(() => {
@@ -139,7 +134,7 @@ describe('createResource()', () => {
   });
 
   it('should handle multiarg urls', () => {
-    const MyUserResource = createResource({
+    const MyUserResource = resource({
       path: 'http\\://test.com/groups/:group/users/:id',
       schema: User,
     });
@@ -201,7 +196,7 @@ describe('createResource()', () => {
     mynock.get(`/article-paginated`).reply(200, paginatedFirstPage);
     mynock.get(`/article-paginated?cursor=2`).reply(200, paginatedSecondPage);
 
-    const { result, waitForNextUpdate } = renderRestHook(() => {
+    const { result, waitForNextUpdate } = renderDataClient(() => {
       const { fetch } = useController();
       const {
         data: { results: articles },
@@ -213,10 +208,8 @@ describe('createResource()', () => {
     () =>
       // @ts-expect-error
       result.current.fetch(PaginatedArticleResource.getNextPage);
-    await act(async () => {
-      await result.current.fetch(PaginatedArticleResource.getNextPage, {
-        cursor: 2,
-      });
+    await result.current.fetch(PaginatedArticleResource.getNextPage, {
+      cursor: 2,
     });
     expect(result.current.articles.map(({ id }) => id)).toEqual([5, 3, 7, 8]);
   });
@@ -228,7 +221,7 @@ describe('createResource()', () => {
       results: [nested[nested.length - 1], ...moreNested],
     });
 
-    const { result, waitForNextUpdate } = renderRestHook(() => {
+    const { result, waitForNextUpdate } = renderDataClient(() => {
       const { fetch } = useController();
       const {
         data: { results: articles },
@@ -237,10 +230,8 @@ describe('createResource()', () => {
       return { articles, nextPage, fetch };
     });
     await waitForNextUpdate();
-    await act(async () => {
-      await result.current.fetch(PaginatedArticleResource.getNextPage, {
-        cursor: 2,
-      });
+    await result.current.fetch(PaginatedArticleResource.getNextPage, {
+      cursor: 2,
     });
     expect(result.current.articles.map(({ id }) => id)).toEqual([5, 3, 7, 8]);
   });
@@ -262,7 +253,7 @@ describe('createResource()', () => {
         return this.id;
       }
     }
-    const ComplexResource = createResource({
+    const ComplexResource = resource({
       path: '/complex-thing/:id',
       schema: ComplexEntity,
     });
@@ -276,7 +267,7 @@ describe('createResource()', () => {
     };
     mynock.get(`/complex-thing/5`).reply(200, firstResponse);
 
-    const { result, waitForNextUpdate } = renderRestHook(() => {
+    const { result, waitForNextUpdate } = renderDataClient(() => {
       const { fetch } = useController();
       const article = useSuspense(ComplexResource.get, { id: '5' });
       return { article, fetch };
@@ -293,10 +284,8 @@ describe('createResource()', () => {
     };
 
     mynock.get(`/complex-thing/5`).reply(200, secondResponse);
-    await act(async () => {
-      await result.current.fetch(ComplexResource.get, {
-        id: '5',
-      });
+    await result.current.fetch(ComplexResource.get, {
+      id: '5',
     });
     expect(result.current.article).toEqual({ ...secondResponse, extra: 'hi' });
   });

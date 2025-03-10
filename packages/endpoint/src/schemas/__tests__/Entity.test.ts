@@ -1,19 +1,19 @@
 // eslint-env jest
-import { fromJS, Record } from 'immutable';
-import { normalize } from '@rest-hooks/normalizr';
+import { normalize, denormalize } from '@data-client/normalizr';
+import { INVALID } from '@data-client/normalizr';
+import { Temporal } from '@js-temporal/polyfill';
 import { IDEntity } from '__tests__/new';
-import { DELETED } from '@rest-hooks/normalizr';
-import { WeakListMap } from '@rest-hooks/normalizr';
+import { fromJS, Record } from 'immutable';
 
+import { SimpleMemoCache } from './denormalize';
 import { AbstractInstanceType } from '../../';
-import denormalize from './denormalize';
 import { schema } from '../../';
 import Entity from '../Entity';
 
 let dateSpy: jest.SpyInstance;
 beforeAll(() => {
   dateSpy = jest
-    // eslint-disable-next-line no-undef
+
     .spyOn(global.Date, 'now')
     .mockImplementation(() => new Date('2019-05-14T11:01:58.135Z').valueOf());
 });
@@ -34,9 +34,6 @@ class ArticleEntity extends Entity {
   readonly title: string = '';
   readonly author: string = '';
   readonly content: string = '';
-  pk() {
-    return this.id;
-  }
 }
 
 class WithOptional extends Entity {
@@ -44,10 +41,6 @@ class WithOptional extends Entity {
   readonly article: ArticleEntity | null = null;
   readonly requiredArticle = ArticleEntity.fromJS();
   readonly nextPage: string = '';
-
-  pk() {
-    return this.id;
-  }
 
   static schema = {
     article: ArticleEntity,
@@ -60,16 +53,61 @@ describe(`${Entity.name} normalization`, () => {
   afterEach(() => {
     warnSpy.mockRestore();
   });
-  beforeEach(() => (warnSpy = jest.spyOn(console, 'warn')));
+  beforeEach(() =>
+    (warnSpy = jest.spyOn(console, 'warn')).mockImplementation(() => {}),
+  );
 
   test('normalizes an entity', () => {
-    class MyEntity extends IDEntity {}
-    expect(normalize({ id: '1' }, MyEntity)).toMatchSnapshot();
+    class MyEntity extends Entity {}
+    expect(normalize(MyEntity, { id: '1' })).toMatchSnapshot();
+  });
+
+  test('normalize throws error when id missing with no pk', () => {
+    class MyEntity extends Entity {}
+    expect(() =>
+      normalize(MyEntity, { slug: '1' }),
+    ).toThrowErrorMatchingSnapshot();
   });
 
   test('normalizes already processed entities', () => {
-    class MyEntity extends IDEntity {}
-    expect(normalize('1', MyEntity)).toMatchSnapshot();
+    class MyEntity extends Entity {}
+    class Nested extends Entity {
+      title = '';
+      nest = MyEntity.fromJS();
+      static schema = {
+        nest: MyEntity,
+      };
+    }
+    expect(normalize(new schema.Array(MyEntity), ['1'])).toMatchSnapshot();
+    expect(
+      normalize(new schema.Object({ data: MyEntity }), { data: '1' }),
+    ).toMatchSnapshot();
+    expect(
+      normalize(Nested, { title: 'hi', id: '5', nest: '10' }),
+    ).toMatchSnapshot();
+  });
+
+  test('normalizes does not change value when shouldUpdate() returns false', () => {
+    class MyEntity extends Entity {
+      id = '';
+      title = '';
+      static shouldUpdate() {
+        return false;
+      }
+    }
+
+    const { entities, entityMeta } = normalize(MyEntity, {
+      id: '1',
+      title: 'hi',
+    });
+    const secondEntities = normalize(
+      MyEntity,
+      { id: '1', title: 'second' },
+      [],
+      { entities, entityMeta, indexes: {} },
+    ).entities;
+    expect(entities.MyEntity['1']).toBeDefined();
+    expect(entities.MyEntity['1']).toBe(secondEntities.MyEntity['1']);
   });
 
   it('should throw a custom error if data does not include pk', () => {
@@ -82,12 +120,27 @@ describe(`${Entity.name} normalization`, () => {
     }
     const schema = MyEntity;
     function normalizeBad() {
-      normalize({ secondthing: 'hi' }, schema);
+      normalize(schema, { secondthing: 'hi' });
     }
     expect(normalizeBad).toThrowErrorMatchingSnapshot();
   });
 
-  it('should throw a custom error if schema key is missing from Entity', () => {
+  it('should throw a custom error if data does not include pk (serializes pk)', () => {
+    class MyEntity extends Entity {
+      readonly name: string = '';
+      readonly secondthing: string = '';
+      pk() {
+        return `${this.name}`;
+      }
+    }
+    const schema = MyEntity;
+    function normalizeBad() {
+      normalize(schema, { secondthing: 'hi' });
+    }
+    expect(normalizeBad).toThrowErrorMatchingSnapshot();
+  });
+
+  it('should not throw if schema key is missing from Entity', () => {
     class MyEntity extends Entity {
       readonly name: string = '';
       readonly secondthing: string = '';
@@ -96,14 +149,14 @@ describe(`${Entity.name} normalization`, () => {
       }
 
       static schema = {
-        blarb: Date,
+        blarb: Temporal.Instant.from,
       };
     }
     const schema = MyEntity;
-    function normalizeBad() {
-      normalize({ name: 'bob', secondthing: 'hi' }, schema);
-    }
-    expect(normalizeBad).toThrowErrorMatchingSnapshot();
+
+    expect(
+      normalize(schema, { name: 'bob', secondthing: 'hi' }),
+    ).toMatchSnapshot();
   });
 
   it('should handle optional schema entries Entity', () => {
@@ -116,12 +169,12 @@ describe(`${Entity.name} normalization`, () => {
       }
 
       static schema = {
-        blarb: Date,
+        blarb: Temporal.Instant.from,
       };
     }
     const schema = MyEntity;
 
-    expect(normalize({ name: 'bob', secondthing: 'hi' }, schema))
+    expect(normalize(schema, { name: 'bob', secondthing: 'hi' }))
       .toMatchInlineSnapshot(`
       {
         "entities": {
@@ -157,7 +210,7 @@ describe(`${Entity.name} normalization`, () => {
     }
     const schema = MyEntity;
     function normalizeBad() {
-      normalize({}, schema);
+      normalize(schema, {});
     }
     expect(normalizeBad).toThrowErrorMatchingSnapshot();
   });
@@ -172,14 +225,11 @@ describe(`${Entity.name} normalization`, () => {
     }
     const schema = MyEntity;
     function normalizeBad() {
-      normalize(
-        [
-          { name: 'hi', secondthing: 'ho' },
-          { name: 'hi', secondthing: 'ho' },
-          { name: 'hi', secondthing: 'ho' },
-        ],
-        schema,
-      );
+      normalize(schema, [
+        { name: 'hi', secondthing: 'ho' },
+        { name: 'hi', secondthing: 'ho' },
+        { name: 'hi', secondthing: 'ho' },
+      ]);
     }
     expect(normalizeBad).toThrowErrorMatchingSnapshot();
   });
@@ -195,93 +245,15 @@ describe(`${Entity.name} normalization`, () => {
     }
     const schema = MyEntity;
     function normalizeBad() {
-      normalize(
-        [
-          { name: 'hi', secondthing: 'ho' },
-          { name: 'hi', secondthing: 'ho' },
-          { name: 'hi', secondthing: 'ho' },
-        ],
-        schema,
-      );
+      normalize(schema, [
+        { name: 'hi', secondthing: 'ho' },
+        { name: 'hi', secondthing: 'ho' },
+        { name: 'hi', secondthing: 'ho' },
+      ]);
     }
     expect(normalizeBad).not.toThrow();
     expect(warnSpy.mock.calls.length).toBe(1);
     expect(warnSpy.mock.calls).toMatchSnapshot();
-  });
-
-  it('should only warn if at least four members are found with unexpected', () => {
-    class MyEntity extends Entity {
-      readonly name: string = '';
-      readonly a: string = '';
-      readonly b: string = '';
-      readonly c: string = '';
-      readonly missinga: string = '';
-      readonly missingb: string = '';
-      readonly missingc: string = '';
-      readonly missingd: string = '';
-      readonly missinge: string = '';
-      readonly missingf: string = '';
-      readonly missingg: string = '';
-      readonly missingh: string = '';
-      readonly missingi: string = '';
-      readonly missingj: string = '';
-      readonly missingk: string = '';
-      readonly missingl: string = '';
-      readonly missingm: string = '';
-      readonly missingn: string = '';
-      readonly missingo: string = '';
-      readonly missingp: string = '';
-      pk() {
-        return this.name;
-      }
-    }
-    const schema = MyEntity;
-
-    expect(
-      normalize(
-        {
-          name: 'hi',
-          a: 'a',
-          b: 'b',
-          c: 'c',
-          d: 'e',
-          e: 0,
-          f: 0,
-          g: 0,
-          h: 0,
-          i: 0,
-          j: 0,
-          k: 0,
-          l: 0,
-          m: 0,
-          n: 0,
-          o: 0,
-          p: 0,
-        },
-        schema,
-      ),
-    ).toMatchSnapshot();
-    expect(warnSpy.mock.calls.length).toBe(1);
-    expect(warnSpy.mock.calls).toMatchSnapshot();
-  });
-
-  it('should error if no matching keys are found', () => {
-    class MyEntity extends Entity {
-      readonly name: string = '';
-      pk() {
-        return (this as any).e;
-      }
-    }
-    const schema = MyEntity;
-
-    expect(() =>
-      normalize(
-        {
-          e: 0,
-        },
-        schema,
-      ),
-    ).toThrowErrorMatchingSnapshot();
   });
 
   it('should allow many unexpected as long as none are missing', () => {
@@ -295,35 +267,56 @@ describe(`${Entity.name} normalization`, () => {
     const schema = MyEntity;
 
     expect(
-      normalize(
-        {
-          name: 'hi',
-          a: 'a',
-          b: 'b',
-          c: 'c',
-          d: 'e',
-          e: 0,
-          f: 0,
-          g: 0,
-          h: 0,
-          i: 0,
-          j: 0,
-          k: 0,
-          l: 0,
-          m: 0,
-          n: 0,
-          o: 0,
-          p: 0,
-          q: 0,
-          r: 0,
-          s: 0,
-          t: 0,
-          u: 0,
-        },
-        schema,
-      ),
+      normalize(schema, {
+        name: 'hi',
+        a: 'a',
+        b: 'b',
+        c: 'c',
+        d: 'e',
+        e: 0,
+        f: 0,
+        g: 0,
+        h: 0,
+        i: 0,
+        j: 0,
+        k: 0,
+        l: 0,
+        m: 0,
+        n: 0,
+        o: 0,
+        p: 0,
+        q: 0,
+        r: 0,
+        s: 0,
+        t: 0,
+        u: 0,
+      }),
     ).toMatchSnapshot();
     expect(warnSpy.mock.calls.length).toBe(0);
+  });
+
+  it('should throw with custom validator', () => {
+    class MyEntity extends Entity {
+      readonly name: string = '';
+      readonly secondthing: string = '';
+      readonly thirdthing: number = 0;
+
+      get nonexistantthing() {
+        return this.name + 5;
+      }
+
+      pk() {
+        return this.name;
+      }
+
+      static validate(value: any) {
+        if (value.nonexistantthing) return 'should not contain getter';
+      }
+    }
+    function normalizeBad() {
+      normalize(MyEntity, { name: 'hoho', nonexistantthing: 'hi' });
+    }
+    expect(normalizeBad).toThrow();
   });
 
   it('should not expect getters returned', () => {
@@ -346,106 +339,10 @@ describe(`${Entity.name} normalization`, () => {
       }
     }
     function normalizeBad() {
-      normalize({ name: 'bob' }, MyEntity);
+      normalize(MyEntity, { name: 'bob' });
     }
     expect(normalizeBad).not.toThrow();
     expect(warnSpy.mock.calls.length).toBe(0);
-  });
-
-  it('should throw if data loads with unexpected prop that is a getter', () => {
-    class MyEntity extends Entity {
-      readonly name: string = '';
-      readonly secondthing: string = '';
-      readonly thirdthing: number = 0;
-
-      get nonexistantthing() {
-        return this.name + 5;
-      }
-
-      pk() {
-        return this.name;
-      }
-    }
-    function normalizeBad() {
-      normalize({ name: 'hoho', nonexistantthing: 'hi' }, MyEntity);
-    }
-    expect(normalizeBad).toThrow();
-  });
-
-  it('should throw if data loads with unexpected prop that is a method', () => {
-    class MyEntity extends Entity {
-      readonly name: string = '';
-      readonly secondthing: string = '';
-      readonly thirdthing: number = 0;
-      readonly thirdthing2: number = 0;
-
-      nonexistantthing() {
-        return this.name + 5;
-      }
-
-      nonexistantthing2() {
-        return this.name + 5;
-      }
-
-      nonexistantthing3() {
-        return this.name + 5;
-      }
-
-      nonexistantthing4() {
-        return this.name + 5;
-      }
-
-      pk() {
-        return this.name;
-      }
-    }
-    function normalizeBad() {
-      normalize(
-        {
-          name: 'hoho',
-          nonexistantthing: 'hi',
-          nonexistantthing2: 'hi',
-          nonexistantthing3: 'hi',
-        },
-        MyEntity,
-      );
-    }
-    expect(normalizeBad).toThrow();
-  });
-
-  it('should throw a custom error if data loads with half unexpected props', () => {
-    class MyEntity extends Entity {
-      readonly name: string = '';
-      readonly secondthing: string = '';
-      readonly thirdthing: number = 0;
-      pk() {
-        return this.name;
-      }
-    }
-    const schema = MyEntity;
-    function normalizeBad() {
-      normalize({ name: 'hoho', nonexistantthing: 'hi' }, schema);
-    }
-    expect(normalizeBad).toThrowErrorMatchingSnapshot();
-  });
-
-  it('should warn when automaticValidation === "warn"', () => {
-    class MyEntity extends Entity {
-      readonly name: string = '';
-      readonly secondthing: string = '';
-      readonly thirdthing: number = 0;
-      static automaticValidation = 'warn' as const;
-      pk() {
-        return this.name;
-      }
-    }
-    const schema = MyEntity;
-    function normalizeBad() {
-      normalize({ name: 'hoho', nonexistantthing: 'hi' }, schema);
-    }
-    expect(normalizeBad).not.toThrow();
-    expect(warnSpy.mock.calls.length).toBe(1);
-    expect(warnSpy.mock.calls).toMatchSnapshot();
   });
 
   it('should do nothing when automaticValidation === "silent"', () => {
@@ -460,7 +357,7 @@ describe(`${Entity.name} normalization`, () => {
     }
     const schema = MyEntity;
     function normalizeBad() {
-      normalize({ name: 'hoho', nonexistantthing: 'hi' }, schema);
+      normalize(schema, { name: 'hoho', nonexistantthing: 'hi' });
     }
     expect(normalizeBad).not.toThrow();
     expect(warnSpy.mock.calls.length).toBe(0);
@@ -477,7 +374,7 @@ describe(`${Entity.name} normalization`, () => {
     }
     const schema = { data: MyEntity };
     function normalizeBad() {
-      normalize('hibho', schema);
+      normalize(schema, 'hibho');
     }
     expect(normalizeBad).toThrowErrorMatchingSnapshot();
   });
@@ -487,9 +384,6 @@ describe(`${Entity.name} normalization`, () => {
       const makeSchema = () =>
         class extends Entity {
           readonly id: number = 0;
-          pk() {
-            return `${this.id}`;
-          }
         };
       expect(() => makeSchema().key).toThrow();
     });
@@ -524,7 +418,7 @@ describe(`${Entity.name} normalization`, () => {
         }
       }
       expect(
-        normalize({ idStr: '134351', name: 'Kathy' }, User),
+        normalize(User, { idStr: '134351', name: 'Kathy' }),
       ).toMatchSnapshot();
     });
 
@@ -538,10 +432,10 @@ describe(`${Entity.name} normalization`, () => {
       const inputSchema = new schema.Values({ users: User }, () => 'users');
 
       expect(
-        normalize(
-          { '4': { name: 'taco' }, '56': { name: 'burrito' } },
-          inputSchema,
-        ),
+        normalize(inputSchema, {
+          '4': { name: 'taco' },
+          '56': { name: 'burrito' },
+        }),
       ).toMatchSnapshot();
     });
 
@@ -556,10 +450,10 @@ describe(`${Entity.name} normalization`, () => {
       const inputSchema = new schema.Object({ user: User });
 
       expect(
-        normalize(
-          { name: 'tacos', user: { id: '4', name: 'Jimmy' } },
-          inputSchema,
-        ),
+        normalize(inputSchema, {
+          name: 'tacos',
+          user: { id: '4', name: 'Jimmy' },
+        }),
       ).toMatchSnapshot();
     });
   });
@@ -568,11 +462,11 @@ describe(`${Entity.name} normalization`, () => {
     test('defaults to plain merging', () => {
       expect(
         normalize(
+          [Tacos],
           [
             { id: '1', name: 'foo' },
             { id: '1', name: 'bar', alias: 'bar' },
           ],
-          [Tacos],
         ),
       ).toMatchSnapshot();
     });
@@ -593,11 +487,11 @@ describe(`${Entity.name} normalization`, () => {
 
       expect(
         normalize(
+          [MergeTaco],
           [
             { id: '1', name: 'foo' },
             { id: '1', name: 'bar', alias: 'bar' },
           ],
-          [MergeTaco],
         ),
       ).toMatchSnapshot();
     });
@@ -614,11 +508,17 @@ describe(`${Entity.name} normalization`, () => {
           };
         }
       }
-      const { entities, result } = normalize(
-        { id: '1', name: 'foo' },
+      const { entities, result } = normalize(ProcessTaco, {
+        id: '1',
+        name: 'foo',
+      });
+      const final = new SimpleMemoCache().denormalize(
         ProcessTaco,
+        result,
+        entities,
       );
-      const [final] = denormalize(result, ProcessTaco, entities);
+      expect(final).not.toEqual(expect.any(Symbol));
+      if (typeof final === 'symbol') return;
       expect(final?.slug).toEqual('thing-1');
       expect(final).toMatchSnapshot();
     });
@@ -644,15 +544,18 @@ describe(`${Entity.name} normalization`, () => {
         static schema = { child: ChildEntity };
       }
 
-      const { entities, result } = normalize(
-        {
-          id: '1',
-          content: 'parent',
-          child: { id: '4', content: 'child' },
-        },
+      const { entities, result } = normalize(ParentEntity, {
+        id: '1',
+        content: 'parent',
+        child: { id: '4', content: 'child' },
+      });
+      const final = new SimpleMemoCache().denormalize(
         ParentEntity,
+        result,
+        entities,
       );
-      const [final] = denormalize(result, ParentEntity, entities);
+      expect(final).not.toEqual(expect.any(Symbol));
+      if (typeof final === 'symbol') return;
       expect(final?.child?.parentId).toEqual('1');
       expect(final).toMatchSnapshot();
     });
@@ -674,13 +577,51 @@ describe(`${Entity.name} normalization`, () => {
         }
       }
 
-      const { entities, result } = normalize(
-        { message: { id: '123', data: { attachment: { id: '456' } } } },
+      const { entities, result } = normalize(EntriesEntity, {
+        message: { id: '123', data: { attachment: { id: '456' } } },
+      });
+      const final = new SimpleMemoCache().denormalize(
         EntriesEntity,
+        result,
+        entities,
       );
-      const [final] = denormalize(result, EntriesEntity, entities);
+      expect(final).not.toEqual(expect.any(Symbol));
+      if (typeof final === 'symbol') return;
       expect(final?.type).toEqual('message');
       expect(final).toMatchSnapshot();
+    });
+
+    test('when undefined is returned, INVALIDate the entity', () => {
+      class ProcessTaco extends Tacos {
+        readonly slug: string = '';
+        static process(input: any, parent: any, key: string | undefined): any {
+          if (input.id === 'DELETE') return undefined;
+          return {
+            ...input,
+            slug: `thing-${(input as unknown as ProcessTaco).id}`,
+          };
+        }
+      }
+      let { entities, result } = normalize(ProcessTaco, {
+        id: 'DELETE',
+        name: 'foo',
+      });
+      let final = new SimpleMemoCache().denormalize(
+        ProcessTaco,
+        result,
+        entities,
+      );
+      expect(final).toEqual(expect.any(Symbol));
+
+      // still work in normal cases
+      ({ entities, result } = normalize(ProcessTaco, {
+        id: '1',
+        name: 'foo',
+      }));
+      final = new SimpleMemoCache().denormalize(ProcessTaco, result, entities);
+      expect(final).not.toEqual(expect.any(Symbol));
+      if (typeof final === 'symbol') return;
+      expect(final?.slug).toEqual('thing-1');
     });
   });
 });
@@ -692,13 +633,13 @@ describe(`${Entity.name} denormalization`, () => {
         '1': { id: '1', name: 'foo' },
       },
     };
-    expect(denormalize('1', Tacos, entities)).toMatchSnapshot();
-    expect(denormalize('1', Tacos, fromJS(entities))).toMatchSnapshot();
+    expect(denormalize(Tacos, '1', entities)).toMatchSnapshot();
+    expect(denormalize(Tacos, '1', fromJS(entities))).toMatchSnapshot();
   });
 
-  class Food extends IDEntity {}
-  class Menu extends IDEntity {
-    readonly food: Food = Food.fromJS();
+  class Food extends Entity {}
+  class Menu extends Entity {
+    food: Food = Food.fromJS();
 
     static schema = { food: Food };
   }
@@ -714,11 +655,13 @@ describe(`${Entity.name} denormalization`, () => {
       },
     };
 
-    expect(denormalize('1', Menu, entities)).toMatchSnapshot();
-    expect(denormalize('1', Menu, fromJS(entities))).toMatchSnapshot();
+    const de1 = denormalize(Menu, '1', entities);
+    expect(de1).toMatchSnapshot();
+    expect(denormalize(Menu, '1', fromJS(entities))).toEqual(de1);
 
-    expect(denormalize('2', Menu, entities)).toMatchSnapshot();
-    expect(denormalize('2', Menu, fromJS(entities))).toMatchSnapshot();
+    const de2 = denormalize(Menu, '2', entities);
+    expect(de2).toMatchSnapshot();
+    expect(denormalize(Menu, '2', fromJS(entities))).toEqual(de2);
   });
 
   test('denormalizes deep entities while maintaining referential equality', () => {
@@ -731,11 +674,14 @@ describe(`${Entity.name} denormalization`, () => {
         '1': { id: '1' },
       },
     };
-    const entityCache = {};
-    const resultCache = new WeakListMap();
+    const memo = new SimpleMemoCache();
 
-    const [first] = denormalize('1', Menu, entities, entityCache, resultCache);
-    const [second] = denormalize('1', Menu, entities, entityCache, resultCache);
+    const first = memo.denormalize(Menu, '1', entities);
+    const second = memo.denormalize(Menu, '1', entities);
+    expect(first).not.toEqual(expect.any(Symbol));
+    if (typeof first === 'symbol') return;
+    expect(second).not.toEqual(expect.any(Symbol));
+    if (typeof second === 'symbol') return;
     expect(first).toBe(second);
     expect(first?.food).toBe(second?.food);
   });
@@ -751,16 +697,10 @@ describe(`${Entity.name} denormalization`, () => {
         '1': { id: '1' },
       },
     };
-    expect(denormalize('1', MyTacos, entities)).toStrictEqual([
-      undefined,
-      false,
-      true,
-    ]);
-    expect(denormalize('1', MyTacos, fromJS(entities))).toStrictEqual([
-      undefined,
-      false,
-      true,
-    ]);
+    expect(denormalize(MyTacos, '1', entities)).toEqual(expect.any(Symbol));
+    expect(denormalize(MyTacos, '1', fromJS(entities))).toEqual(
+      expect.any(Symbol),
+    );
   });
 
   test('denormalizes to undefined for missing data', () => {
@@ -773,11 +713,11 @@ describe(`${Entity.name} denormalization`, () => {
       },
     };
 
-    expect(denormalize('1', Menu, entities)).toMatchSnapshot();
-    expect(denormalize('1', Menu, fromJS(entities))).toMatchSnapshot();
+    expect(denormalize(Menu, '1', entities)).toMatchSnapshot();
+    expect(denormalize(Menu, '1', fromJS(entities))).toMatchSnapshot();
 
-    expect(denormalize('2', Menu, entities)).toMatchSnapshot();
-    expect(denormalize('2', Menu, fromJS(entities))).toMatchSnapshot();
+    expect(denormalize(Menu, '2', entities)).toMatchSnapshot();
+    expect(denormalize(Menu, '2', fromJS(entities))).toMatchSnapshot();
   });
 
   it('should handle optional schema entries Entity', () => {
@@ -790,25 +730,21 @@ describe(`${Entity.name} denormalization`, () => {
       }
 
       static schema = {
-        blarb: Date,
+        blarb: Temporal.Instant.from,
       };
     }
     const schema = MyEntity;
 
     expect(
-      denormalize('bob', schema, {
+      denormalize(schema, 'bob', {
         MyEntity: { bob: { name: 'bob', secondthing: 'hi' } },
       }),
     ).toMatchInlineSnapshot(`
-      [
-        MyEntity {
-          "blarb": undefined,
-          "name": "bob",
-          "secondthing": "hi",
-        },
-        true,
-        false,
-      ]
+      MyEntity {
+        "blarb": undefined,
+        "name": "bob",
+        "secondthing": "hi",
+      }
     `);
   });
 
@@ -822,25 +758,21 @@ describe(`${Entity.name} denormalization`, () => {
       }
 
       static schema = {
-        blarb: Date,
+        blarb: Temporal.Instant.from,
       };
     }
     const schema = MyEntity;
 
     expect(
-      denormalize('bob', schema, {
+      denormalize(schema, 'bob', {
         MyEntity: { bob: { name: 'bob', secondthing: 'hi', blarb: null } },
       }),
     ).toMatchInlineSnapshot(`
-      [
-        MyEntity {
-          "blarb": null,
-          "name": "bob",
-          "secondthing": "hi",
-        },
-        true,
-        false,
-      ]
+      MyEntity {
+        "blarb": null,
+        "name": "bob",
+        "secondthing": "hi",
+      }
     `);
   });
 
@@ -848,19 +780,19 @@ describe(`${Entity.name} denormalization`, () => {
     const entities = {
       Menu: {
         '1': { id: '1', food: '2' },
-        '2': DELETED,
+        '2': INVALID,
       },
       Food: {
         '1': { id: '1' },
-        '2': DELETED,
+        '2': INVALID,
       },
     };
 
-    expect(denormalize('1', Menu, entities)).toMatchSnapshot();
-    expect(denormalize('1', Menu, fromJS(entities))).toMatchSnapshot();
+    expect(denormalize(Menu, '1', entities)).toMatchSnapshot();
+    expect(denormalize(Menu, '1', fromJS(entities))).toMatchSnapshot();
 
-    expect(denormalize('2', Menu, entities)).toMatchSnapshot();
-    expect(denormalize('2', Menu, fromJS(entities))).toMatchSnapshot();
+    expect(denormalize(Menu, '2', entities)).toMatchSnapshot();
+    expect(denormalize(Menu, '2', fromJS(entities))).toMatchSnapshot();
   });
 
   test('denormalizes deep entities with records', () => {
@@ -880,11 +812,11 @@ describe(`${Entity.name} denormalization`, () => {
       },
     };
 
-    expect(denormalize('1', Menu, entities)).toMatchSnapshot();
-    expect(denormalize('1', Menu, fromJS(entities))).toMatchSnapshot();
+    expect(denormalize(Menu, '1', entities)).toMatchSnapshot();
+    expect(denormalize(Menu, '1', fromJS(entities))).toMatchSnapshot();
 
-    expect(denormalize('2', Menu, entities)).toMatchSnapshot();
-    expect(denormalize('2', Menu, fromJS(entities))).toMatchSnapshot();
+    expect(denormalize(Menu, '2', entities)).toMatchSnapshot();
+    expect(denormalize(Menu, '2', fromJS(entities))).toMatchSnapshot();
   });
 
   test('can denormalize already partially denormalized data', () => {
@@ -898,8 +830,8 @@ describe(`${Entity.name} denormalization`, () => {
       },
     };
 
-    expect(denormalize('1', Menu, entities)).toMatchSnapshot();
-    expect(denormalize('1', Menu, fromJS(entities))).toMatchSnapshot();
+    expect(denormalize(Menu, '1', entities)).toMatchSnapshot();
+    expect(denormalize(Menu, '1', fromJS(entities))).toMatchSnapshot();
   });
 
   class User extends IDEntity {
@@ -917,7 +849,7 @@ describe(`${Entity.name} denormalization`, () => {
     };
   }
   User.schema = {
-    reports: [Report],
+    reports: new schema.Array(Report),
   };
   class Comment extends IDEntity {
     readonly body: string = '';
@@ -947,11 +879,11 @@ describe(`${Entity.name} denormalization`, () => {
       },
     };
 
-    expect(denormalize('123', Report, entities)[0]).toMatchSnapshot();
-    expect(denormalize('123', Report, fromJS(entities))[0]).toMatchSnapshot();
+    expect(denormalize(Report, '123', entities)).toMatchSnapshot();
+    expect(denormalize(Report, '123', fromJS(entities))).toMatchSnapshot();
 
-    expect(denormalize('456', User, entities)[0]).toMatchSnapshot();
-    expect(denormalize('456', User, fromJS(entities))[0]).toMatchSnapshot();
+    expect(denormalize(User, '456', entities)).toMatchSnapshot();
+    expect(denormalize(User, '456', fromJS(entities))).toMatchSnapshot();
   });
 
   test('denormalizes recursive entities with referential equality', () => {
@@ -984,16 +916,11 @@ describe(`${Entity.name} denormalization`, () => {
         },
       },
     };
-    const entityCache: any = {};
-    const resultCache = new WeakListMap();
+    const memo = new SimpleMemoCache();
 
-    const [denormalizedReport] = denormalize(
-      '123',
-      Report,
-      entities,
-      entityCache,
-      resultCache,
-    );
+    const denormalizedReport = memo.denormalize(Report, '123', entities);
+    expect(denormalizedReport).not.toEqual(expect.any(Symbol));
+    if (typeof denormalizedReport === 'symbol') return;
 
     expect(denormalizedReport).toBeDefined();
     // This is just for TypeScript, the above line actually determines this
@@ -1004,13 +931,7 @@ describe(`${Entity.name} denormalization`, () => {
       denormalizedReport.draftedBy,
     );
 
-    const [denormalizedReport2] = denormalize(
-      '123',
-      Report,
-      entities,
-      entityCache,
-      resultCache,
-    );
+    const denormalizedReport2 = memo.denormalize(Report, '123', entities);
 
     expect(denormalizedReport2).toStrictEqual(denormalizedReport);
     expect(denormalizedReport2).toBe(denormalizedReport);
@@ -1048,22 +969,17 @@ describe(`${Entity.name} denormalization`, () => {
         },
       },
     };
-    const entityCache: any = {};
-    const resultCache = new WeakListMap();
+    const memo = new SimpleMemoCache();
 
     const input = { report: '123', comment: '999' };
-    const schema = {
+    const sch = new schema.Object({
       report: Report,
       comment: Comment,
-    };
+    });
 
-    const [denormalizedReport] = denormalize(
-      input,
-      schema,
-      entities,
-      entityCache,
-      resultCache,
-    );
+    const denormalizedReport = memo.denormalize(sch, input, entities);
+    expect(denormalizedReport).not.toEqual(expect.any(Symbol));
+    if (typeof denormalizedReport === 'symbol') return;
 
     expect(denormalizedReport.report).toBeDefined();
     expect(denormalizedReport.comment).toBeDefined();
@@ -1074,13 +990,9 @@ describe(`${Entity.name} denormalization`, () => {
       denormalizedReport.comment.author,
     );
 
-    const [denormalizedReport2] = denormalize(
-      input,
-      schema,
-      entities,
-      entityCache,
-      resultCache,
-    );
+    const denormalizedReport2 = memo.denormalize(sch, input, entities);
+    expect(denormalizedReport2).not.toEqual(expect.any(Symbol));
+    if (typeof denormalizedReport2 === 'symbol') return;
 
     expect(denormalizedReport2).toStrictEqual(denormalizedReport);
     expect(denormalizedReport2).toBe(denormalizedReport);
@@ -1097,13 +1009,9 @@ describe(`${Entity.name} denormalization`, () => {
       },
     };
 
-    const [denormalizedReport3] = denormalize(
-      input,
-      schema,
-      nextEntities,
-      entityCache,
-      resultCache,
-    );
+    const denormalizedReport3 = memo.denormalize(sch, input, nextEntities);
+    expect(denormalizedReport3).not.toEqual(expect.any(Symbol));
+    if (typeof denormalizedReport3 === 'symbol') return;
 
     expect(denormalizedReport3.comment?.author?.role).toBe('supervisor');
     expect(denormalizedReport3.report?.draftedBy?.role).toBe('supervisor');
@@ -1113,20 +1021,19 @@ describe(`${Entity.name} denormalization`, () => {
 
   describe('optional entities', () => {
     it('should be marked as found even when optional is not there', () => {
-      const [denormalized, found] = denormalize('abc', WithOptional, {
+      const denormalized = denormalize(WithOptional, 'abc', {
         [WithOptional.key]: {
-          abc: WithOptional.fromJS({
+          abc: {
             id: 'abc',
             // this is typed because we're actually sending wrong data to it
             requiredArticle: '5' as any,
             nextPage: 'blob',
-          }),
+          },
         },
         [ArticleEntity.key]: {
-          ['5']: ArticleEntity.fromJS({ id: '5' }),
+          ['5']: { id: '5' },
         },
       });
-      expect(found).toBe(true);
       const response = denormalized;
       expect(response).toBeDefined();
       expect(response).toBeInstanceOf(WithOptional);
@@ -1139,7 +1046,7 @@ describe(`${Entity.name} denormalization`, () => {
     });
 
     it('should be marked as found when nested entity is missing', () => {
-      const [denormalized, found, deleted] = denormalize('abc', WithOptional, {
+      const denormalized = denormalize(WithOptional, 'abc', {
         [WithOptional.key]: {
           abc: WithOptional.fromJS({
             id: 'abc',
@@ -1152,8 +1059,7 @@ describe(`${Entity.name} denormalization`, () => {
           ['5']: ArticleEntity.fromJS({ id: '5' }),
         },
       });
-      expect(found).toBe(true);
-      expect(deleted).toBe(false);
+      expect(denormalized).not.toEqual(expect.any(Symbol));
       const response = denormalized;
       expect(response).toBeDefined();
       expect(response).toBeInstanceOf(WithOptional);
@@ -1166,34 +1072,24 @@ describe(`${Entity.name} denormalization`, () => {
     });
 
     it('should be marked as deleted when required entity is deleted symbol', () => {
-      const [denormalized, found, deleted] = denormalize('abc', WithOptional, {
+      const denormalized = denormalize(WithOptional, 'abc', {
         [WithOptional.key]: {
-          abc: WithOptional.fromJS({
+          abc: {
             id: 'abc',
             // this is typed because we're actually sending wrong data to it
             requiredArticle: '5' as any,
             nextPage: 'blob',
-          }),
+          },
         },
         [ArticleEntity.key]: {
-          ['5']: DELETED,
+          ['5']: INVALID,
         },
       });
-      expect(found).toBe(true);
-      expect(deleted).toBe(true);
-      const response = denormalized;
-      expect(response).toBeDefined();
-      expect(response).toBeInstanceOf(WithOptional);
-      expect(response).toEqual({
-        id: 'abc',
-        article: null,
-        requiredArticle: undefined,
-        nextPage: 'blob',
-      });
+      expect(denormalized).toEqual(expect.any(Symbol));
     });
 
     it('should be non-required deleted members should not result in deleted indicator', () => {
-      const [denormalized, found, deleted] = denormalize('abc', WithOptional, {
+      const denormalized = denormalize(WithOptional, 'abc', {
         [WithOptional.key]: {
           abc: WithOptional.fromJS({
             id: 'abc',
@@ -1204,12 +1100,11 @@ describe(`${Entity.name} denormalization`, () => {
           }),
         },
         [ArticleEntity.key]: {
-          ['5']: DELETED,
+          ['5']: INVALID,
           ['6']: ArticleEntity.fromJS({ id: '6' }),
         },
       });
-      expect(found).toBe(true);
-      expect(deleted).toBe(false);
+      expect(denormalized).not.toEqual(expect.any(Symbol));
       const response = denormalized;
       expect(response).toBeDefined();
       expect(response).toBeInstanceOf(WithOptional);
@@ -1221,10 +1116,10 @@ describe(`${Entity.name} denormalization`, () => {
       });
     });
 
-    it('should be both deleted and not found when both are true in different parts of schema', () => {
-      const [denormalized, found, deleted] = denormalize(
+    it('should be deleted when both are true in different parts of schema', () => {
+      const denormalized = denormalize(
+        new schema.Object({ data: WithOptional, other: ArticleEntity }),
         { data: 'abc' },
-        { data: WithOptional, other: ArticleEntity },
         {
           [WithOptional.key]: {
             abc: WithOptional.fromJS({
@@ -1236,14 +1131,13 @@ describe(`${Entity.name} denormalization`, () => {
             }),
           },
           [ArticleEntity.key]: {
-            ['5']: DELETED,
+            ['5']: INVALID,
             ['6']: ArticleEntity.fromJS({ id: '6' }),
           },
         },
       );
-      expect(found).toBe(false);
-      expect(deleted).toBe(true);
-      const response = denormalized;
+      expect(denormalized).toEqual(expect.any(Symbol));
+      /*const response = denormalized;
       expect(response).toBeDefined();
       expect(response).toEqual({
         data: {
@@ -1253,6 +1147,46 @@ describe(`${Entity.name} denormalization`, () => {
           nextPage: 'blob',
         },
       });
+      deleted symbol replaces whole denorm value
+      */
     });
+  });
+});
+
+describe('Entity.defaults', () => {
+  it('should work with inheritance', () => {
+    abstract class DefaultsEntity extends Entity {
+      static getMyDefaults() {
+        return this.defaults;
+      }
+    }
+
+    class ID extends DefaultsEntity {
+      id = '';
+      pk() {
+        return this.id;
+      }
+    }
+    class UserEntity extends ID {
+      username = '';
+      createdAt = Temporal.Instant.fromEpochSeconds(0);
+
+      static schema = {
+        createdAt: Temporal.Instant.from,
+      };
+    }
+
+    expect(ID.getMyDefaults()).toMatchInlineSnapshot(`
+      ID {
+        "id": "",
+      }
+    `);
+    expect(UserEntity.getMyDefaults()).toMatchInlineSnapshot(`
+      UserEntity {
+        "createdAt": "1970-01-01T00:00:00Z",
+        "id": "",
+        "username": "",
+      }
+    `);
   });
 });
