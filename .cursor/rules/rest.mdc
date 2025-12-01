@@ -1,5 +1,9 @@
 ---
-applyTo: '**/*.ts*'
+description: Patterns for using @data-client/rest to model resources and endpoints
+globs:
+  - '**/*.ts'
+  - '**/*.tsx'
+alwaysApply: false
 ---
 # Guide: Using `@data-client/rest` for Resource Modeling
 
@@ -137,7 +141,7 @@ const groupTodoByUser = new schema.Query(
 );
 ```
 
-For more detailed usage, refer to the [@data-client/react guide](.github/instructions/react.instructions.md).
+For more detailed usage, refer to the [@data-client/react guide](.cursor/rules/react.mdc).
 
 ---
 
