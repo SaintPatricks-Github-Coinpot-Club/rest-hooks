@@ -12,12 +12,12 @@ This project uses [@data-client/rest](https://dataclient.io/rest) to define, fet
 
 ## 1. Defining Schemas
 
-This project uses [schemas](https://dataclient.io/rest/api/schema) to define and normalize data models with type safety and automatic cache management. Apply the skill "rdc-schema" for schema patterns.
+This project uses [schemas](references/schema.md) to define and normalize data models with type safety and automatic cache management. Apply the skill "rdc-schema" for schema patterns.
 **Always follow these patterns (apply the skill "rdc-schema") when generating mutable data definitions.**
 
 ## 2. Resources (`resource()`)
 
-- [resource()](https://dataclient.io/rest/api/resource) creates a collection of [RestEndpoints](https://dataclient.io/rest/api/RestEndpoint) for CRUD operations on a common object
+- [resource()](references/resource.md) creates a collection of [RestEndpoints](references/RestEndpoint.md) for CRUD operations on a common object
 - Required fields:
   - `path`: path‑to‑regexp template (typed!)
   - `schema`: Declarative data shape for a **single** item (typically Entity or Union)
@@ -58,7 +58,7 @@ export const TodoResource = resource({
 
 ### Usage
 
-#### [Rendering](https://dataclient.io/docs/getting-started/data-dependency)
+#### [Rendering](references/data-dependency.md)
 
 ```ts
 // GET https://jsonplaceholder.typicode.com/todos/5
@@ -69,7 +69,7 @@ const todoList = useSuspense(TodoResource.getList);
 const todoListByUser = useSuspense(TodoResource.getList, { userId: 1 });
 ```
 
-#### [Mutations](https://dataclient.io/docs/getting-started/mutations)
+#### [Mutations](references/mutations.md)
 
 ```ts
 const ctrl = useController();
@@ -93,7 +93,7 @@ For more detailed usage, apply the skill "rdc-react".
 
 ---
 
-## 3. Custom [RestEndpoint](https://dataclient.io/rest/api/RestEndpoint) patterns
+## 3. Custom [RestEndpoint](references/RestEndpoint.md) patterns
 
 ```ts
 /** Stand‑alone endpoint with custom typing */
@@ -158,13 +158,24 @@ export const IssueResource = resource({
 For detailed API documentation, see the [references](references/) directory:
 
 - [resource](references/resource.md) - Create CRUD endpoints
-- [RestEndpoint](references/RestEndpoint.md) - Single REST endpoint
-- [Entity](references/Entity.md) - Normalized data class
-- [Endpoint](references/Endpoint.md) - Base endpoint class
+- [RestEndpoint](references/RestEndpoint.md);[_EndpointLifecycle.mdx](references/_EndpointLifecycle.mdx) - Single REST endpoint
+- [Entity](references/Entity.md);[_entity_lifecycle_methods.mdx](references/_entity_lifecycle_methods.mdx) - Normalized data class
+- [Endpoint](references/Endpoint.md);[_EndpointLifecycle.mdx](references/_EndpointLifecycle.mdx) - Base endpoint class
 - [Collection](references/Collection.md) - Mutable lists
 - [schema](references/schema.md) - Schema overview
-- [data-dependency](references/data-dependency.md) - Rendering guide
-- [mutations](references/mutations.md) - Mutations guide
+- [Fixtures](references/Fixtures.md) - Mock data for testing
+- [data-dependency](references/data-dependency.md);[_useLive.mdx](references/_useLive.mdx);[_AsyncBoundary.mdx](references/_AsyncBoundary.mdx) - Rendering guide
+- [mutations](references/mutations.md);[_useLoading.mdx](references/_useLoading.mdx);[_VoteDemo.mdx](references/_VoteDemo.mdx) - Mutations guide
+
+**Guides** (refer when user asks about these topics):
+- [auth](references/auth.md) - Authentication headers, tokens, login/logout flows
+- [pagination](references/pagination.md);[_pagination.mdx](references/_pagination.mdx) - Cursor/offset pagination, infinite scroll
+- [optimistic-updates](references/optimistic-updates.md);[_optimisticTransform.mdx](references/_optimisticTransform.mdx) - Instant UI feedback before server response
+- [network-transform](references/network-transform.md) - Transform responses, handle non-standard APIs
+
+**Concepts** (refer when user asks about these topics):
+- [expiry-policy](references/expiry-policy.md) - Cache invalidation, stale data, dataExpiryLength, errorExpiryLength
+- [error-policy](references/error-policy.md) - Error handling, retry behavior, soft vs hard errors
 
 **Guides** (refer when user asks about these topics):
 - [auth](references/auth.md) - Authentication headers, tokens, login/logout flows

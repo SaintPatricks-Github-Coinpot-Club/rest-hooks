@@ -59,7 +59,7 @@ delay: 150,
 },
 ]}>
 
-```ts title="api/Todo" {13} collapsed
+```ts title="api/Todo" {15} collapsed
 import { Entity, RestEndpoint, Collection } from '@data-client/rest';
 
 export class Todo extends Entity {
@@ -78,7 +78,7 @@ export const getTodos = new RestEndpoint({
 });
 ```
 
-```ts title="api/User" {12-16} collapsed
+```ts title="api/User" {13-17} collapsed
 import { Entity, RestEndpoint, Collection } from '@data-client/rest';
 import { Todo } from './Todo';
 
@@ -105,7 +105,7 @@ export const getUsers = new RestEndpoint({
 });
 ```
 
-```tsx title="NewTodo" {9-13}
+```tsx title="NewTodo" {10-14}
 import { useController } from '@data-client/react';
 import { getTodos } from './api/Todo';
 
@@ -185,7 +185,59 @@ render(<UserList />);
 
 </HooksPlayground>
 
+### Collection with Values
+
+When an API returns keyed objects rather than arrays, combine `Collection` with [Values](./Values.md)
+to enable mutations on the result.
+
+```typescript
+import { Entity, resource, Collection, Values } from '@data-client/rest';
+
+class Stats extends Entity {
+  product_id = '';
+  volume = 0;
+  price = 0;
+
+  pk() {
+    return this.product_id;
+  }
+
+  static key = 'Stats';
+}
+
+export const StatsResource = resource({
+  urlPrefix: 'https://api.exchange.example.com',
+  path: '/products/:product_id/stats',
+  schema: Stats,
+}).extend({
+  getList: {
+    path: '/products/stats',
+    // Collection wraps Values to enable .push, .assign, etc.
+    // highlight-next-line
+    schema: new Collection(new Values(Stats)),
+    process(value) {
+      // Transform nested response structure
+      Object.keys(value).forEach(key => {
+        value[key] = {
+          ...value[key].stats_24hour,
+          product_id: key,
+        };
+      });
+      return value;
+    },
+  },
+});
+```
+
+This allows updating individual entries with [.assign](./Collection.md#assign):
+
+```typescript
+ctrl.fetch(StatsResource.getList.assign, { product_id: 'BTC-USD', volume: 1000 });
+```
+
 ## Options
+
+One of `argsKey` or `nestKey` is used to compute the `Collection's` [pk](#pk).
 
 ### argsKey(...args): Object {#argsKey}
 
@@ -210,6 +262,9 @@ const getTodos = new RestEndpoint({
 
 Returns a serializable Object whose members uniquely define this collection based
 on the parent it is nested inside.
+
+Nested `Collection's` [pk](#pk) are better defined by what they are nested inside. This allows
+the nested Collection to share its state with other instances whose key has the same value.
 
 ```ts {28-30}
 import { Collection, Entity } from '@data-client/rest';
@@ -241,9 +296,14 @@ class User extends Entity {
 }
 ```
 
+In this case, `user.todos` and getTodos() response (from the argsKey example) will always
+be the same (referentially equal) Array.
+
 ### nonFilterArgumentKeys?
 
-`nonFilterArgumentKeys` defines a test to determine which argument keys
+A convenient alternative to [argsKey](#argsKey)
+
+`nonFilterArgumentKeys` defines a test to determine which [argument keys](#argsKey)
 are _not_ used for filtering the results. For instance, if your API uses
 'orderBy' to choose a sort - this argument would not influence which
 entities are included in the response.
