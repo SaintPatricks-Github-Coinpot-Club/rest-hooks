@@ -10,6 +10,10 @@ import { join } from 'path';
 const REPO = 'reactive/data-client';
 const BLOG_BASE_URL = 'https://dataclient.io/blog';
 
+function escapeRegExp(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 /**
  * Find a blog post for a given major.minor version
  * Blog posts are named like: 2026-01-06-v0.15-*.md
@@ -21,7 +25,7 @@ function findBlogPost(majorMinor) {
   const files = readdirSync(blogDir);
   // Look for blog post matching this version (e.g., v0.15)
   const versionPattern = new RegExp(
-    `^(\\d{4})-(\\d{2})-(\\d{2})-v${majorMinor.replace('.', '\\.')}-.*\\.md$`,
+    `^(\\d{4})-(\\d{2})-(\\d{2})-v${escapeRegExp(majorMinor)}-.*\\.md$`,
   );
 
   for (const file of files) {
@@ -51,7 +55,7 @@ function getChangelogForVersion(packageDir, version) {
 
   for (const line of lines) {
     // Start capturing at ## {version}
-    if (line.match(new RegExp(`^## ${version.replace(/\./g, '\\.')}\\s*$`))) {
+    if (line.match(new RegExp(`^## ${escapeRegExp(version)}\\s*$`))) {
       capturing = true;
       continue;
     }
