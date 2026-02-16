@@ -1,9 +1,21 @@
-@font-face {
-  font-display: swap;
-  font-family: 'Graphik';
-  font-style: normal;
-  font-stretch: normal;
-  src: url('../fonts/Graphik-Regular.woff') format('woff');
+:root {
+  --bg-deep: #111010;
+  --bg-base: #161514;
+  --bg-surface: #1c1b18;
+  --bg-elevated: #242220;
+  --bg-input: #1a1816;
+  --text-primary: #e8e2d9;
+  --text-secondary: #9c958a;
+  --text-muted: #6b655c;
+  --accent: #d4943c;
+  --accent-bright: #e8a84e;
+  --accent-glow: rgba(212, 148, 60, 0.15);
+  --danger: #c45050;
+  --danger-bg: rgba(196, 80, 80, 0.12);
+  --border: #2a2722;
+  --border-light: #363028;
+  --font-display: 'Instrument Serif', Georgia, serif;
+  --font-body: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 * {
@@ -11,14 +23,54 @@
 }
 
 body {
-  font-family: 'Graphik', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: linear-gradient(to bottom right, #f5f7fa 0%, #c3cfe2 100%);
-  min-height: 100vh;
-  color: #111;
+  background: var(--bg-deep);
+  background-image:
+    radial-gradient(ellipse at 25% -10%, rgba(212, 148, 60, 0.07) 0%, transparent 50%),
+    radial-gradient(ellipse at 75% 110%, rgba(212, 148, 60, 0.04) 0%, transparent 50%);
+  color: var(--text-primary);
   margin: 0;
   padding: 0;
+  min-height: 100vh;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--bg-deep);
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-light);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }

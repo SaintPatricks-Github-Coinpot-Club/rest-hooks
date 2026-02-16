@@ -7,7 +7,6 @@ import 'style/main.css';
 import UserSelection from 'pages/Home/UserSelection';
 import useNavigationState from 'useNavigationState';
 
-// Typically place global navigation and routing layer in here
 function App() {
   const [userId, setUserId, loading] = useNavigationState(1);
 
@@ -15,12 +14,12 @@ function App() {
     <AppContainer>
       <LoadingBar duration={500} loading={loading} />
       <AppNav>
-        <NavContainer>
-          <NavBrand>📝 Todos</NavBrand>
-          <AsyncBoundary fallback={<NavLoading>Loading...</NavLoading>}>
+        <NavInner>
+          <NavBrand>Todos</NavBrand>
+          <AsyncBoundary fallback={<NavLoading>loading…</NavLoading>}>
             <UserSelection userId={userId} setUserId={setUserId} />
           </AsyncBoundary>
-        </NavContainer>
+        </NavInner>
       </AppNav>
       <Home userId={userId} />
     </AppContainer>
@@ -35,31 +34,36 @@ const AppContainer = styled.div`
 `;
 
 const AppNav = styled.nav`
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border);
   position: sticky;
   top: 0;
   z-index: 100;
+  backdrop-filter: blur(12px);
 `;
 
-const NavContainer = styled.div`
-  max-width: 1200px;
+const NavInner = styled.div`
+  max-width: 680px;
   margin: 0 auto;
-  padding: 12px 20px;
+  padding: 14px 24px;
   display: flex;
   align-items: center;
   gap: 24px;
 `;
 
 const NavBrand = styled.div`
-  color: white;
-  font-size: 18px;
-  font-weight: 700;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 22px;
+  color: var(--accent-bright);
+  letter-spacing: -0.02em;
   white-space: nowrap;
+  user-select: none;
 `;
 
 const NavLoading = styled.div`
-  color: white;
-  font-size: 14px;
-  opacity: 0.8;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 300;
+  letter-spacing: 0.05em;
 `;

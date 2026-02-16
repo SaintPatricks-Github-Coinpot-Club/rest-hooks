@@ -10,12 +10,12 @@ export default function Home({ userId }: { userId: number }) {
   return (
     <HomeContainer>
       <TodoCard>
-        <Header>
-          <AsyncBoundary fallback={<h1>📝 Todo App</h1>}>
+        <CardHeader>
+          <AsyncBoundary fallback={<HeaderTitle>Todos</HeaderTitle>}>
             <UserHeader userId={userId} />
           </AsyncBoundary>
-        </Header>
-        <AsyncBoundary fallback={<Loading>Loading todos...</Loading>}>
+        </CardHeader>
+        <AsyncBoundary fallback={<Loading>loading…</Loading>}>
           <NewTodo userId={userId} />
           <TodoList userId={userId} />
           <TodoStats userId={userId} />
@@ -29,54 +29,69 @@ function UserHeader({ userId }: { userId: number }) {
   const user = useSuspense(UserResource.get, { id: userId });
   return (
     <div>
-      <h1>📝 {user.name}'s Todos</h1>
-      <Subtitle>@{user.username}</Subtitle>
+      <HeaderTitle>{user.name}</HeaderTitle>
+      <HeaderSub>@{user.username}</HeaderSub>
     </div>
   );
 }
 
 const HomeContainer = styled.main`
-  max-width: 600px;
-  margin: 20px auto;
+  max-width: 620px;
+  margin: 32px auto;
+  padding: 0 16px;
+  animation: fadeSlideIn 0.5s ease-out;
 
   @media (max-width: 768px) {
-    margin: 20px 12px;
+    margin: 16px auto;
   }
 `;
 
 const TodoCard = styled.div`
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
   overflow: hidden;
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(212, 148, 60, 0.03);
 `;
 
-const Header = styled.div`
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 24px;
-  text-align: center;
-
-  h1 {
-    margin: 0;
-    font-size: 32px;
-    font-weight: 600;
-  }
+const CardHeader = styled.div`
+  padding: 32px 28px 24px;
+  border-bottom: 1px solid var(--border);
 
   @media (max-width: 768px) {
-    display: none;
+    padding: 24px 20px 20px;
   }
 `;
 
-const Subtitle = styled.p`
-  margin: 8px 0 0;
-  opacity: 0.9;
+const HeaderTitle = styled.h1`
+  font-family: var(--font-display);
+  font-size: 36px;
+  font-weight: 400;
+  color: var(--text-primary);
+  margin: 0;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+
+  @media (max-width: 768px) {
+    font-size: 28px;
+  }
+`;
+
+const HeaderSub = styled.p`
+  margin: 6px 0 0;
+  color: var(--text-muted);
   font-size: 14px;
+  font-weight: 300;
+  letter-spacing: 0.02em;
 `;
 
 const Loading = styled.div`
-  padding: 40px;
+  padding: 48px 28px;
   text-align: center;
-  color: #9e9e9e;
-  font-size: 16px;
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 300;
+  letter-spacing: 0.05em;
 `;

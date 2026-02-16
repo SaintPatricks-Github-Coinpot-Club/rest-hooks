@@ -68,17 +68,21 @@ const LoadingBarContainer = styled.div`
   position: fixed;
   top: 0;
   width: 100%;
-  height: 3px;
+  height: 2px;
   z-index: 200;
 `;
 
 const LoadingBarInner = styled.div`
   position: absolute;
   top: 0;
-  left: -10px;
+  left: 0;
   height: 100%;
   width: 100%;
-  background: linear-gradient(90deg, #facc15 0%, #fb923c 50%, #f87171 100%);
+  background: linear-gradient(
+    90deg,
+    var(--accent) 0%,
+    var(--accent-bright) 100%
+  );
   transform-origin: left center;
-  box-shadow: 0px -3px 10px 5px rgba(239, 68, 68, 0.6);
+  box-shadow: 0 0 12px var(--accent-glow);
 `;

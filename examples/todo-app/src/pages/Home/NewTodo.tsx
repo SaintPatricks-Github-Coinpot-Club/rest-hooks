@@ -41,7 +41,7 @@ function NewTodo({ userId }: { userId?: number }) {
         disabled={isLoading}
       />
       <AddBtn onClick={handleAdd} disabled={isLoading}>
-        {isLoading ? ' ... ' : 'Add'}
+        {isLoading ? '…' : 'Add'}
       </AddBtn>
     </AddTodo>
   );
@@ -50,42 +50,70 @@ export default memo(NewTodo);
 
 const AddTodo = styled.div`
   display: flex;
-  padding: 20px;
+  padding: 20px 28px;
   gap: 12px;
-  border-bottom: 2px solid #e0e0e0;
+  border-bottom: 1px solid var(--border);
+
+  @media (max-width: 768px) {
+    padding: 16px 20px;
+  }
 `;
 
 const TodoInput = styled.input`
   flex: 1;
   padding: 12px 16px;
-  border: 2px solid #e0e0e0;
-  border-radius: 8px;
-  font-size: 16px;
-  transition: border-color 0.2s;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--text-primary);
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+
+  &::placeholder {
+    color: var(--text-muted);
+    font-weight: 300;
+  }
 
   &:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+  }
+
+  &:disabled {
+    opacity: 0.5;
   }
 `;
 
 const AddBtn = styled.button`
   padding: 12px 24px;
-  background: #667eea;
-  color: white;
+  background: var(--accent);
+  color: var(--bg-deep);
   border: none;
-  border-radius: 8px;
-  font-size: 16px;
+  border-radius: 10px;
+  font-family: var(--font-body);
+  font-size: 14px;
   font-weight: 600;
+  letter-spacing: 0.03em;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition:
+    background-color 0.2s,
+    transform 0.1s;
 
   &:hover:not(:disabled) {
-    background: #5568d3;
+    background: var(--accent-bright);
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.97);
   }
 
   &:disabled {
-    opacity: 0.6;
+    opacity: 0.5;
     cursor: not-allowed;
   }
 `;
