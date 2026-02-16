@@ -47,11 +47,9 @@ function NewTodo({ userId }: { userId?: number }) {
   );
 }
 export default memo(NewTodo);
-
 const AddTodo = styled.div`
   display: flex;
   padding: 20px 28px;
-  gap: 12px;
   border-bottom: 1px solid var(--border);
 
   @media (max-width: 768px) {
@@ -61,10 +59,10 @@ const AddTodo = styled.div`
 
 const TodoInput = styled.input`
   flex: 1;
-  padding: 12px 16px;
+  padding: 10px 16px;
   background: var(--bg-input);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 10px 0 0 10px;
   font-family: var(--font-body);
   font-size: 15px;
   font-weight: 400;
@@ -90,13 +88,14 @@ const TodoInput = styled.input`
 `;
 
 const AddBtn = styled.button`
-  padding: 12px 24px;
+  padding: 10px 18px;
   background: var(--accent);
   color: var(--bg-deep);
-  border: none;
-  border-radius: 10px;
+  border: 1px solid var(--accent);
+  border-left: none;
+  border-radius: 0 10px 10px 0;
   font-family: var(--font-body);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.03em;
   cursor: pointer;

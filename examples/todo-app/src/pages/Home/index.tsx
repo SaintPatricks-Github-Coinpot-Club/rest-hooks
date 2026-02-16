@@ -63,6 +63,10 @@ const CardHeader = styled.div`
   @media (max-width: 768px) {
     padding: 24px 20px 20px;
   }
+
+  @media (max-width: 560px) {
+    display: none;
+  }
 `;
 
 const HeaderTitle = styled.h1`
