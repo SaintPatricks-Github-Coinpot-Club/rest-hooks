@@ -99,7 +99,7 @@ TodoResource.update({ id: 5 }, { title: 'my todo' });
 // PATCH https://jsonplaceholder.typicode.com/todos/5
 TodoResource.partialUpdate({ id: 5 }, { title: 'my todo' });
 // PATCH https://jsonplaceholder.typicode.com/todos/5
-const toggleStatus = (completed: boolean) => ctrl.fetch(TodoResource.getList.move, { id }, { completed });
+TodoResource.getList.move({ id: 5 }, { completed: true });
 // DELETE https://jsonplaceholder.typicode.com/todos/5
 TodoResource.delete({ id: 5 });
 ```
