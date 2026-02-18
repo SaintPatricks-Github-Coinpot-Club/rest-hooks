@@ -1,4 +1,4 @@
-import type { schema } from './index.js';
+import type { schema, Collection } from './index.js';
 import type {
   SchemaSimple,
   Schema,
@@ -13,6 +13,9 @@ export { EntityMap, Invalidate };
 
 export { EntityInterface } from './interface.js';
 
+/** Schema when adding to an Array Collection
+ * Conceptually only returns a single item
+ */
 export type CollectionArrayAdder<S extends PolymorphicInterface> =
   S extends (
     {
@@ -23,6 +26,20 @@ export type CollectionArrayAdder<S extends PolymorphicInterface> =
     }
   ) ?
     // TODO: eventually we want to allow singular or list and infer the return based on arguments
+    T
+  : never;
+
+/** Schema to remove/move (by value) from a Collection(Array|Values)
+ * Conceptually only returns a single item
+ */
+export type CollectionArrayOrValuesAdder<S extends PolymorphicInterface> =
+  S extends (
+    {
+      denormalize(...args: any): any;
+      // get what we are a record of
+      schema: infer T;
+    }
+  ) ?
     T
   : never;
 
@@ -40,7 +57,7 @@ export interface CollectionInterface<
     createCollectionFilter?: (
       ...args: P
     ) => (collectionKey: Record<string, string>) => boolean,
-  ): schema.Collection<S, P>;
+  ): Collection<S, P>;
 
   readonly cacheWith: object;
 
@@ -153,17 +170,22 @@ export interface CollectionInterface<
    */
   unshift: CollectionArrayAdder<S>;
 
-  /** Schema to remove (by value) from a Collection
-   * @see https://dataclient.io/rest/api/Collection#remove
-   */
-  remove: CollectionArrayAdder<S>;
-
   /** Schema to merge with a Values Collection
    * @see https://dataclient.io/rest/api/Collection#assign
    */
   assign: S extends { denormalize(...args: any): Record<string, unknown> } ?
-    schema.Collection<S, Args, Parent>
+    Collection<S, Args, Parent>
   : never;
+
+  /** Schema to remove (by value) from a Collection(Array|Values)
+   * @see https://dataclient.io/rest/api/Collection#remove
+   */
+  remove: CollectionArrayOrValuesAdder<S>;
+
+  /** Schema to move items between Collections (remove from old, add to new)
+   * @see https://dataclient.io/rest/api/Collection#move
+   */
+  move: CollectionArrayOrValuesAdder<S>;
 }
 export type CollectionFromSchema<
   S extends any[] | PolymorphicInterface = any,

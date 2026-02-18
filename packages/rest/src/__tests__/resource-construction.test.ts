@@ -818,6 +818,542 @@ describe('resource()', () => {
       );
   });
 
+  it('UserResource.getList.move should work', async () => {
+    mynock.patch(`/groups/five/users/2`).reply(200, (uri, body: any) => ({
+      id: 2,
+      username: 'user2',
+      email: 'user2@example.com',
+      group: 'ten',
+      ...body,
+    }));
+
+    const { result, controller } = renderDataClient(
+      () => {
+        return {
+          user2: useQuery(User, { id: 2 }),
+          groupFive: useCache(UserResource.getList, { group: 'five' }),
+          groupTen: useCache(UserResource.getList, { group: 'ten' }),
+        };
+      },
+      {
+        initialFixtures: [
+          {
+            endpoint: UserResource.getList,
+            args: [{ group: 'five' }],
+            response: [
+              {
+                id: 1,
+                username: 'user1',
+                email: 'user1@example.com',
+                group: 'five',
+              },
+              {
+                id: 2,
+                username: 'user2',
+                email: 'user2@example.com',
+                group: 'five',
+              },
+            ],
+          },
+          {
+            endpoint: UserResource.getList,
+            args: [{ group: 'ten' }],
+            response: [
+              {
+                id: 3,
+                username: 'user3',
+                email: 'user3@example.com',
+                group: 'ten',
+              },
+            ],
+          },
+        ],
+      },
+    );
+
+    expect(result.current.groupFive).toHaveLength(2);
+    expect(result.current.groupTen).toHaveLength(1);
+
+    // PATCH /groups/five/users/2 - moves user 2 from 'five' to 'ten'
+    await act(async () => {
+      const response = await controller.fetch(
+        UserResource.getList.move,
+        { group: 'five', id: '2' },
+        {
+          id: 2,
+          group: 'ten',
+        },
+      );
+      expect(response.id).toEqual(2);
+    });
+
+    // user should be removed from group 'five'
+    expect(result.current.groupFive).toHaveLength(1);
+    expect(result.current.groupFive?.[0]?.username).toBe('user1');
+
+    // user should be added to group 'ten'
+    expect(result.current.groupTen).toHaveLength(2);
+    expect(result.current.groupTen?.map((u: any) => u.username)).toEqual(
+      expect.arrayContaining(['user3', 'user2']),
+    );
+
+    // entity should be updated
+    expect(result.current.user2?.group).toEqual('ten');
+
+    // move uses full path params (group + id), no searchParams
+    () =>
+      controller.fetch(
+        UserResource.getList.move,
+        { group: 'five', id: 2 },
+        { id: 1, group: 'ten' },
+      );
+    () =>
+      controller.fetch(
+        UserResource.getList.move,
+        // @ts-expect-error - missing required group
+        { id: 2 },
+        { id: 1 },
+      );
+    // @ts-expect-error
+    () => controller.fetch(UserResource.getList.move, { username: 'never' });
+    // @ts-expect-error
+    () => controller.fetch(UserResource.getList.move, 1, 'hi');
+    () =>
+      controller.fetch(
+        UserResource.getList.move,
+        { group: 'five', id: 2 },
+        // @ts-expect-error
+        { sdf: 'never' },
+      );
+    () =>
+      controller.fetch(
+        UserResource.getList.move,
+        // @ts-expect-error
+        { sdf: 'five', id: 2 },
+        { id: 1 },
+      );
+  });
+
+  it('getList.move should work when entity lacks path param field', async () => {
+    // Entity has 'status' but NOT 'team' - team is only a URL path param
+    // Collection keys include both team (from path) and status (from searchParams)
+    class Task extends Entity {
+      readonly id: number | undefined = undefined;
+      readonly title: string = '';
+      readonly status: string = 'backlog';
+
+      pk() {
+        return this.id?.toString();
+      }
+    }
+
+    const TeamTaskResource = resource({
+      path: 'http\\://test.com/teams/:team/tasks/:id',
+      searchParams: {} as { status: string },
+      schema: Task,
+    });
+
+    mynock.patch(`/teams/alpha/tasks/3`).reply(200, (uri, body: any) => ({
+      id: 3,
+      title: 'My Task',
+      status: 'in-progress',
+      ...body,
+    }));
+
+    const { result, controller } = renderDataClient(
+      () => {
+        return {
+          task3: useQuery(Task, { id: 3 }),
+          backlog: useCache(TeamTaskResource.getList, {
+            team: 'alpha',
+            status: 'backlog',
+          }),
+          inProgress: useCache(TeamTaskResource.getList, {
+            team: 'alpha',
+            status: 'in-progress',
+          }),
+        };
+      },
+      {
+        initialFixtures: [
+          {
+            endpoint: TeamTaskResource.getList,
+            args: [{ team: 'alpha', status: 'backlog' }],
+            response: [
+              { id: 1, title: 'Task 1', status: 'backlog' },
+              { id: 3, title: 'My Task', status: 'backlog' },
+            ],
+          },
+          {
+            endpoint: TeamTaskResource.getList,
+            args: [{ team: 'alpha', status: 'in-progress' }],
+            response: [{ id: 2, title: 'Task 2', status: 'in-progress' }],
+          },
+        ],
+      },
+    );
+
+    expect(result.current.backlog).toHaveLength(2);
+    expect(result.current.inProgress).toHaveLength(1);
+
+    // PATCH /teams/alpha/tasks/3 - move task 3 from backlog to in-progress
+    // 'team' is only in URL params (not on entity); 'status' is in body and on entity
+    await act(async () => {
+      const response = await controller.fetch(
+        TeamTaskResource.getList.move,
+        { team: 'alpha', id: '3' },
+        { id: 3, status: 'in-progress' },
+      );
+      expect(response.id).toEqual(3);
+    });
+
+    // task should be removed from backlog
+    expect(result.current.backlog).toHaveLength(1);
+    expect(result.current.backlog?.[0]?.title).toBe('Task 1');
+
+    // task should be added to in-progress
+    expect(result.current.inProgress).toHaveLength(2);
+    expect(result.current.inProgress?.map((t: any) => t.title)).toEqual(
+      expect.arrayContaining(['Task 2', 'My Task']),
+    );
+
+    // entity should be updated
+    expect(result.current.task3?.status).toEqual('in-progress');
+  });
+
+  it('getList.move should work with searchParams-based collections', async () => {
+    class Task extends Entity {
+      readonly id: number | undefined = undefined;
+      readonly title: string = '';
+      readonly status: string = 'backlog';
+
+      pk() {
+        return this.id?.toString();
+      }
+    }
+
+    const TaskResource = resource({
+      path: 'http\\://test.com/tasks/:id',
+      searchParams: {} as { status: string },
+      schema: Task,
+    });
+
+    mynock.patch(`/tasks/3`).reply(200, (uri, body: any) => ({
+      id: 3,
+      title: 'My Task',
+      status: 'in-progress',
+      ...body,
+    }));
+
+    const { result, controller } = renderDataClient(
+      () => {
+        return {
+          task3: useQuery(Task, { id: 3 }),
+          backlog: useCache(TaskResource.getList, { status: 'backlog' }),
+          inProgress: useCache(TaskResource.getList, {
+            status: 'in-progress',
+          }),
+        };
+      },
+      {
+        initialFixtures: [
+          {
+            endpoint: TaskResource.getList,
+            args: [{ status: 'backlog' }],
+            response: [
+              { id: 1, title: 'Task 1', status: 'backlog' },
+              { id: 3, title: 'My Task', status: 'backlog' },
+            ],
+          },
+          {
+            endpoint: TaskResource.getList,
+            args: [{ status: 'in-progress' }],
+            response: [{ id: 2, title: 'Task 2', status: 'in-progress' }],
+          },
+        ],
+      },
+    );
+
+    expect(result.current.backlog).toHaveLength(2);
+    expect(result.current.inProgress).toHaveLength(1);
+
+    // PATCH /tasks/3 - moves task 3 from 'backlog' to 'in-progress'
+    await act(async () => {
+      const response = await controller.fetch(
+        TaskResource.getList.move,
+        { id: '3' },
+        { id: 3, status: 'in-progress' },
+      );
+      expect(response.id).toEqual(3);
+    });
+
+    // task should be removed from backlog
+    expect(result.current.backlog).toHaveLength(1);
+    expect(result.current.backlog?.[0]?.title).toBe('Task 1');
+
+    // task should be added to in-progress
+    expect(result.current.inProgress).toHaveLength(2);
+    expect(result.current.inProgress?.map((t: any) => t.title)).toEqual(
+      expect.arrayContaining(['Task 2', 'My Task']),
+    );
+
+    // entity should be updated
+    expect(result.current.task3?.status).toEqual('in-progress');
+  });
+
+  it('getList.move should work with FormData body', async () => {
+    class Task extends Entity {
+      readonly id: number | undefined = undefined;
+      readonly title: string = '';
+      readonly status: string = 'backlog';
+
+      pk() {
+        return this.id?.toString();
+      }
+    }
+
+    const TaskResource = resource({
+      path: 'http\\://test.com/tasks/:id',
+      searchParams: {} as { status: string },
+      schema: Task,
+    });
+
+    mynock.patch(`/tasks/3`).reply(200, (uri, body: any) => ({
+      id: 3,
+      title: 'My Task',
+      status: 'in-progress',
+      ...(body instanceof FormData ? Object.fromEntries(body.entries()) : body),
+    }));
+
+    const { result, controller } = renderDataClient(
+      () => {
+        return {
+          task3: useQuery(Task, { id: 3 }),
+          backlog: useCache(TaskResource.getList, { status: 'backlog' }),
+          inProgress: useCache(TaskResource.getList, {
+            status: 'in-progress',
+          }),
+        };
+      },
+      {
+        initialFixtures: [
+          {
+            endpoint: TaskResource.getList,
+            args: [{ status: 'backlog' }],
+            response: [
+              { id: 1, title: 'Task 1', status: 'backlog' },
+              { id: 3, title: 'My Task', status: 'backlog' },
+            ],
+          },
+          {
+            endpoint: TaskResource.getList,
+            args: [{ status: 'in-progress' }],
+            response: [{ id: 2, title: 'Task 2', status: 'in-progress' }],
+          },
+        ],
+      },
+    );
+
+    expect(result.current.backlog).toHaveLength(2);
+    expect(result.current.inProgress).toHaveLength(1);
+
+    // Use FormData as the body (simulates multipart form submission)
+    const formData = new FormData();
+    formData.append('id', '3');
+    formData.append('status', 'in-progress');
+
+    await act(async () => {
+      const response = await controller.fetch(
+        TaskResource.getList.move,
+        { id: '3' },
+        formData,
+      );
+      expect(response.id).toEqual(3);
+    });
+
+    // task should be removed from backlog
+    expect(result.current.backlog).toHaveLength(1);
+    expect(result.current.backlog?.[0]?.title).toBe('Task 1');
+
+    // task should be added to in-progress
+    expect(result.current.inProgress).toHaveLength(2);
+    expect(result.current.inProgress?.map((t: any) => t.title)).toEqual(
+      expect.arrayContaining(['Task 2', 'My Task']),
+    );
+
+    // entity should be updated
+    expect(result.current.task3?.status).toEqual('in-progress');
+  });
+
+  it('getList.move should work optimistically with path-based collections', async () => {
+    const OptUserResource = resource({
+      path: 'http\\://test.com/groups/:group/users/:id',
+      schema: User,
+      optimistic: true,
+    });
+
+    mynock.patch(`/groups/five/users/2`).reply(200, () => ({
+      id: 2,
+      username: 'user2',
+      email: 'user2@example.com',
+      group: 'ten',
+    }));
+
+    const { result, controller } = renderDataClient(
+      () => {
+        return {
+          user2: useQuery(User, { id: 2 }),
+          groupFive: useCache(OptUserResource.getList, { group: 'five' }),
+          groupTen: useCache(OptUserResource.getList, { group: 'ten' }),
+        };
+      },
+      {
+        initialFixtures: [
+          {
+            endpoint: OptUserResource.getList,
+            args: [{ group: 'five' }],
+            response: [
+              {
+                id: 1,
+                username: 'user1',
+                email: 'user1@example.com',
+                group: 'five',
+              },
+              {
+                id: 2,
+                username: 'user2',
+                email: 'user2@example.com',
+                group: 'five',
+              },
+            ],
+          },
+          {
+            endpoint: OptUserResource.getList,
+            args: [{ group: 'ten' }],
+            response: [
+              {
+                id: 3,
+                username: 'user3',
+                email: 'user3@example.com',
+                group: 'ten',
+              },
+            ],
+          },
+        ],
+      },
+    );
+
+    expect(OptUserResource.getList.move.getOptimisticResponse).toBeDefined();
+    expect(result.current.groupFive).toHaveLength(2);
+    expect(result.current.groupTen).toHaveLength(1);
+
+    let promise: any;
+    act(() => {
+      promise = controller.fetch(
+        OptUserResource.getList.move,
+        { group: 'five', id: '2' },
+        { id: 2, group: 'ten' },
+      );
+    });
+
+    // optimistic: should update immediately before network responds
+    expect(result.current.groupFive).toHaveLength(1);
+    expect(result.current.groupFive?.[0]?.username).toBe('user1');
+    expect(result.current.groupTen).toHaveLength(2);
+    expect(result.current.groupTen?.map((u: any) => u.username)).toEqual(
+      expect.arrayContaining(['user3', 'user2']),
+    );
+    expect(result.current.user2?.group).toEqual('ten');
+
+    // after server response, should still be correct
+    await act(() => promise);
+    expect(result.current.groupFive).toHaveLength(1);
+    expect(result.current.groupTen).toHaveLength(2);
+    expect(result.current.user2?.group).toEqual('ten');
+  });
+
+  it('getList.move should work optimistically with searchParams-based collections', async () => {
+    class Task extends Entity {
+      readonly id: number | undefined = undefined;
+      readonly title: string = '';
+      readonly status: string = 'backlog';
+
+      pk() {
+        return this.id?.toString();
+      }
+    }
+
+    const TaskResource = resource({
+      path: 'http\\://test.com/tasks/:id',
+      searchParams: {} as { status: string },
+      schema: Task,
+      optimistic: true,
+    });
+
+    mynock.patch(`/tasks/3`).reply(200, () => ({
+      id: 3,
+      title: 'My Task',
+      status: 'in-progress',
+    }));
+
+    const { result, controller } = renderDataClient(
+      () => {
+        return {
+          task3: useQuery(Task, { id: 3 }),
+          backlog: useCache(TaskResource.getList, { status: 'backlog' }),
+          inProgress: useCache(TaskResource.getList, {
+            status: 'in-progress',
+          }),
+        };
+      },
+      {
+        initialFixtures: [
+          {
+            endpoint: TaskResource.getList,
+            args: [{ status: 'backlog' }],
+            response: [
+              { id: 1, title: 'Task 1', status: 'backlog' },
+              { id: 3, title: 'My Task', status: 'backlog' },
+            ],
+          },
+          {
+            endpoint: TaskResource.getList,
+            args: [{ status: 'in-progress' }],
+            response: [{ id: 2, title: 'Task 2', status: 'in-progress' }],
+          },
+        ],
+      },
+    );
+
+    expect(TaskResource.getList.move.getOptimisticResponse).toBeDefined();
+    expect(result.current.backlog).toHaveLength(2);
+    expect(result.current.inProgress).toHaveLength(1);
+
+    let promise: any;
+    act(() => {
+      promise = controller.fetch(
+        TaskResource.getList.move,
+        { id: '3' },
+        { id: 3, status: 'in-progress' },
+      );
+    });
+
+    // optimistic: should update immediately before network responds
+    expect(result.current.backlog).toHaveLength(1);
+    expect(result.current.backlog?.[0]?.title).toBe('Task 1');
+    expect(result.current.inProgress).toHaveLength(2);
+    expect(result.current.inProgress?.map((t: any) => t.title)).toEqual(
+      expect.arrayContaining(['Task 2', 'My Task']),
+    );
+    expect(result.current.task3?.status).toEqual('in-progress');
+
+    // after server response, should still be correct
+    await act(() => promise);
+    expect(result.current.backlog).toHaveLength(1);
+    expect(result.current.inProgress).toHaveLength(2);
+    expect(result.current.task3?.status).toEqual('in-progress');
+  });
+
   it.each([
     {
       response: {
